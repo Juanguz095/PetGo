@@ -1,4 +1,4 @@
-# Bienestar Animal
+# Descripcion
 
 Aplicación Android para conectar a la comunidad con mascotas perdidas, encontradas y en adopción. Permite publicar alertas con ubicación en el mapa, reportar avistamientos de mascotas perdidas y gestionar adopciones.
 
