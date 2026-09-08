@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.Manifest
 import android.content.Context
@@ -128,18 +128,35 @@ class CrearDenunciaActivity : AppCompatActivity() {
         val desc = etDesc.text.toString().trim()
         val pt = punto
         if (desc.isEmpty()) {
-            tvError.text = "Escribe una descripción"; tvError.visibility = View.VISIBLE; return
+            tvError.text = "Escribe una descripción"
+            tvError.visibility = View.VISIBLE
+            return
         }
         if (pt == null) {
-            tvError.text = "Elige la ubicación"; tvError.visibility = View.VISIBLE; return
+            tvError.text = "Elige la ubicación"
+            tvError.visibility = View.VISIBLE
+            return
         }
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_enviar).isEnabled = false
+        val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_enviar)
+        button.isEnabled = false
         exec.execute {
-            ControladorDenuncias.insertarDenuncia(this, motivo, desc, fotoUri, pt.latitude, pt.longitude)
-            runOnUiThread { Toast.makeText(this, "Denuncia enviada", Toast.LENGTH_SHORT).show(); finish() }
+            try {
+                ControladorDenuncias.insertarDenuncia(
+                    this, motivo, desc, fotoUri, pt.latitude, pt.longitude
+                )
+                runOnUiThread {
+                    Toast.makeText(this, "Denuncia enviada", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            } catch (error: Exception) {
+                runOnUiThread {
+                    button.isEnabled = true
+                    tvError.text = error.message ?: "No se pudo enviar la denuncia"
+                    tvError.visibility = View.VISIBLE
+                }
+            }
         }
     }
-
     override fun onResume() {
         super.onResume(); map.onResume()
     }

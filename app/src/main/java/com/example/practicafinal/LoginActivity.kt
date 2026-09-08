@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.practicafinal.controlador.ControladorUsuarios
+import com.example.practicafinal.session.FavoritosManager
 import com.example.practicafinal.session.SesionManager
 import java.util.concurrent.Executors
 
@@ -53,17 +54,44 @@ class LoginActivity : AppCompatActivity() {
 
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login).isEnabled = false
         executor.execute {
-            val usuario = ControladorUsuarios.iniciarSesion(this, correo, contrasena)
-            runOnUiThread {
-                findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login).isEnabled = true
-                if (usuario != null) {
-                    SesionManager.guardarSesion(this, usuario.id)
-                    Toast.makeText(this, "¡Hola, ${usuario.nombre}!", Toast.LENGTH_SHORT).show()
-                    irAlMapa()
-                } else {
-                    mostrarError("Correo o contraseña incorrectos")
+            try {
+                val usuario = ControladorUsuarios.iniciarSesion(this, correo, contrasena)
+                runOnUiThread {
+                    findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login).isEnabled = true
+                    if (usuario != null) {
+                        SesionManager.guardarSesion(this, usuario.id)
+                        FavoritosManager.sincronizar(this)
+                        Toast.makeText(this, "¡Hola, ${usuario.nombre}!", Toast.LENGTH_SHORT).show()
+                        irAlMapa()
+                    } else {
+                        mostrarError("Correo o contraseña incorrectos")
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login).isEnabled = true
+                    mostrarError(traducirErrorFirebase(e))
                 }
             }
+        }
+    }
+
+    private fun traducirErrorFirebase(e: Exception): String {
+        val msg = e.message ?: ""
+        return when {
+            msg.contains("USER_NOT_FOUND", true) || msg.contains("user-not-found", true) ->
+                "No existe una cuenta con ese correo"
+            msg.contains("wrong-password", true) || msg.contains("INVALID_PASSWORD", true) ->
+                "Contraseña incorrecta"
+            msg.contains("INVALID_EMAIL", true) || msg.contains("malformed", true) ->
+                "El correo electrónico no es válido"
+            msg.contains("TOO_MANY_REQUESTS", true) || msg.contains("too-many-requests", true) ->
+                "Demasiados intentos. Espera unos minutos"
+            msg.contains("network", true) || msg.contains("timeout", true) || msg.contains("unavailable", true) ->
+                "Sin conexión a internet. Verifica tu red"
+            msg.contains("API key not valid", true) || msg.contains("api_key", true) ->
+                "Error de configuración de Firebase"
+            else -> "Error: ${e.localizedMessage ?: "Error desconocido"}"
         }
     }
 

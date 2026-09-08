@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.Manifest;
 import android.content.Context;
@@ -17,12 +17,14 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.practicafinal.controlador.ControladorAlbergues
 import com.example.practicafinal.controlador.ControladorPublicaciones
+import com.example.practicafinal.db.DatabaseHelper
 import com.example.practicafinal.modelo.Albergue
 import com.example.practicafinal.modelo.Avistamiento;
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.session.SesionManager;
 import com.example.practicafinal.util.fechaRelativa
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.firestore.ListenerRegistration
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
@@ -53,6 +55,11 @@ class MainActivity : AppCompatActivity() {
     private var pubActual: Publicacion? = null
     private lateinit var btnCercanas: TextView
     private var pendienteMostrarAlerta: Long? = null
+    private val firebaseListeners = mutableListOf<ListenerRegistration>()
+    private var listenersAttached = false
+    private var publicacionesActuales: List<Publicacion> = emptyList()
+    private var avistamientosActuales: List<Avistamiento> = emptyList()
+    private var alberguesActuales: List<Albergue> = emptyList()
 
     private val permiso = registerForActivityResult(ActivityResultContracts.RequestPermission()) { g ->
         if (g) centrarUsuario() else {
@@ -171,24 +178,41 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun centrarUsuario() {
-        val loc = getLastLoc(); if (loc != null) {
-            userLoc =
-                GeoPoint(loc.latitude, loc.longitude); marcUser(userLoc!!); circUser(userLoc!!); map.controller.setZoom(
-                19.5
-            ); map.controller.setCenter(userLoc)
-        } else try {
-            (getSystemService(Context.LOCATION_SERVICE) as LocationManager).requestSingleUpdate(
-                LocationManager.GPS_PROVIDER,
-                { loc ->
-                    userLoc = GeoPoint(
-                        loc.latitude,
-                        loc.longitude
-                    ); marcUser(userLoc!!); circUser(userLoc!!); map.controller.setZoom(19.5); map.controller.setCenter(
-                    userLoc
-                )
-                },
-                mainLooper
-            )
+        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        var ubicado = false
+
+        val callback = object : android.location.LocationListener {
+            override fun onLocationChanged(loc: Location) {
+                if (ubicado) return
+                ubicado = true
+                try { lm.removeUpdates(this) } catch (_: Exception) {}
+                userLoc = GeoPoint(loc.latitude, loc.longitude)
+                marcUser(userLoc!!); circUser(userLoc!!)
+                map.controller.setZoom(19.5); map.controller.setCenter(userLoc)
+            }
+            @Deprecated("Deprecated in Java")
+            override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) {}
+            override fun onProviderEnabled(provider: String) {}
+            override fun onProviderDisabled(provider: String) {}
+        }
+
+        try {
+            if (tienePermiso()) {
+                if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500L, 5f, callback, mainLooper)
+                if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000L, 10f, callback, mainLooper)
+
+                android.os.Handler(mainLooper).postDelayed({
+                    if (!ubicado) {
+                        ubicado = true
+                        try { lm.removeUpdates(callback) } catch (_: Exception) {}
+                        centrarLima()
+                    }
+                }, 15000)
+            } else {
+                centrarLima()
+            }
         } catch (_: SecurityException) {
             centrarLima()
         }
@@ -200,7 +224,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun marcUser(p: GeoPoint) {
         Marker(map).apply {
-            position = p; title = "Mi ubicación"; icon =
+            position = p; title = "Mi ubicaciÃ³n"; icon =
             ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_punto_azul); setAnchor(
             Marker.ANCHOR_CENTER,
             Marker.ANCHOR_CENTER
@@ -231,119 +255,65 @@ class MainActivity : AppCompatActivity() {
 
     private fun cargarBD() {
         exec.execute {
-            if (ControladorPublicaciones.obtenerPublicaciones(this).isEmpty()) {
-                ControladorPublicaciones.publicar(
+            try {
+                DatabaseHelper(this).seedIfNeeded()
+            } catch (error: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, "No se pudo sincronizar con Firebase", Toast.LENGTH_LONG).show()
+                }
+                return@execute
+            }
+            if (listenersAttached) return@execute
+            runOnUiThread {
+                if (listenersAttached) return@runOnUiThread
+                listenersAttached = true
+                val errorHandler: (Exception) -> Unit = {
+                    runOnUiThread {
+                        Toast.makeText(this, "Error de sincronización o red", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                firebaseListeners += ControladorPublicaciones.observarPublicaciones(
                     this,
-                    null,
-                    "Perdida",
-                    "Max",
-                    "Se perdió cerca del Centro de Lima",
-                    null,
-                    "Centro de Lima",
-                    "Perro",
-                    -12.0464,
-                    -77.0428
+                    { values ->
+                        publicacionesActuales = values
+                        render(
+                            publicacionesActuales,
+                            avistamientosActuales,
+                            alberguesActuales,
+                            publicacionesActuales.associate { it.id to it.nombre }
+                        )
+                    },
+                    errorHandler
                 )
-                ControladorPublicaciones.publicar(
+                firebaseListeners += ControladorPublicaciones.observarAvistamientos(
                     this,
-                    null,
-                    "Perdida",
-                    "Michi",
-                    "Se perdió en La Victoria",
-                    null,
-                    "La Victoria",
-                    "Gato",
-                    -12.0670,
-                    -77.0337
+                    { values ->
+                        avistamientosActuales = values
+                        render(
+                            publicacionesActuales,
+                            avistamientosActuales,
+                            alberguesActuales,
+                            publicacionesActuales.associate { it.id to it.nombre }
+                        )
+                    },
+                    errorHandler
                 )
-                ControladorPublicaciones.publicar(
+                firebaseListeners += ControladorAlbergues.observarAlbergues(
                     this,
-                    null,
-                    "Encontrada",
-                    "Luna",
-                    "Encontrado en Lince, busca dueño",
-                    null,
-                    "Lince",
-                    "Perro",
-                    -12.0911,
-                    -77.0359
-                )
-                ControladorPublicaciones.publicar(
-                    this,
-                    null,
-                    "Adopcion",
-                    "Bella",
-                    "Perrita cariñosa en busca de hogar",
-                    "android.resource://com.example.practicafinal/drawable/perro_adopcion",
-                    null,
-                    "Perro",
-                    -12.0580,
-                    -77.0360
-                )
-                ControladorPublicaciones.publicar(
-                    this,
-                    null,
-                    "Adopcion",
-                    "Simba",
-                    "Gatito juguetón esperando adopción",
-                    "android.resource://com.example.practicafinal/drawable/gato_adopcion",
-                    null,
-                    "Gato",
-                    -12.0700,
-                    -77.0480
-                )
-                ControladorPublicaciones.publicar(
-                    this,
-                    null,
-                    "Adopcion",
-                    "Rocky",
-                    "Perrito activo esperando un hogar",
-                    "android.resource://com.example.practicafinal/drawable/perro_rocky",
-                    null,
-                    "Perro",
-                    -12.0620,
-                    -77.0410
+                    { values ->
+                        alberguesActuales = values
+                        render(
+                            publicacionesActuales,
+                            avistamientosActuales,
+                            alberguesActuales,
+                            publicacionesActuales.associate { it.id to it.nombre }
+                        )
+                    },
+                    errorHandler
                 )
             }
-            if (ControladorAlbergues.obtenerAlbergues(this).isEmpty()) {
-                ControladorAlbergues.insertarAlbergue(
-                    this,
-                    "Albergue Patitas",
-                    "Refugio de mascotas",
-                    "Av. Universitaria 123",
-                    "999888777",
-                    "android.resource://com.example.practicafinal/drawable/albergue_patitas",
-                    -12.0850,
-                    -77.0050
-                )
-                ControladorAlbergues.insertarAlbergue(
-                    this,
-                    "Refugio Huellitas",
-                    "Hogar temporal",
-                    "Jr. Las Flores 456",
-                    "987654321",
-                    "android.resource://com.example.practicafinal/drawable/albergue_huellitas",
-                    -12.0200,
-                    -77.0800
-                )
-                ControladorAlbergues.insertarAlbergue(
-                    this,
-                    "Hogar Peludo",
-                    "Adopción responsable",
-                    "Calle Los Olivos 789",
-                    "912345678",
-                    "android.resource://com.example.practicafinal/drawable/albergue_peludo",
-                    -12.0760,
-                    -77.0620
-                )
-            }
-            val l = ControladorPublicaciones.obtenerPublicaciones(this)
-            val a = ControladorPublicaciones.obtenerAvistamientos(this)
-            val alb = ControladorAlbergues.obtenerAlbergues(this)
-            val n = l.associate { it.id to it.nombre }; runOnUiThread { render(l, a, alb, n) }
         }
     }
-
     private fun render(l: List<Publicacion>, a: List<Avistamiento>, alb: List<Albergue>, n: Map<Long, String>) {
         marcPub.forEach { map.overlays.remove(it) }; marcPub.clear(); marcAvist.forEach { map.overlays.remove(it) }; marcAvist.clear(); marcAlb.forEach {
             map.overlays.remove(
@@ -396,7 +366,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mostrarAlbergue(al: Albergue) {
-        pnlEmoji.text = "🏠"; pnlTit.text = al.nombre; pnlTipo.text = "Albergue"; pnlDesc.text =
+        pnlEmoji.text = "ðŸ "; pnlTit.text = al.nombre; pnlTipo.text = "Albergue"; pnlDesc.text =
             al.descripcion; pnlUbi.text = al.direccion; pnlEst.text =
             ""; pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled =
             false; pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = false
@@ -447,9 +417,9 @@ class MainActivity : AppCompatActivity() {
                         R.drawable.bg_dot_verde
                     ); else -> ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_dot_naranja)
                 }; (h.itemView.findViewById<TextView>(R.id.tv_info)).text =
-                    "${d.p.nombre} · ${String.format(Locale("es"), "%.1f km", d.km)} — ${
+                    "${d.p.nombre} Â· ${String.format(Locale("es"), "%.1f km", d.km)} â€” ${
                         when (d.p.tipo) {
-                            "Perdida" -> "Perdida"; "Encontrada" -> "Encontrada"; else -> "Adopción"
+                            "Perdida" -> "Perdida"; "Encontrada" -> "Encontrada"; else -> "AdopciÃ³n"
                         }
                     }"; h.itemView.setOnClickListener { centrarArriba(GeoPoint(d.p.latitud, d.p.longitud)) }
             };
@@ -465,20 +435,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun tl(t: String) = when (t) {
-        "Perdida" -> "Mascota perdida"; "Encontrada" -> "Mascota encontrada"; else -> "En adopción"
+        "Perdida" -> "Mascota perdida"; "Encontrada" -> "Mascota encontrada"; else -> "En adopciÃ³n"
     }
 
     private fun showPanel(pub: Publicacion) {
         pubActual = pub; pnlEmoji.text = when (pub.tipo) {
-            "Perdida" -> "🐾"; "Encontrada" -> "🐶"; else -> "🐱"
+            "Perdida" -> "ðŸ¾"; "Encontrada" -> "ðŸ¶"; else -> "ðŸ±"
         }; pnlTit.text = pub.nombre; pnlTipo.text =
-            if (pub.tipo == "Perdida" && pub.ultimoLugar != null) "Mascota perdida · Última vez: ${pub.ultimoLugar}" else tl(
+            if (pub.tipo == "Perdida" && pub.ultimoLugar != null) "Mascota perdida Â· Ãšltima vez: ${pub.ultimoLugar}" else tl(
                 pub.tipo
             ); pnlDesc.text = pub.descripcion;
         val d = GeoPoint(pub.latitud, pub.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }; pnlUbi.text =
-            if (d != null) "A %.1f km de ti".format(d) else "Lima, Perú";
+            if (d != null) "A %.1f km de ti".format(d) else "Lima, PerÃº";
         val r = pub.estado == "Resuelta"; pnlEst.text =
-            if (r) "Resuelta · ${fechaRelativa(pub.fechaCreacion)}" else "Activa · ${fechaRelativa(pub.fechaCreacion)}"; pnlEst.setTextColor(
+            if (r) "Resuelta Â· ${fechaRelativa(pub.fechaCreacion)}" else "Activa Â· ${fechaRelativa(pub.fechaCreacion)}"; pnlEst.setTextColor(
             ContextCompat.getColor(this, if (r) android.R.color.darker_gray else R.color.verde_estado)
         ); pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled =
             !r; pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = !r; pnl.visibility =
@@ -488,12 +458,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPanelAvist(a: Avistamiento, nom: String) {
-        pubActual = null; pnlEmoji.text = "👀"; pnlTit.text = "Avistamiento de $nom"; pnlTipo.text =
+        pubActual = null; pnlEmoji.text = "ðŸ‘€"; pnlTit.text = "Avistamiento de $nom"; pnlTipo.text =
             "Reportado por la comunidad"; pnlDesc.text =
-            a.descripcion.ifEmpty { "Alguien reportó haber visto a esta mascota aquí." };
+            a.descripcion.ifEmpty { "Alguien reportÃ³ haber visto a esta mascota aquÃ­." };
         val d = GeoPoint(a.latitud, a.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }; pnlUbi.text =
-            if (d != null) "A %.1f km de ti".format(d) else "Lima, Perú"; pnlEst.text =
-            "Avistamiento · ${fechaRelativa(a.fecha)}"; pnlEst.setTextColor(
+            if (d != null) "A %.1f km de ti".format(d) else "Lima, PerÃº"; pnlEst.text =
+            "Avistamiento Â· ${fechaRelativa(a.fecha)}"; pnlEst.setTextColor(
             ContextCompat.getColor(
                 this,
                 R.color.ambar_estado
@@ -514,10 +484,10 @@ class MainActivity : AppCompatActivity() {
     private fun verAvist() {
         val p = pubActual ?: return;
         val pt = userLoc ?: getLastLoc()?.let { GeoPoint(it.latitude, it.longitude) }; if (pt == null) {
-            Toast.makeText(this, "No tenemos tu ubicación", Toast.LENGTH_SHORT).show(); return
+            Toast.makeText(this, "No tenemos tu ubicaciÃ³n", Toast.LENGTH_SHORT).show(); return
         }; exec.execute {
             ControladorPublicaciones.actualizarAvistamiento(this, p.id, pt.latitude, pt.longitude); runOnUiThread {
-            Toast.makeText(this, "¡Gracias!", Toast.LENGTH_SHORT).show(); ocultarPanel(); cargarBD()
+            Toast.makeText(this, "Â¡Gracias!", Toast.LENGTH_SHORT).show(); ocultarPanel(); cargarBD()
         }
         }
     }
@@ -527,7 +497,7 @@ class MainActivity : AppCompatActivity() {
             ControladorPublicaciones.resolver(this, p.id); runOnUiThread {
             Toast.makeText(
                 this,
-                "¡Resuelta!",
+                "Â¡Resuelta!",
                 Toast.LENGTH_SHORT
             ).show(); ocultarPanel(); cargarBD()
         }
@@ -535,7 +505,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun txt(pub: Publicacion) =
-        "${pub.nombre} · ${tl(pub.tipo)}\n${pub.descripcion}\nEstado: ${pub.estado} · ${fechaRelativa(pub.fechaCreacion)}\nhttps://maps.google.com/?q=${pub.latitud},${pub.longitud}"
+        "${pub.nombre} Â· ${tl(pub.tipo)}\n${pub.descripcion}\nEstado: ${pub.estado} Â· ${fechaRelativa(pub.fechaCreacion)}\nhttps://maps.google.com/?q=${pub.latitud},${pub.longitud}"
 
     private fun enviarWA() {
         val p = pubActual ?: return; try {
@@ -560,6 +530,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        firebaseListeners.forEach { it.remove() }
+        firebaseListeners.clear()
         super.onDestroy(); exec.shutdown()
     }
 }

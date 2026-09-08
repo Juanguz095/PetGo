@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.Manifest
 import android.content.Context
@@ -218,27 +218,35 @@ class CrearPublicacionActivity : AppCompatActivity() {
 
         val error = ControladorPublicaciones.validarPublicacion(nombre, descripcion)
         if (error != null) {
-            mostrarError(error); return
+            mostrarError(error)
+            return
         }
         if (punto == null) {
-            mostrarError("Elige una ubicación en el mapa"); return
+            mostrarError("Elige una ubicación en el mapa")
+            return
         }
 
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar).isEnabled = false
+        val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar)
+        button.isEnabled = false
         executor.execute {
-            val usuarioId = SesionManager.obtenerUsuarioId(this)
-            ControladorPublicaciones.publicar(
-                this, usuarioId, tipoSeleccionado, nombre, descripcion,
-                fotoUri, ultimoLugar, especie,
-                punto.latitude, punto.longitude
-            )
-            runOnUiThread {
-                Toast.makeText(this, "¡Publicación creada!", Toast.LENGTH_SHORT).show()
-                finish()
+            try {
+                val usuarioId = SesionManager.obtenerUsuarioId(this)
+                ControladorPublicaciones.publicar(
+                    this, usuarioId, tipoSeleccionado, nombre, descripcion,
+                    fotoUri, ultimoLugar, especie, punto.latitude, punto.longitude
+                )
+                runOnUiThread {
+                    Toast.makeText(this, "¡Publicación creada!", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            } catch (error: Exception) {
+                runOnUiThread {
+                    button.isEnabled = true
+                    mostrarError(error.message ?: "No se pudo guardar la publicación")
+                }
             }
         }
     }
-
     private fun mostrarError(mensaje: String) {
         tvError.text = mensaje
         tvError.visibility = View.VISIBLE

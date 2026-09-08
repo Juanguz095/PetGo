@@ -1,0 +1,34 @@
+{
+  "project_info": {
+    "project_number": "946336898390",
+    "project_id": "petgo-325bb",
+    "storage_bucket": "petgo-325bb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946336898390:android:c6e06c418ad7047cb28af7",
+        "android_client_info": {
+          "package_name": "com.example.practicafinal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "946336898390-5ij4apdlljs42mgggggl49g0hgn4bpk7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtCNYMZo_ydC-kp5dIt-YlV39JR53AH4A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.practicafinal.controlador.ControladorUsuarios
+import com.example.practicafinal.session.FavoritosManager
 import com.example.practicafinal.session.SesionManager
 import java.util.concurrent.Executors
 
@@ -50,18 +51,42 @@ class RegistroActivity : AppCompatActivity() {
 
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = false
         executor.execute {
-            val id = ControladorUsuarios.registrar(this, nombre, correo, contrasena)
-            runOnUiThread {
-                findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled =
-                    true
-                if (id != null) {
-                    SesionManager.guardarSesion(this, id)
-                    Toast.makeText(this, "¡Cuenta creada!", Toast.LENGTH_SHORT).show()
-                    irAlMapa()
-                } else {
-                    mostrarError("Ese correo ya está registrado")
+            try {
+                val id = ControladorUsuarios.registrar(this, nombre, correo, contrasena)
+                runOnUiThread {
+                    findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = true
+                    if (id != null) {
+                        SesionManager.guardarSesion(this, id)
+                        FavoritosManager.sincronizar(this)
+                        Toast.makeText(this, "¡Cuenta creada!", Toast.LENGTH_SHORT).show()
+                        irAlMapa()
+                    } else {
+                        mostrarError("No se pudo crear la cuenta")
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = true
+                    mostrarError(traducirErrorFirebase(e))
                 }
             }
+        }
+    }
+
+    private fun traducirErrorFirebase(e: Exception): String {
+        val msg = e.message ?: ""
+        return when {
+            msg.contains("EMAIL_ALREADY_IN_USE", true) || msg.contains("email-already-in-use", true) ->
+                "Ese correo ya está registrado"
+            msg.contains("WEAK_PASSWORD", true) || msg.contains("password", true) && msg.contains("too short", true) ->
+                "La contraseña es muy débil (mínimo 6 caracteres)"
+            msg.contains("INVALID_EMAIL", true) || msg.contains("malformed", true) ->
+                "El correo electrónico no es válido"
+            msg.contains("network", true) || msg.contains("timeout", true) || msg.contains("unavailable", true) ->
+                "Sin conexión a internet. Verifica tu red"
+            msg.contains("API key not valid", true) || msg.contains("api_key", true) ->
+                "Error de configuración de Firebase"
+            else -> "Error: ${e.localizedMessage ?: "Error desconocido"}"
         }
     }
 

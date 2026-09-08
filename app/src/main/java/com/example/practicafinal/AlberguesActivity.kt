@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.Manifest
 import android.content.Context
@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.practicafinal.controlador.ControladorAlbergues
 import com.example.practicafinal.modelo.Albergue
-import com.example.practicafinal.util.decodificarImagen
+import com.bumptech.glide.Glide
 import org.osmdroid.util.GeoPoint
 import java.util.Locale
 import java.util.concurrent.Executors
@@ -116,7 +116,7 @@ class AlberguesActivity : AppCompatActivity() {
                 ControladorAlbergues.insertarAlbergue(
                     this,
                     "Hogar Peludo",
-                    "Adopción responsable",
+                    "AdopciÃ³n responsable",
                     "Calle Los Olivos 789",
                     "912345678",
                     null,
@@ -148,15 +148,18 @@ class AlberguesActivity : AppCompatActivity() {
 
             override fun onBindViewHolder(h: RecyclerView.ViewHolder, pos: Int) {
                 val a = filtrados[pos]
-                val foto = a.foto?.let { decodificarImagen(h.itemView.context, it, 4) }
                 val img = h.itemView.findViewById<android.widget.ImageView>(R.id.img_foto)
                 val pl = h.itemView.findViewById<TextView>(R.id.tv_placeholder)
-                if (foto != null) {
-                    img.setImageBitmap(foto); pl.visibility = View.GONE
-                } else pl.visibility = View.VISIBLE
+                if (!a.foto.isNullOrBlank()) {
+                    Glide.with(h.itemView.context).load(a.foto).into(img)
+                    pl.visibility = View.GONE
+                } else {
+                    img.setImageDrawable(null)
+                    pl.visibility = View.VISIBLE
+                }
                 (h.itemView.findViewById<TextView>(R.id.tv_nombre)).text = a.nombre
                 (h.itemView.findViewById<TextView>(R.id.tv_direccion)).text = a.direccion
-                (h.itemView.findViewById<TextView>(R.id.tv_telefono)).text = "📞 ${a.telefono}"
+                (h.itemView.findViewById<TextView>(R.id.tv_telefono)).text = "ðŸ“ž ${a.telefono}"
                 if (userLoc != null) (h.itemView.findViewById<TextView>(R.id.tv_distancia)).text = String.format(
                     Locale("es"),
                     "A %.1f km",

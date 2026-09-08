@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
+        android:name=".PetGoApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,6 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PracticaFinal">
+        <meta-data
+            android:name="com.google.firebase.apiKey"
+            android:value="AIzaSyB0wKntYPlNf-0IqgXowwkmCSdviVJIejg" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">

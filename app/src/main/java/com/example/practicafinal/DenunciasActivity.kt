@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.practicafinal.controlador.ControladorDenuncias
-import com.example.practicafinal.util.decodificarImagen
+import com.bumptech.glide.Glide
 import com.example.practicafinal.util.fechaRelativa
 import java.util.concurrent.Executors
 
@@ -33,7 +33,7 @@ class DenunciasActivity : AppCompatActivity() {
     }
 
     private fun iconoMotivo(m: String) = when (m) {
-        "Maltrato" -> "🚨"; "Abandono" -> "🏚️"; else -> "💰"
+        "Maltrato" -> "ðŸš¨"; "Abandono" -> "ðŸšï¸"; else -> "ðŸ’°"
     }
 
     private fun cargar() {
@@ -48,14 +48,15 @@ class DenunciasActivity : AppCompatActivity() {
 
                     override fun onBindViewHolder(h: RecyclerView.ViewHolder, pos: Int) {
                         val d = lista[pos]
-                        val foto = d.foto?.let { decodificarImagen(h.itemView.context, it, 8) }
                         val img = h.itemView.findViewById<android.widget.ImageView>(R.id.img_foto)
                         val pl = h.itemView.findViewById<TextView>(R.id.tv_placeholder)
-                        if (foto != null) {
-                            img.setImageBitmap(foto); pl.visibility = View.GONE
-                            pl.text = iconoMotivo(d.motivo)
+                        pl.text = iconoMotivo(d.motivo)
+                        if (!d.foto.isNullOrBlank()) {
+                            Glide.with(h.itemView.context).load(d.foto).into(img)
+                            pl.visibility = View.GONE
                         } else {
-                            pl.visibility = View.VISIBLE; pl.text = iconoMotivo(d.motivo)
+                            img.setImageDrawable(null)
+                            pl.visibility = View.VISIBLE
                         }
                         (h.itemView.findViewById<TextView>(R.id.tv_motivo)).text =
                             "${iconoMotivo(d.motivo)} ${d.motivo}"

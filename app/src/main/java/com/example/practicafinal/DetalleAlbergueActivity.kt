@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.content.Intent
 import android.net.Uri
@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.practicafinal.controlador.ControladorAlbergues
-import com.example.practicafinal.util.decodificarImagen
+import com.bumptech.glide.Glide
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
@@ -39,12 +39,14 @@ class DetalleAlbergueActivity : AppCompatActivity() {
                 if (a == null) {
                     finish(); return@runOnUiThread
                 }
-                val foto = a.foto?.let { decodificarImagen(this, it, 2) }
                 val img = findViewById<android.widget.ImageView>(R.id.img_foto)
                 val pl = findViewById<TextView>(R.id.tv_placeholder)
-                if (foto != null) {
-                    img.setImageBitmap(foto); pl.visibility = View.GONE
-                } else pl.visibility = View.VISIBLE
+                if (!a.foto.isNullOrBlank()) {
+                    Glide.with(this).load(a.foto).into(img)
+                    pl.visibility = View.GONE
+                } else {
+                    pl.visibility = View.VISIBLE
+                }
 
                 findViewById<TextView>(R.id.tv_nombre).text = a.nombre
                 findViewById<TextView>(R.id.tv_descripcion).text = a.descripcion

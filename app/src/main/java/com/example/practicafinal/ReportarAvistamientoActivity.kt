@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.Manifest
 import android.content.Context
@@ -68,7 +68,7 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
             .setNavigationOnClickListener { finish() }
 
         val nombre = intent.getStringExtra(EXTRA_NOMBRE) ?: "la mascota"
-        findViewById<TextView>(R.id.tv_mascota).text = "👀 Avistamiento de $nombre"
+        findViewById<TextView>(R.id.tv_mascota).text = "ðŸ‘€ Avistamiento de $nombre"
 
         etDescripcion = findViewById(R.id.et_descripcion)
         imgFotoAvist = findViewById(R.id.img_foto_avist)
@@ -148,20 +148,31 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
             return
         }
         val descripcion = etDescripcion.text.toString().trim()
-
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_reportar).isEnabled = false
+        val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_reportar)
+        button.isEnabled = false
         executor.execute {
-            val usuarioId = SesionManager.obtenerUsuarioId(this)
-            ControladorPublicaciones.reportarAvistamiento(
-                this, publicacionId, usuarioId, punto.latitude, punto.longitude, descripcion, fotoAvistUri
-            )
-            runOnUiThread {
-                Toast.makeText(this, "¡Avistamiento reportado! Gracias 🙌", Toast.LENGTH_SHORT).show()
-                finish()
+            try {
+                val usuarioId = SesionManager.obtenerUsuarioId(this)
+                ControladorPublicaciones.reportarAvistamiento(
+                    this, publicacionId, usuarioId, punto.latitude, punto.longitude,
+                    descripcion, fotoAvistUri
+                )
+                runOnUiThread {
+                    Toast.makeText(this, "¡Avistamiento reportado!", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            } catch (error: Exception) {
+                runOnUiThread {
+                    button.isEnabled = true
+                    Toast.makeText(
+                        this,
+                        error.message ?: "No se pudo guardar el avistamiento",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }
-
     override fun onResume() {
         super.onResume()
         map.onResume()

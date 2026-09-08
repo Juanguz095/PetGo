@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.content.Intent
 import android.net.Uri
@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.practicafinal.controlador.ControladorPublicaciones
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.session.FavoritosManager
-import com.example.practicafinal.util.decodificarImagen
+import com.bumptech.glide.Glide
 import java.util.concurrent.Executors
 
 class DetalleAdopcionActivity : AppCompatActivity() {
@@ -53,15 +53,14 @@ class DetalleAdopcionActivity : AppCompatActivity() {
         
         val imgFoto = findViewById<android.widget.ImageView>(R.id.img_foto)
         val tvPlaceholder = findViewById<TextView>(R.id.tv_placeholder)
-        val foto = p.foto?.let { decodificarImagen(this, it, 2) }
-        if (foto != null) {
-            imgFoto.setImageBitmap(foto)
+        if (!p.foto.isNullOrBlank()) {
+            Glide.with(this).load(p.foto).into(imgFoto)
             tvPlaceholder.visibility = View.GONE
         } else {
             tvPlaceholder.visibility = View.VISIBLE
-        }
 
         
+        }
         val tvEspecie = findViewById<TextView>(R.id.tv_especie_detalle)
         if (!p.especie.isNullOrEmpty()) {
             tvEspecie.text = p.especie
@@ -75,7 +74,7 @@ class DetalleAdopcionActivity : AppCompatActivity() {
 
         
         findViewById<TextView>(R.id.tv_ubicacion).apply {
-            text = "📍 Ver ubicación en el mapa"
+            text = "ðŸ“ Ver ubicaciÃ³n en el mapa"
             setOnClickListener {
                 val intent = Intent(this@DetalleAdopcionActivity, MainActivity::class.java).apply {
                     putExtra("centrar_lat", p.latitud)
@@ -102,12 +101,12 @@ class DetalleAdopcionActivity : AppCompatActivity() {
 
     private fun actualizarBotonFavorito(btn: com.google.android.material.button.MaterialButton) {
         val esFav = FavoritosManager.esFavorito(this, publicacionId)
-        btn.text = if (esFav) "❤  Quitar de favoritos" else "🤍  Agregar a favoritos"
+        btn.text = if (esFav) "â¤  Quitar de favoritos" else "ðŸ¤  Agregar a favoritos"
     }
 
     private fun contactarWhatsApp(p: Publicacion) {
         val texto =
-            "${p.nombre} · En adopción\n${p.descripcion}\n📍 https://maps.google.com/?q=${p.latitud},${p.longitud}"
+            "${p.nombre} Â· En adopciÃ³n\n${p.descripcion}\nðŸ“ https://maps.google.com/?q=${p.latitud},${p.longitud}"
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/?text=${Uri.encode(texto)}")))
         } catch (_: Exception) {

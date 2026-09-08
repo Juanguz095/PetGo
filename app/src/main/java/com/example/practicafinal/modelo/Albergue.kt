@@ -1,4 +1,4 @@
-package com.example.practicafinal.modelo
+﻿package com.example.practicafinal.modelo
 
 data class Albergue(
     val id: Long,
@@ -9,4 +9,14 @@ data class Albergue(
     val foto: String?,
     val latitud: Double,
     val longitud: Double
-)
+) {
+    fun toFirestoreMap(): Map<String, Any> = buildMap {
+        put("nombre", nombre)
+        put("descripcion", descripcion)
+        put("direccion", direccion)
+        put("telefono", telefono)
+        foto?.let { put("foto", it) }
+        put("latitud", latitud)
+        put("longitud", longitud)
+    }
+}
