@@ -73,6 +73,26 @@
         app:layout_constraintTop_toBottomOf="@id/btn_leyenda" />
 
     
+    <TextView
+        android:id="@+id/btn_notificaciones"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_chip_map"
+        android:elevation="2dp"
+        android:paddingStart="12dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="5dp"
+        android:text="🔔  Notificaciones"
+        android:textColor="@color/text_primary"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_cercanas" />
+
+    
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_recenter"
         android:layout_width="wrap_content"

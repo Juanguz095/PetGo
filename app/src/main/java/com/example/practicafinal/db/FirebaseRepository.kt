@@ -34,6 +34,7 @@ class FirebaseRepository(private val context: Context) {
         private const val SIGHTINGS = "avistamientos"
         private const val SHELTERS = "albergues"
         private const val REPORTS = "denuncias"
+        private const val NOTIFICATIONS = "notificaciones"
     }
 
     private val db: FirebaseFirestore
@@ -191,6 +192,26 @@ class FirebaseRepository(private val context: Context) {
             System.currentTimeMillis()
         )
         await(db.collection(SIGHTINGS).document(id.toString()).set(sighting.toFirestoreMap(currentUid())))
+
+        val pubSnapshot = await(db.collection(PUBLICATIONS).document(publicacionId.toString()).get())
+        val ownerUid = pubSnapshot.getString("usuarioId")
+        val petName = pubSnapshot.getString("nombre") ?: "la mascota"
+        if (!ownerUid.isNullOrEmpty() && ownerUid != uid) {
+            val notifId = newId()
+            val notif = hashMapOf(
+                "id" to notifId.toString(),
+                "usuarioDestinoId" to ownerUid,
+                "usuarioOrigenId" to uid,
+                "tipo" to "avistamiento",
+                "publicacionId" to publicacionId.toString(),
+                "mensaje" to "Vieron a $petName",
+                "latitud" to latitud,
+                "longitud" to longitud,
+                "fecha" to System.currentTimeMillis(),
+                "leida" to false
+            )
+            await(db.collection(NOTIFICATIONS).document(notifId.toString()).set(notif))
+        }
         return id
     }
 
@@ -261,6 +282,53 @@ class FirebaseRepository(private val context: Context) {
             .map { it.toDenuncia() }.sortedByDescending { it.fecha }
     }
 
+    fun obtenerNotificaciones(): List<Map<String, Any>> {
+        val uid = currentUid()
+        if (uid.isEmpty()) return emptyList()
+        return await(db.collection(NOTIFICATIONS)
+            .whereEqualTo("usuarioDestinoId", uid)
+            .orderBy("fecha").get()).documents.mapNotNull { doc ->
+            val map = mutableMapOf<String, Any>()
+            map["id"] = doc.id
+            map["mensaje"] = doc.getString("mensaje").orEmpty()
+            map["tipo"] = doc.getString("tipo").orEmpty()
+            map["publicacionId"] = doc.getString("publicacionId").orEmpty()
+            map["fecha"] = (doc.get("fecha") as? Number)?.toLong() ?: 0L
+            map["leida"] = doc.getBoolean("leida") ?: false
+            map["latitud"] = (doc.get("latitud") as? Number)?.toDouble() ?: 0.0
+            map["longitud"] = (doc.get("longitud") as? Number)?.toDouble() ?: 0.0
+            map["usuarioOrigenId"] = doc.getString("usuarioOrigenId").orEmpty()
+            map
+        }.sortedByDescending { it["fecha"] as Long }
+    }
+
+    fun contarNoLeidas(): Int {
+        val uid = currentUid()
+        if (uid.isEmpty()) return 0
+        return await(db.collection(NOTIFICATIONS)
+            .whereEqualTo("usuarioDestinoId", uid)
+            .whereEqualTo("leida", false)
+            .get()).size()
+    }
+
+    fun marcarNotificacionLeida(notifId: String) {
+        await(db.collection(NOTIFICATIONS).document(notifId).update("leida", true))
+    }
+
+    fun marcarTodasLeidas() {
+        val uid = currentUid()
+        if (uid.isEmpty()) return
+        val snapshot = await(db.collection(NOTIFICATIONS)
+            .whereEqualTo("usuarioDestinoId", uid)
+            .whereEqualTo("leida", false)
+            .get())
+        val batch = db.batch()
+        for (doc in snapshot.documents) {
+            batch.update(doc.reference, "leida", true)
+        }
+        await(batch.commit())
+    }
+
     fun seedIfNeeded() {
         val uid = currentUid()
         val publications = db.collection(PUBLICATIONS)
@@ -315,17 +383,43 @@ class FirebaseRepository(private val context: Context) {
             else onChanged(snapshot?.documents.orEmpty().map { it.toAlbergue() })
         }
 
-    private fun uploadPhoto(value: String, path: String): String {
+    private fun uploadPhoto(value: String, path: String): String? {
         val uri = Uri.parse(value)
         if (uri.scheme == "http" || uri.scheme == "https" || uri.scheme == "android.resource") return value
-        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-            ?: throw IllegalArgumentException("No se pudo leer la imagen")
-        require(bytes.size.toLong() <= MAX_IMAGE_BYTES) { "La imagen supera 5 MB" }
-        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-        val payload = if (bitmap == null) bytes else compress(bitmap)
-        val reference = storage.reference.child(path)
-        await(reference.putBytes(payload))
-        return await(reference.downloadUrl).toString()
+        return try {
+            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                ?: return null
+            if (bytes.size.toLong() > MAX_IMAGE_BYTES) return null
+            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            val payload = if (bitmap == null) bytes else compress(bitmap)
+            uploadViaRest(path, payload)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun uploadViaRest(path: String, bytes: ByteArray): String {
+        val bucket = "petgo-325bb.firebasestorage.app"
+        val encodedPath = java.net.URLEncoder.encode(path, "UTF-8")
+        val uploadUrl = URL("https://firebasestorage.googleapis.com/v0/b/$bucket/o?uploadType=media&name=$encodedPath")
+        val conn = (uploadUrl.openConnection() as HttpURLConnection).apply {
+            requestMethod = "POST"
+            setRequestProperty("Content-Type", "image/jpeg")
+            setRequestProperty("Content-Length", bytes.size.toString())
+            doOutput = true
+            connectTimeout = 30000
+            readTimeout = 30000
+        }
+        conn.outputStream.use { it.write(bytes) }
+        val code = conn.responseCode
+        val stream = if (code in 200..299) conn.inputStream else conn.errorStream
+        val response = stream.bufferedReader().use { it.readText() }
+        if (code !in 200..299) {
+            throw Exception("Upload failed: $response")
+        }
+        val json = JSONObject(response)
+        val downloadToken = json.getString("downloadTokens")
+        return "https://firebasestorage.googleapis.com/v0/b/$bucket/o/${encodedPath}?alt=media&token=$downloadToken"
     }
 
     private fun compress(bitmap: Bitmap): ByteArray {

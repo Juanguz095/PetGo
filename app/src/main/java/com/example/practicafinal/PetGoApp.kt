@@ -3,12 +3,14 @@ package com.example.practicafinal
 import android.app.Application
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.practicafinal.util.NotificacionHelper
 import com.google.firebase.FirebaseApp
 
 class PetGoApp : Application() {
     override fun onCreate() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
+        NotificacionHelper.crearCanal(this)
 
         val prefs = getSharedPreferences("configuracion", MODE_PRIVATE)
         val modo = prefs.getInt("modo_tema", -1)

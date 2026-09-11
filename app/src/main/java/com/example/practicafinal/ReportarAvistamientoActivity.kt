@@ -14,7 +14,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.practicafinal.controlador.ControladorPublicaciones
+import com.example.practicafinal.db.DatabaseHelper
 import com.example.practicafinal.session.SesionManager
+import com.example.practicafinal.util.NotificacionHelper
 import com.example.practicafinal.util.decodificarImagen
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -68,7 +70,7 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
             .setNavigationOnClickListener { finish() }
 
         val nombre = intent.getStringExtra(EXTRA_NOMBRE) ?: "la mascota"
-        findViewById<TextView>(R.id.tv_mascota).text = "ðŸ‘€ Avistamiento de $nombre"
+        findViewById<TextView>(R.id.tv_mascota).text = "Avistamiento de $nombre"
 
         etDescripcion = findViewById(R.id.et_descripcion)
         imgFotoAvist = findViewById(R.id.img_foto_avist)
@@ -157,8 +159,22 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
                     this, publicacionId, usuarioId, punto.latitude, punto.longitude,
                     descripcion, fotoAvistUri
                 )
+
+                val pub = ControladorPublicaciones.obtenerPorId(this, publicacionId)
+                if (pub != null) {
+                    NotificacionHelper.notificarAvistamiento(
+                        this,
+                        publicacionId.toInt(),
+                        pub.nombre,
+                        descripcion,
+                        publicacionId,
+                        punto.latitude,
+                        punto.longitude
+                    )
+                }
+
                 runOnUiThread {
-                    Toast.makeText(this, "¡Avistamiento reportado!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Avistamiento reportado!", Toast.LENGTH_SHORT).show()
                     finish()
                 }
             } catch (error: Exception) {

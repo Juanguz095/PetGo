@@ -84,4 +84,9 @@ class DatabaseHelper(context: Context) {
         onChanged: (List<Albergue>) -> Unit,
         onError: (Exception) -> Unit
     ): ListenerRegistration = repository.observarAlbergues(onChanged, onError)
+
+    fun obtenerNotificaciones(): List<Map<String, Any>> = repository.obtenerNotificaciones()
+    fun contarNoLeidas(): Int = repository.contarNoLeidas()
+    fun marcarNotificacionLeida(notifId: String) = repository.marcarNotificacionLeida(notifId)
+    fun marcarTodasLeidas() = repository.marcarTodasLeidas()
 }

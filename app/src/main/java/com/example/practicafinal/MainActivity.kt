@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build
 import android.os.Bundle
 import android.view.View;
 import android.widget.TextView;
@@ -54,7 +55,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pnlUbi: TextView;
     private lateinit var pnlEst: TextView;
     private var pubActual: Publicacion? = null
+    private var marcBusqAvist: MutableList<Polygon> = mutableListOf()
     private lateinit var btnCercanas: TextView
+    private lateinit var btnNotificaciones: TextView
     private var pendienteMostrarAlerta: Long? = null
     private val firebaseListeners = mutableListOf<ListenerRegistration>()
     private var listenersAttached = false
@@ -67,6 +70,8 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Permiso denegado", Toast.LENGTH_SHORT).show(); centrarLima()
         }
     }
+
+    private val permisoNotif = registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ -> }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,6 +139,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_zoom_in).setOnClickListener { map.controller.zoomIn() }
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_zoom_out).setOnClickListener { map.controller.zoomOut() }
         btnCercanas = findViewById(R.id.btn_cercanas); btnCercanas.setOnClickListener { dialogoCercanas() }
+        btnNotificaciones = findViewById(R.id.btn_notificaciones)
+        btnNotificaciones.setOnClickListener {
+            startActivity(Intent(this, NotificacionesActivity::class.java))
+        }
         cargarBD()
         val clat = intent.getDoubleExtra("centrar_lat", Double.NaN);
         val clng = intent.getDoubleExtra("centrar_lng", Double.NaN)
@@ -143,6 +152,14 @@ class MainActivity : AppCompatActivity() {
         val alertaId = intent.getLongExtra("mostrar_alerta", -1L)
         if (alertaId != -1L) pendienteMostrarAlerta = alertaId
         if (tienePermiso()) centrarUsuario() else permiso.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                permisoNotif.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -226,7 +243,7 @@ class MainActivity : AppCompatActivity() {
     private fun marcUser(p: GeoPoint) {
         if (markerUsuario == null) {
             markerUsuario = Marker(map).apply {
-                position = p; title = "Mi ubicaciÃ³n"; icon =
+                position = p; title = "Mi ubicacion"; icon =
                 ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_punto_azul); setAnchor(
                     Marker.ANCHOR_CENTER,
                     Marker.ANCHOR_CENTER
@@ -327,6 +344,7 @@ class MainActivity : AppCompatActivity() {
                 it
             )
         }; marcAlb.clear()
+        marcBusqAvist.forEach { map.overlays.remove(it) }; marcBusqAvist.clear()
         for (pub in l) {
             val m = Marker(map); m.position = GeoPoint(pub.latitud, pub.longitud); m.icon =
                 ContextCompat.getDrawable(this, ico(pub)); m.setAnchor(
@@ -365,6 +383,9 @@ class MainActivity : AppCompatActivity() {
                 }; true
             }; map.overlays.add(m); marcAlb.add(m)
         }
+
+        dibujarBusquedaColaborativa(l, a)
+
         map.invalidate(); actualizarBtnCercanas(l)
         pendienteMostrarAlerta?.let { id ->
             pendienteMostrarAlerta = null
@@ -373,12 +394,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun mostrarAlbergue(al: Albergue) {
-        pnlEmoji.text = "ðŸ "; pnlTit.text = al.nombre; pnlTipo.text = "Albergue"; pnlDesc.text =
-            al.descripcion; pnlUbi.text = al.direccion; pnlEst.text =
-            ""; pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled =
-            false; pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = false
-        pnl.visibility = View.VISIBLE; pnl.alpha = 0f; pnl.post {
-            pnl.translationY = pnl.height.toFloat(); pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
+        pnlEmoji.text = "ALBERGUE"
+        pnlEmoji.setTextColor(ContextCompat.getColor(this, R.color.colorSecondary))
+        pnlEmoji.textSize = 14f
+        pnlTit.text = al.nombre
+        pnlTipo.text = "Albergue"
+        pnlDesc.text = al.descripcion
+        pnlUbi.text = al.direccion
+        pnlEst.text = ""
+        pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled = false
+        pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = false
+        pnl.visibility = View.VISIBLE
+        pnl.alpha = 0f
+        pnl.post {
+            pnl.translationY = pnl.height.toFloat()
+            pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
         }
     }
 
@@ -424,9 +454,9 @@ class MainActivity : AppCompatActivity() {
                         R.drawable.bg_dot_verde
                     ); else -> ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_dot_naranja)
                 }; (h.itemView.findViewById<TextView>(R.id.tv_info)).text =
-                    "${d.p.nombre} Â· ${String.format(Locale("es"), "%.1f km", d.km)} â€” ${
+                    "${d.p.nombre} . ${String.format(Locale("es"), "%.1f km", d.km)} - ${
                         when (d.p.tipo) {
-                            "Perdida" -> "Perdida"; "Encontrada" -> "Encontrada"; else -> "AdopciÃ³n"
+                            "Perdida" -> "Perdida"; "Encontrada" -> "Encontrada"; else -> "Adopcion"
                         }
                     }"; h.itemView.setOnClickListener { centrarArriba(GeoPoint(d.p.latitud, d.p.longitud)) }
             };
@@ -441,21 +471,63 @@ class MainActivity : AppCompatActivity() {
         p.estado == "Resuelta" -> R.drawable.ic_pin_gris; p.tipo == "Perdida" -> R.drawable.ic_pin_rojo; p.tipo == "Encontrada" -> R.drawable.ic_pin_verde; else -> R.drawable.ic_pin_naranja
     }
 
+    private fun dibujarBusquedaColaborativa(publicaciones: List<Publicacion>, avistamientos: List<Avistamiento>) {
+        val perdidasActivas = publicaciones.filter { it.tipo == "Perdida" && it.estado == "Activa" }
+        for (pub in perdidasActivas) {
+            val avistDePub = avistamientos.filter { it.publicacionId == pub.id }
+            if (avistDePub.size < 2) continue
+
+            val puntos = mutableListOf(GeoPoint(pub.latitud, pub.longitud))
+            puntos.addAll(avistDePub.map { GeoPoint(it.latitud, it.longitud) })
+            puntos.add(GeoPoint(pub.latitud, pub.longitud))
+
+            val ahora = System.currentTimeMillis()
+            for (av in avistDePub) {
+                val horasPasadas = (ahora - av.fecha) / (1000.0 * 60 * 60)
+                val opacidad = if (horasPasadas < 24) 0x60FFA000 else if (horasPasadas < 72) 0x40FFA000 else 0x20FFA000
+
+                val linea = Polygon()
+                linea.points = listOf(
+                    GeoPoint(pub.latitud, pub.longitud),
+                    GeoPoint(av.latitud, av.longitud)
+                )
+                linea.fillColor = 0x00000000
+                linea.strokeColor = opacidad
+                linea.strokeWidth = 3f
+                map.overlays.add(linea)
+                marcBusqAvist.add(linea)
+            }
+
+            val poligono = Polygon()
+            poligono.points = puntos
+            poligono.fillColor = 0x18FFA000
+            poligono.strokeColor = 0x60FFA000
+            poligono.strokeWidth = 2f
+            map.overlays.add(poligono)
+            marcBusqAvist.add(poligono)
+        }
+    }
+
     private fun tl(t: String) = when (t) {
-        "Perdida" -> "Mascota perdida"; "Encontrada" -> "Mascota encontrada"; else -> "En adopciÃ³n"
+        "Perdida" -> "Mascota perdida"; "Encontrada" -> "Mascota encontrada"; else -> "En adopcion"
     }
 
     private fun showPanel(pub: Publicacion) {
         pubActual = pub; pnlEmoji.text = when (pub.tipo) {
-            "Perdida" -> "ðŸ¾"; "Encontrada" -> "ðŸ¶"; else -> "ðŸ±"
-        }; pnlTit.text = pub.nombre; pnlTipo.text =
-            if (pub.tipo == "Perdida" && pub.ultimoLugar != null) "Mascota perdida Â· Ãšltima vez: ${pub.ultimoLugar}" else tl(
+            "Perdida" -> "PERDIDA"; "Encontrada" -> "ENCONTRADA"; else -> "ADOPCION"
+        }
+        pnlEmoji.setTextColor(ContextCompat.getColor(this, when (pub.tipo) {
+            "Perdida" -> R.color.colorRed; "Encontrada" -> R.color.colorSuccess; else -> R.color.colorSecondary
+        }))
+        pnlEmoji.textSize = 14f
+        pnlTit.text = pub.nombre; pnlTipo.text =
+            if (pub.tipo == "Perdida" && pub.ultimoLugar != null) "Mascota perdida . Ultima vez: ${pub.ultimoLugar}" else tl(
                 pub.tipo
             ); pnlDesc.text = pub.descripcion;
         val d = GeoPoint(pub.latitud, pub.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }; pnlUbi.text =
-            if (d != null) "A %.1f km de ti".format(d) else "Lima, PerÃº";
+            if (d != null) "A %.1f km de ti".format(d) else "Lima, Peru";
         val r = pub.estado == "Resuelta"; pnlEst.text =
-            if (r) "Resuelta Â· ${fechaRelativa(pub.fechaCreacion)}" else "Activa Â· ${fechaRelativa(pub.fechaCreacion)}"; pnlEst.setTextColor(
+            if (r) "Resuelta . ${fechaRelativa(pub.fechaCreacion)}" else "Activa . ${fechaRelativa(pub.fechaCreacion)}"; pnlEst.setTextColor(
             ContextCompat.getColor(this, if (r) android.R.color.darker_gray else R.color.verde_estado)
         ); pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled =
             !r; pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = !r; pnl.visibility =
@@ -465,20 +537,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPanelAvist(a: Avistamiento, nom: String) {
-        pubActual = null; pnlEmoji.text = "ðŸ‘€"; pnlTit.text = "Avistamiento de $nom"; pnlTipo.text =
-            "Reportado por la comunidad"; pnlDesc.text =
-            a.descripcion.ifEmpty { "Alguien reportÃ³ haber visto a esta mascota aquÃ­." };
-        val d = GeoPoint(a.latitud, a.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }; pnlUbi.text =
-            if (d != null) "A %.1f km de ti".format(d) else "Lima, PerÃº"; pnlEst.text =
-            "Avistamiento Â· ${fechaRelativa(a.fecha)}"; pnlEst.setTextColor(
-            ContextCompat.getColor(
-                this,
-                R.color.ambar_estado
-            )
-        ); pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled =
-            false; pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = false; pnl.visibility =
-            View.VISIBLE; pnl.alpha = 0f; pnl.post {
-            pnl.translationY = pnl.height.toFloat(); pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
+        pubActual = null
+        pnlEmoji.text = "AVISTAMIENTO"
+        pnlEmoji.setTextColor(ContextCompat.getColor(this, R.color.ambar_estado))
+        pnlEmoji.textSize = 14f
+        pnlTit.text = "Vieron a $nom"
+        pnlTipo.text = "Reportado por la comunidad"
+        pnlDesc.text = a.descripcion.ifEmpty { "Alguien reporto haber visto a esta mascota aqui." }
+        val d = GeoPoint(a.latitud, a.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }
+        pnlUbi.text = if (d != null) "A %.1f km de ti".format(d) else "Lima, Peru"
+        pnlEst.text = "Avistamiento . ${fechaRelativa(a.fecha)}"
+        pnlEst.setTextColor(ContextCompat.getColor(this, R.color.ambar_estado))
+        pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled = false
+        pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = false
+        pnl.visibility = View.VISIBLE
+        pnl.alpha = 0f
+        pnl.post {
+            pnl.translationY = pnl.height.toFloat()
+            pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
         }
     }
 
@@ -491,10 +567,10 @@ class MainActivity : AppCompatActivity() {
     private fun verAvist() {
         val p = pubActual ?: return;
         val pt = userLoc ?: getLastLoc()?.let { GeoPoint(it.latitude, it.longitude) }; if (pt == null) {
-            Toast.makeText(this, "No tenemos tu ubicaciÃ³n", Toast.LENGTH_SHORT).show(); return
+            Toast.makeText(this, "No tenemos tu ubicacion", Toast.LENGTH_SHORT).show(); return
         }; exec.execute {
             ControladorPublicaciones.actualizarAvistamiento(this, p.id, pt.latitude, pt.longitude); runOnUiThread {
-            Toast.makeText(this, "Â¡Gracias!", Toast.LENGTH_SHORT).show(); ocultarPanel(); cargarBD()
+            Toast.makeText(this, "Gracias!", Toast.LENGTH_SHORT).show(); ocultarPanel(); cargarBD()
         }
         }
     }
@@ -504,7 +580,7 @@ class MainActivity : AppCompatActivity() {
             ControladorPublicaciones.resolver(this, p.id); runOnUiThread {
             Toast.makeText(
                 this,
-                "Â¡Resuelta!",
+                "Resuelta!",
                 Toast.LENGTH_SHORT
             ).show(); ocultarPanel(); cargarBD()
         }
@@ -512,7 +588,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun txt(pub: Publicacion) =
-        "${pub.nombre} Â· ${tl(pub.tipo)}\n${pub.descripcion}\nEstado: ${pub.estado} Â· ${fechaRelativa(pub.fechaCreacion)}\nhttps://maps.google.com/?q=${pub.latitud},${pub.longitud}"
+        "${pub.nombre} . ${tl(pub.tipo)}\n${pub.descripcion}\nEstado: ${pub.estado} . ${fechaRelativa(pub.fechaCreacion)}\nhttps://maps.google.com/?q=${pub.latitud},${pub.longitud}"
 
     private fun enviarWA() {
         val p = pubActual ?: return; try {
