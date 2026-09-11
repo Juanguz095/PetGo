@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/bg_surface"
     tools:context=".MascotasPerdidasActivity">
 
     
@@ -12,7 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="#FFFFFF"
+        android:background="@color/bg_surface"
         app:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="¿Perdiste una mascota?\nPublica con foto y último lugar visto"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
 
             <com.google.android.material.button.MaterialButton
@@ -57,7 +57,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                app:backgroundTint="#1A1A1A"
+                app:backgroundTint="?attr/colorPrimary"
                 app:cornerRadius="20dp" />
         </LinearLayout>
     </ScrollView>
@@ -82,7 +82,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="🐾\nAún no hay mascotas perdidas publicadas"
-        android:textColor="#9E9E9E"
+        android:textColor="@color/text_hint"
         android:textSize="13sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -91,3 +91,5 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

@@ -82,6 +82,9 @@
         <activity
             android:name=".DetalleDenunciaActivity"
             android:exported="false" />
+        <activity
+            android:name=".ConfiguracionActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

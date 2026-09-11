@@ -5,4 +5,28 @@
     <color name="verde_estado">#43A047</color>
     <color name="ambar_estado">#F57F17</color>
     <color name="ic_launcher_background">#FFFFFF</color>
+
+    <color name="colorSecondary">#FF1E88E5</color>
+    <color name="colorSuccess">#43A047</color>
+    <color name="colorWhatsApp">#25D366</color>
+    <color name="colorAmber">#F57F17</color>
+    <color name="colorDarkRed">#C62828</color>
+    <color name="colorRed">#E53935</color>
+    <color name="colorBlue">#1E88E5</color>
+
+    <color name="bg_surface">#FFFFFFFF</color>
+    <color name="bg_surface_variant">#FFF5F5F5</color>
+    <color name="bg_card">#FFFFFFFF</color>
+    <color name="bg_overlay">#E6FFFFFF</color>
+    <color name="bg_divider">#FFE0E0E0</color>
+    <color name="bg_progress_track">#FFE0E0E0</color>
+
+    <color name="text_primary">#FF1A1A1A</color>
+    <color name="text_secondary">#FF616161</color>
+    <color name="text_hint">#FF9E9E9E</color>
+    <color name="text_tertiary">#FF757575</color>
+    <color name="text_disabled">#FFBDBDBD</color>
+    <color name="text_on_dark">#FFFFFFFF</color>
+
+    <color name="chip_stroke">#FF1A1A1A</color>
 </resources>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -26,7 +26,7 @@
         android:paddingEnd="10dp"
         android:paddingBottom="4dp"
         android:text="Mantén presionado el mapa para publicar"
-        android:textColor="#9E9E9E"
+        android:textColor="@color/text_hint"
         android:textSize="11sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,7 +45,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="5dp"
         android:text="📖  Leyenda"
-        android:textColor="#1A1A1A"
+        android:textColor="@color/text_primary"
         android:textSize="11sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +65,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="5dp"
         android:text="Alertas cerca"
-        android:textColor="#1A1A1A"
+        android:textColor="@color/text_primary"
         android:textSize="11sp"
         android:textStyle="bold"
         android:visibility="gone"
@@ -113,7 +113,7 @@
                 android:background="@drawable/bg_circle_rojo"
                 android:gravity="center"
                 android:text="✕"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -131,7 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -140,7 +140,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textColor="#9E9E9E"
+            android:textColor="@color/text_hint"
             android:textSize="12sp" />
 
         
@@ -149,7 +149,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="#616161"
+            android:textColor="@color/text_secondary"
             android:textSize="13sp" />
 
         
@@ -158,7 +158,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="#9E9E9E"
+            android:textColor="@color/text_hint"
             android:textSize="12sp" />
 
         
@@ -184,7 +184,7 @@
                 android:layout_height="40dp"
                 android:layout_weight="1"
                 android:text="💬  WhatsApp"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 app:strokeColor="#25D366" />
 
@@ -196,9 +196,9 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="↗  Compartir"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
-                app:strokeColor="#1A1A1A" />
+                app:strokeColor="@color/text_primary" />
         </LinearLayout>
 
         
@@ -215,7 +215,7 @@
                 android:layout_height="40dp"
                 android:layout_weight="1"
                 android:text="👀  Sé dónde está"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 app:strokeColor="#1E88E5" />
 
@@ -227,9 +227,9 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="✓  Resolver"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
-                app:strokeColor="#43A047" />
+                app:strokeColor="@color/colorSuccess" />
         </LinearLayout>
     </LinearLayout>
 
@@ -289,3 +289,4 @@
         app:srcCompat="@drawable/ic_fab_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

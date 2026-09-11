@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/bg_surface"
     tools:context=".AdopcionesActivity">
 
     
@@ -12,7 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="#FFFFFF"
+        android:background="@color/bg_surface"
         app:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -71,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Buscar"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -87,8 +87,8 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:singleLine="true"
-                android:textColor="#1A1A1A"
-                android:textColorHint="#9E9E9E"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
                 android:textSize="14sp" />
 
             
@@ -97,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Filtros"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -117,7 +117,7 @@
                     android:paddingEnd="18dp"
                     android:paddingBottom="8dp"
                     android:text="Todos"
-                    android:textColor="#1A1A1A"
+                    android:textColor="@color/text_primary"
                     android:textSize="13sp" />
 
                 <TextView
@@ -131,7 +131,7 @@
                     android:paddingEnd="18dp"
                     android:paddingBottom="8dp"
                     android:text="Perros"
-                    android:textColor="#616161"
+                    android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
                 <TextView
@@ -145,7 +145,7 @@
                     android:paddingEnd="18dp"
                     android:paddingBottom="8dp"
                     android:text="Gatos"
-                    android:textColor="#616161"
+                    android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
 
@@ -167,7 +167,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Animales encontrados"
-                        android:textColor="#1A1A1A"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -177,7 +177,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="0 opciones para adoptar"
-                        android:textColor="#9E9E9E"
+                        android:textColor="@color/text_hint"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -203,7 +203,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="24dp"
-                android:background="#F0F0F0" />
+                android:background="@color/bg_surface_variant" />
 
             
             <TextView
@@ -211,7 +211,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="¿Cómo funciona la adopción?"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
@@ -235,7 +235,7 @@
                         android:background="@drawable/bg_step_circle"
                         android:gravity="center"
                         android:text="1"
-                        android:textColor="#616161"
+                        android:textColor="@color/text_secondary"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
@@ -244,7 +244,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Encuentra"
-                        android:textColor="#757575"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="10sp" />
                 </LinearLayout>
 
@@ -252,7 +252,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="→"
-                    android:textColor="#BDBDBD"
+                    android:textColor="@color/text_disabled"
                     android:textSize="12sp" />
 
                 <LinearLayout
@@ -268,7 +268,7 @@
                         android:background="@drawable/bg_step_circle"
                         android:gravity="center"
                         android:text="2"
-                        android:textColor="#616161"
+                        android:textColor="@color/text_secondary"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
@@ -277,7 +277,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Conoce"
-                        android:textColor="#757575"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="10sp" />
                 </LinearLayout>
 
@@ -285,7 +285,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="→"
-                    android:textColor="#BDBDBD"
+                    android:textColor="@color/text_disabled"
                     android:textSize="12sp" />
 
                 <LinearLayout
@@ -301,7 +301,7 @@
                         android:background="@drawable/bg_step_circle"
                         android:gravity="center"
                         android:text="3"
-                        android:textColor="#616161"
+                        android:textColor="@color/text_secondary"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
@@ -310,7 +310,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Visita"
-                        android:textColor="#757575"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="10sp" />
                 </LinearLayout>
 
@@ -318,7 +318,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="→"
-                    android:textColor="#BDBDBD"
+                    android:textColor="@color/text_disabled"
                     android:textSize="12sp" />
 
                 <LinearLayout
@@ -334,7 +334,7 @@
                         android:background="@drawable/bg_step_circle"
                         android:gravity="center"
                         android:text="4"
-                        android:textColor="#616161"
+                        android:textColor="@color/text_secondary"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
@@ -343,7 +343,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Adopta"
-                        android:textColor="#757575"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="10sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -355,11 +355,12 @@
                 android:layout_height="38dp"
                 android:layout_marginTop="12dp"
                 android:text="Conocer el proceso completo"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
-                app:strokeColor="#1A1A1A" />
+                app:strokeColor="@color/text_primary" />
 
         </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var map: MapView;
     private val exec = Executors.newSingleThreadExecutor()
     private var userLoc: GeoPoint? = null;
+    private var markerUsuario: Marker? = null
     private var circUser: Polygon? = null;
     private var circBusq: Polygon? = null
     private val marcPub = mutableListOf<Marker>();
@@ -223,13 +224,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun marcUser(p: GeoPoint) {
-        Marker(map).apply {
-            position = p; title = "Mi ubicaciÃ³n"; icon =
-            ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_punto_azul); setAnchor(
-            Marker.ANCHOR_CENTER,
-            Marker.ANCHOR_CENTER
-        )
-        }.let { map.overlays.add(it) }
+        if (markerUsuario == null) {
+            markerUsuario = Marker(map).apply {
+                position = p; title = "Mi ubicaciÃ³n"; icon =
+                ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_punto_azul); setAnchor(
+                    Marker.ANCHOR_CENTER,
+                    Marker.ANCHOR_CENTER
+                )
+            }
+            map.overlays.add(markerUsuario)
+        } else {
+            markerUsuario!!.position = p
+        }
+        map.invalidate()
     }
 
     private fun circUser(c: GeoPoint) {

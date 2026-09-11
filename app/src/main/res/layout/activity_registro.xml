@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/bg_surface"
     tools:context=".RegistroActivity">
 
     
@@ -12,7 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="#FFFFFF"
+        android:background="@color/bg_surface"
         app:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Crea tu cuenta"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Únete para publicar y ayudar a mascotas"
-                android:textColor="#9E9E9E"
+                android:textColor="@color/text_hint"
                 android:textSize="13sp" />
 
             
@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="Nombre"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -77,8 +77,8 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:singleLine="true"
-                android:textColor="#1A1A1A"
-                android:textColorHint="#9E9E9E"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
                 android:textSize="14sp" />
 
             
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Correo"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -103,8 +103,8 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:singleLine="true"
-                android:textColor="#1A1A1A"
-                android:textColorHint="#9E9E9E"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
                 android:textSize="14sp" />
 
             
@@ -113,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Contraseña"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -129,8 +129,8 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:singleLine="true"
-                android:textColor="#1A1A1A"
-                android:textColorHint="#9E9E9E"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
                 android:textSize="14sp" />
 
             
@@ -139,7 +139,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Confirmar contraseña"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -155,8 +155,8 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:singleLine="true"
-                android:textColor="#1A1A1A"
-                android:textColorHint="#9E9E9E"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
                 android:textSize="14sp" />
 
             
@@ -180,10 +180,12 @@
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:backgroundTint="#1A1A1A"
+                app:backgroundTint="?attr/colorPrimary"
                 app:cornerRadius="25dp" />
 
         </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -19,14 +19,14 @@
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
             <TextView android:id="@+id/tv_nombre" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:textColor="#1A1A1A" android:textSize="15sp" android:textStyle="bold" />
+                android:layout_height="wrap_content" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold" />
             <TextView android:id="@+id/tv_direccion" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:layout_marginTop="2dp" android:textColor="#616161"
+                android:layout_height="wrap_content" android:layout_marginTop="2dp" android:textColor="@color/text_secondary"
                 android:textSize="12sp" android:ellipsize="end" android:maxLines="1" />
             <TextView android:id="@+id/tv_telefono" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:layout_marginTop="2dp" android:textColor="#1E88E5" android:textSize="12sp" />
             <TextView android:id="@+id/tv_distancia" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_marginTop="2dp" android:textColor="#9E9E9E" android:textSize="11sp" />
+                android:layout_height="wrap_content" android:layout_marginTop="2dp" android:textColor="@color/text_hint" android:textSize="11sp" />
         </LinearLayout>
 
         <ImageView
@@ -41,3 +41,4 @@
             android:src="@drawable/ic_telefono" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

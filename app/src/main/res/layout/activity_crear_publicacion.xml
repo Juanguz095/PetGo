@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/bg_surface"
     tools:context=".CrearPublicacionActivity">
 
     
@@ -12,7 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="#FFFFFF"
+        android:background="@color/bg_surface"
         app:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tipo de publicación"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -64,7 +64,7 @@
                     android:paddingEnd="18dp"
                     android:paddingBottom="8dp"
                     android:text="Perdida"
-                    android:textColor="#1A1A1A"
+                    android:textColor="@color/text_primary"
                     android:textSize="13sp" />
 
                 <TextView
@@ -78,7 +78,7 @@
                     android:paddingEnd="18dp"
                     android:paddingBottom="8dp"
                     android:text="Encontrada"
-                    android:textColor="#616161"
+                    android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
                 <TextView
@@ -92,7 +92,7 @@
                     android:paddingEnd="18dp"
                     android:paddingBottom="8dp"
                     android:text="Adopción"
-                    android:textColor="#616161"
+                    android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
 
@@ -102,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Foto (opcional)"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -127,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="📷\nAgregar foto"
-                    android:textColor="#9E9E9E"
+                    android:textColor="@color/text_hint"
                     android:textSize="11sp"
                     android:gravity="center" />
             </FrameLayout>
@@ -138,7 +138,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Nombre de la mascota"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -154,8 +154,8 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:singleLine="true"
-                android:textColor="#1A1A1A"
-                android:textColorHint="#9E9E9E"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
                 android:textSize="14sp" />
 
             
@@ -164,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Especie"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -184,7 +184,7 @@
                     android:paddingEnd="24dp"
                     android:paddingBottom="8dp"
                     android:text="Perro"
-                    android:textColor="#1A1A1A"
+                    android:textColor="@color/text_primary"
                     android:textSize="13sp" />
 
                 <TextView
@@ -198,7 +198,7 @@
                     android:paddingEnd="24dp"
                     android:paddingBottom="8dp"
                     android:text="Gato"
-                    android:textColor="#616161"
+                    android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
 
@@ -208,7 +208,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Última vez visto (opcional)"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -224,8 +224,8 @@
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:singleLine="true"
-                android:textColor="#1A1A1A"
-                android:textColorHint="#9E9E9E"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
                 android:textSize="14sp" />
 
             
@@ -234,7 +234,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Descripción"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -249,8 +249,8 @@
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
                 android:padding="14dp"
-                android:textColor="#1A1A1A"
-                android:textColorHint="#9E9E9E"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
                 android:textSize="14sp" />
 
             
@@ -259,7 +259,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Ubicación"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -268,14 +268,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:layout_marginTop="8dp"
-                android:background="#E3E3E3" />
+                android:background="@color/bg_divider" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="📍 Toca el mapa para elegir la ubicación"
-                android:textColor="#9E9E9E"
+                android:textColor="@color/text_hint"
                 android:textSize="12sp" />
 
             
@@ -299,10 +299,12 @@
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:backgroundTint="#1A1A1A"
+                app:backgroundTint="?attr/colorPrimary"
                 app:cornerRadius="25dp" />
 
         </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

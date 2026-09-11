@@ -75,11 +75,8 @@ class PerfilActivity : AppCompatActivity() {
         }
 
         
-        val pendientes = listOf(R.id.row_configuracion)
-        pendientes.forEach { id ->
-            findViewById<View>(id).setOnClickListener {
-                Toast.makeText(this, "Próximamente", Toast.LENGTH_SHORT).show()
-            }
+        findViewById<View>(R.id.row_configuracion).setOnClickListener {
+            startActivity(Intent(this, ConfiguracionActivity::class.java))
         }
     }
 

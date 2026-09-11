@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/bg_surface"
     tools:context=".PerfilActivity">
 
     
@@ -12,7 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="#FFFFFF"
+        android:background="@color/bg_surface"
         app:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,7 +58,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="12dp"
                 android:text="Usuario Demo"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -70,7 +70,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="2dp"
                 android:text="usuario@demo.com"
-                android:textColor="#9E9E9E"
+                android:textColor="@color/text_hint"
                 android:textSize="13sp" />
 
             
@@ -86,7 +86,7 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="6dp"
                 android:text="Ciudadano"
-                android:textColor="#616161"
+                android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
             
@@ -112,7 +112,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="#1A1A1A"
+                        android:textColor="@color/text_primary"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
@@ -121,7 +121,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Publicaciones"
-                        android:textColor="#9E9E9E"
+                        android:textColor="@color/text_hint"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -142,7 +142,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="#1A1A1A"
+                        android:textColor="@color/text_primary"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
@@ -151,7 +151,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Denuncias"
-                        android:textColor="#9E9E9E"
+                        android:textColor="@color/text_hint"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -171,7 +171,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="#1A1A1A"
+                        android:textColor="@color/text_primary"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
@@ -180,7 +180,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Favoritos"
-                        android:textColor="#9E9E9E"
+                        android:textColor="@color/text_hint"
                         android:textSize="11sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -213,14 +213,14 @@
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:text="Mis publicaciones"
-                        android:textColor="#1A1A1A"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
-                        android:textColor="#BDBDBD"
+                        android:textColor="@color/text_disabled"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -228,7 +228,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginStart="50dp"
-                    android:background="#F0F0F0" />
+                    android:background="@color/bg_surface_variant" />
 
                 <LinearLayout
                     android:id="@+id/row_denuncias"
@@ -250,14 +250,14 @@
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:text="Mis denuncias"
-                        android:textColor="#1A1A1A"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
-                        android:textColor="#BDBDBD"
+                        android:textColor="@color/text_disabled"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -265,7 +265,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginStart="50dp"
-                    android:background="#F0F0F0" />
+                    android:background="@color/bg_surface_variant" />
 
                 <LinearLayout
                     android:id="@+id/row_favoritos"
@@ -287,14 +287,14 @@
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:text="Mis favoritos"
-                        android:textColor="#1A1A1A"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
-                        android:textColor="#BDBDBD"
+                        android:textColor="@color/text_disabled"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -302,7 +302,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginStart="50dp"
-                    android:background="#F0F0F0" />
+                    android:background="@color/bg_surface_variant" />
 
                 <LinearLayout
                     android:id="@+id/row_configuracion"
@@ -324,14 +324,14 @@
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:text="Configuración"
-                        android:textColor="#1A1A1A"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=">"
-                        android:textColor="#BDBDBD"
+                        android:textColor="@color/text_disabled"
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -371,10 +371,11 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
                 android:text="v1.0"
-                android:textColor="#BDBDBD"
+                android:textColor="@color/text_disabled"
                 android:textSize="11sp" />
 
         </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

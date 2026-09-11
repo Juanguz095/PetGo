@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:background="#FFFFFF">
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/bg_surface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar" android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize" android:background="#FFFFFF"
+        android:layout_height="?attr/actionBarSize" android:background="@color/bg_surface"
         app:elevation="2dp" app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back" app:title="Denunciar"
@@ -19,36 +19,36 @@
             android:orientation="vertical" android:padding="20dp">
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Motivo" android:textColor="#616161" android:textSize="13sp" android:textStyle="bold" />
+                android:text="Motivo" android:textColor="@color/text_secondary" android:textSize="13sp" android:textStyle="bold" />
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" android:orientation="horizontal">
                 <TextView android:id="@+id/chip_maltrato" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:background="@drawable/bg_chip_selected"
                     android:paddingStart="16dp" android:paddingTop="8dp" android:paddingEnd="16dp"
-                    android:paddingBottom="8dp" android:text="Maltrato" android:textColor="#1A1A1A" android:textSize="13sp" />
+                    android:paddingBottom="8dp" android:text="Maltrato" android:textColor="@color/text_primary" android:textSize="13sp" />
                 <TextView android:id="@+id/chip_abandono" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_marginStart="8dp"
                     android:background="@drawable/bg_chip" android:paddingStart="16dp"
                     android:paddingTop="8dp" android:paddingEnd="16dp" android:paddingBottom="8dp"
-                    android:text="Abandono" android:textColor="#616161" android:textSize="13sp" />
+                    android:text="Abandono" android:textColor="@color/text_secondary" android:textSize="13sp" />
                 <TextView android:id="@+id/chip_venta" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_marginStart="8dp"
                     android:background="@drawable/bg_chip" android:paddingStart="16dp"
                     android:paddingTop="8dp" android:paddingEnd="16dp" android:paddingBottom="8dp"
-                    android:text="Venta ilegal" android:textColor="#616161" android:textSize="13sp" />
+                    android:text="Venta ilegal" android:textColor="@color/text_secondary" android:textSize="13sp" />
             </LinearLayout>
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" android:text="Descripción" android:textColor="#616161"
+                android:layout_marginTop="16dp" android:text="Descripción" android:textColor="@color/text_secondary"
                 android:textSize="13sp" android:textStyle="bold" />
             <EditText android:id="@+id/et_descripcion" android:layout_width="match_parent"
                 android:layout_height="100dp" android:layout_marginTop="8dp"
                 android:background="@drawable/bg_search_field" android:gravity="top|start"
                 android:hint="Describe la situación" android:padding="14dp"
-                android:textColor="#1A1A1A" android:textSize="14sp" />
+                android:textColor="@color/text_primary" android:textSize="14sp" />
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" android:text="Foto (opcional)" android:textColor="#616161"
+                android:layout_marginTop="16dp" android:text="Foto (opcional)" android:textColor="@color/text_secondary"
                 android:textSize="13sp" android:textStyle="bold" />
             <FrameLayout android:id="@+id/contenedor_foto" android:layout_width="96dp"
                 android:layout_height="96dp" android:layout_marginTop="8dp"
@@ -57,18 +57,18 @@
                     android:layout_height="match_parent" android:scaleType="centerCrop" />
                 <TextView android:id="@+id/tv_foto_hint" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_gravity="center"
-                    android:text="📷\nAgregar foto" android:textColor="#9E9E9E" android:textSize="11sp" />
+                    android:text="📷\nAgregar foto" android:textColor="@color/text_hint" android:textSize="11sp" />
             </FrameLayout>
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" android:text="Ubicación" android:textColor="#616161"
+                android:layout_marginTop="16dp" android:text="Ubicación" android:textColor="@color/text_secondary"
                 android:textSize="13sp" android:textStyle="bold" />
             <org.osmdroid.views.MapView android:id="@+id/mapa_denuncia"
                 android:layout_width="match_parent" android:layout_height="200dp"
-                android:layout_marginTop="8dp" android:background="#E3E3E3" />
+                android:layout_marginTop="8dp" android:background="@color/bg_divider" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_marginTop="6dp" android:text="Toca el mapa para elegir la ubicación"
-                android:textColor="#9E9E9E" android:textSize="12sp" />
+                android:textColor="@color/text_hint" android:textSize="12sp" />
 
             <TextView android:id="@+id/tv_error" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:layout_marginTop="10dp"
@@ -83,3 +83,4 @@
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
+

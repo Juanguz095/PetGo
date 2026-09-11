@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:text="🐾  Perdidas — se busca a la mascota"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/text_primary"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -47,7 +47,7 @@
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:text="🐶  Encontradas — busca a su dueño"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/text_primary"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -69,7 +69,7 @@
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:text="🐱  Adopciones — busca un hogar"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/text_primary"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -91,7 +91,7 @@
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:text="👀  Avistamientos — alguien la vio aquí"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/text_primary"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -113,7 +113,7 @@
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:text="✓  Resueltas — caso cerrado"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/text_primary"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -135,8 +135,9 @@
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:text="🏠  Albergues — refugios de mascotas"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/text_primary"
             android:textSize="13sp" />
     </LinearLayout>
 
 </LinearLayout>
+
