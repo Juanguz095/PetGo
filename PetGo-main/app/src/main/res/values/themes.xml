@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Base.Theme.PracticaFinal" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+
+    <style name="Theme.PracticaFinal" parent="Base.Theme.PracticaFinal" />
+
+    <style name="Theme.PracticaFinal.MenuOverlay" parent="Theme.PracticaFinal">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="TextAppearance.AdopcionesTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+</resources>
