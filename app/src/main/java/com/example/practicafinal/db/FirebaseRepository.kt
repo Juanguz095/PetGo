@@ -166,25 +166,29 @@ class FirebaseRepository(private val context: Context) {
         val uri = Uri.parse(value)
         if (uri.scheme == "http" || uri.scheme == "https") return value
         if (uri.scheme == "android.resource") return value
+        var bitmap: Bitmap? = null
+        var resized: Bitmap? = null
         return try {
             val input = context.contentResolver.openInputStream(uri) ?: return value
-            val bitmap = BitmapFactory.decodeStream(input)
+            bitmap = BitmapFactory.decodeStream(input)
             input.close()
             if (bitmap == null) return value
             val maxDim = 600
             val scale = minOf(1f, maxDim.toFloat() / maxOf(bitmap.width, bitmap.height))
-            val resized = if (scale < 1f) Bitmap.createScaledBitmap(
+            resized = if (scale < 1f) Bitmap.createScaledBitmap(
                 bitmap, (bitmap.width * scale).toInt(), (bitmap.height * scale).toInt(), true
             ) else bitmap
             val baos = java.io.ByteArrayOutputStream()
             resized.compress(Bitmap.CompressFormat.JPEG, 60, baos)
-            if (resized !== bitmap) resized.recycle()
             val bytes = baos.toByteArray()
             android.util.Log.d("FirebaseRepo", "Foto procesada: ${bytes.size} bytes")
             "data:image/jpeg;base64," + android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
         } catch (e: Exception) {
             android.util.Log.e("FirebaseRepo", "Error procesando foto: ${e.message}", e)
             value
+        } finally {
+            if (resized != null && resized !== bitmap) resized.recycle()
+            bitmap?.recycle()
         }
     }
 
@@ -251,7 +255,8 @@ class FirebaseRepository(private val context: Context) {
             .asReversed().map { it.toAvistamiento() }
 
     fun obtenerAvistamientosPorPublicacion(publicacionId: Long): List<Avistamiento> =
-        obtenerAvistamientos().filter { it.publicacionId == publicacionId }
+        await(db.collection(SIGHTINGS).whereEqualTo("publicacionId", publicacionId.toString()).get())
+            .documents.map { it.toAvistamiento() }
 
     fun marcarResuelta(id: Long) {
         val uid = currentUid()
@@ -371,7 +376,8 @@ class FirebaseRepository(private val context: Context) {
     }
 
     fun seedIfNeeded() {
-        val uid = currentUid()
+        val prefs = context.getSharedPreferences("seed_status", android.content.Context.MODE_PRIVATE)
+        if (prefs.getBoolean("seeded", false)) return
         val publications = db.collection(PUBLICATIONS)
         if (await(publications.limit(1).get()).isEmpty) {
             val now = System.currentTimeMillis()
@@ -395,6 +401,7 @@ class FirebaseRepository(private val context: Context) {
             )
             seeds.forEach { a -> await(shelters.document(a.id.toString()).set(a.toFirestoreMap())) }
         }
+        prefs.edit().putBoolean("seeded", true).apply()
     }
 
     fun observarPublicaciones(
@@ -494,17 +501,20 @@ class FirebaseRepository(private val context: Context) {
         val resized = if (scale < 1f) Bitmap.createScaledBitmap(
             bitmap, (bitmap.width * scale).toInt(), (bitmap.height * scale).toInt(), true
         ) else bitmap
-        var quality = 85
-        var result: ByteArray
-        do {
-            val output = ByteArrayOutputStream()
-            resized.compress(Bitmap.CompressFormat.JPEG, quality, output)
-            result = output.toByteArray()
-            quality -= 10
-        } while (result.size > MAX_IMAGE_BYTES && quality >= 35)
-        check(result.size.toLong() <= MAX_IMAGE_BYTES) { "La imagen comprimida supera 5 MB" }
-        if (resized !== bitmap) resized.recycle()
-        return result
+        try {
+            var quality = 85
+            var result: ByteArray
+            do {
+                val output = ByteArrayOutputStream()
+                resized.compress(Bitmap.CompressFormat.JPEG, quality, output)
+                result = output.toByteArray()
+                quality -= 10
+            } while (result.size > MAX_IMAGE_BYTES && quality >= 35)
+            check(result.size.toLong() <= MAX_IMAGE_BYTES) { "La imagen comprimida supera 5 MB" }
+            return result
+        } finally {
+            if (resized !== bitmap) resized.recycle()
+        }
     }
 
     private fun newId(): Long = abs(UUID.randomUUID().mostSignificantBits).let { if (it == 0L) 1L else it }

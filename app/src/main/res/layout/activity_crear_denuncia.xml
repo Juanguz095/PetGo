@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/bg_surface">
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/bg_surface" android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar" android:layout_width="0dp"
@@ -25,7 +25,7 @@
                 <TextView android:id="@+id/chip_maltrato" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:background="@drawable/bg_chip_selected"
                     android:paddingStart="16dp" android:paddingTop="8dp" android:paddingEnd="16dp"
-                    android:paddingBottom="8dp" android:text="Maltrato" android:textColor="@color/text_primary" android:textSize="13sp" />
+                    android:paddingBottom="8dp" android:text="Maltrato" android:textColor="@color/text_on_dark" android:textSize="13sp" />
                 <TextView android:id="@+id/chip_abandono" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_marginStart="8dp"
                     android:background="@drawable/bg_chip" android:paddingStart="16dp"

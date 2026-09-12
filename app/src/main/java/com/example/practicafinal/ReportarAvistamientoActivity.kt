@@ -64,8 +64,6 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_reportar_avistamiento)
 
-        setContentView(R.layout.activity_reportar_avistamiento)
-
         findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
             .setNavigationOnClickListener { finish() }
 

@@ -47,6 +47,7 @@ object SesionManager {
 
     fun cerrarSesion(context: Context) {
         prefs(context).edit().clear().apply()
+        FirebaseAuth.getInstance().signOut()
     }
 
     private fun legacyId(uid: String): Long =

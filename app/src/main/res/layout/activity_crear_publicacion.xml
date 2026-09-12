@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_surface"
+    android:fitsSystemWindows="true"
     tools:context=".CrearPublicacionActivity">
 
     
@@ -71,7 +72,7 @@
                     android:paddingEnd="18dp"
                     android:paddingBottom="8dp"
                     android:text="Perdida"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/text_on_dark"
                     android:textSize="13sp" />
 
                 <TextView
@@ -150,7 +151,7 @@
                         android:paddingEnd="16dp"
                         android:paddingBottom="8dp"
                         android:text="Maltrato"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@color/text_on_dark"
                         android:textSize="13sp" />
 
                     <TextView
@@ -307,7 +308,7 @@
                     android:paddingEnd="24dp"
                     android:paddingBottom="8dp"
                     android:text="Perro"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/text_on_dark"
                     android:textSize="13sp" />
 
                 <TextView

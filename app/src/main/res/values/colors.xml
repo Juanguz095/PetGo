@@ -6,6 +6,8 @@
     <color name="ambar_estado">#F57F17</color>
     <color name="ic_launcher_background">#FFFFFF</color>
 
+    <color name="colorPrimary">#FF6750A4</color>
+
     <color name="colorSecondary">#FF1E88E5</color>
     <color name="colorSuccess">#43A047</color>
     <color name="colorWhatsApp">#25D366</color>

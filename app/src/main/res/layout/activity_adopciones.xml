@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_surface"
+    android:fitsSystemWindows="true"
     tools:context=".AdopcionesActivity">
 
     
@@ -117,7 +118,7 @@
                     android:paddingEnd="18dp"
                     android:paddingBottom="8dp"
                     android:text="Todos"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/text_on_dark"
                     android:textSize="13sp" />
 
                 <TextView
@@ -199,7 +200,7 @@
                     android:paddingEnd="14dp"
                     android:paddingBottom="6dp"
                     android:text="Recientes"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/text_on_dark"
                     android:textSize="11sp" />
 
                 <TextView
