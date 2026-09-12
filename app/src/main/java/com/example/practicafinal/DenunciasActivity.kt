@@ -33,7 +33,7 @@ class DenunciasActivity : AppCompatActivity() {
     }
 
     private fun iconoMotivo(m: String) = when (m) {
-        "Maltrato" -> "ðŸš¨"; "Abandono" -> "ðŸšï¸"; else -> "ðŸ’°"
+        "Maltrato" -> "\uD83D\uDEA8"; "Abandono" -> "\uD83C\uDFE0"; else -> "\uD83D\uDCB0"
     }
 
     private fun cargar() {

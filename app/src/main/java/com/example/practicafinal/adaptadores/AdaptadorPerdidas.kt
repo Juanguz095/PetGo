@@ -34,23 +34,26 @@ class AdaptadorPerdidas(
     override fun onBindViewHolder(holder: PerdidaViewHolder, position: Int) {
         val p = items[position]
         if (!p.foto.isNullOrBlank()) {
-            Glide.with(holder.itemView.context).load(p.foto).into(holder.imgFoto)
+            com.example.practicafinal.util.cargarImagen(holder.imgFoto, p.foto)
             holder.tvPlaceholder.visibility = View.GONE
         } else {
-            holder.imgFoto.setImageDrawable(null)
-            holder.tvPlaceholder.visibility = View.VISIBLE
-            holder.tvPlaceholder.text = when {
-                p.especie.equals("Perro", ignoreCase = true) -> "🐶"
-                p.especie.equals("Gato", ignoreCase = true) -> "🐱"
-                else -> "🐾"
-            }
+            holder.imgFoto.setImageResource(android.R.drawable.ic_menu_gallery)
+            holder.tvPlaceholder.visibility = View.GONE
         }
         holder.tvNombre.text = p.nombre
         holder.tvUltimoLugar.text = p.ultimoLugar?.let { "📍 Última vez: " + it } ?: "📍 Sin ubicación de referencia"
         holder.tvFecha.text = fechaRelativa(p.fechaCreacion)
-        val resuelta = p.estado == "Resuelta"
-        holder.tvEstado.text = if (resuelta) "● Resuelta" else "● Activa"
-        holder.tvEstado.setTextColor(ContextCompat.getColor(holder.itemView.context, if (resuelta) android.R.color.darker_gray else R.color.verde_estado))
+        val resuelta = p.estado == "Resuelta" || p.estado == "Adoptada"
+        holder.tvEstado.text = when {
+            p.estado == "Adoptada" -> "Adoptada"
+            p.estado == "Resuelta" -> "Resuelta"
+            else -> "Activa"
+        }
+        holder.tvEstado.setTextColor(ContextCompat.getColor(holder.itemView.context, when {
+            p.estado == "Adoptada" -> R.color.colorSecondary
+            p.estado == "Resuelta" -> android.R.color.darker_gray
+            else -> R.color.verde_estado
+        }))
         holder.btnVi.isEnabled = !resuelta
         holder.btnVi.setOnClickListener { onSighting(p) }
         val count = avistPorPublicacion[p.id]?.size ?: 0

@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.practicafinal.controlador.ControladorPublicaciones
+import com.example.practicafinal.controlador.ControladorDenuncias
 import com.example.practicafinal.session.SesionManager
 import com.example.practicafinal.util.decodificarImagen
 import org.osmdroid.config.Configuration
@@ -48,10 +49,19 @@ class CrearPublicacionActivity : AppCompatActivity() {
     private lateinit var chipPerdida: View
     private lateinit var chipEncontrada: View
     private lateinit var chipAdopcion: View
+    private lateinit var chipDenuncia: View
     private lateinit var chipPerro: View
     private lateinit var chipGato: View
     private lateinit var imgFoto: ImageView
     private lateinit var tvFotoHint: TextView
+    private lateinit var labelNombre: TextView
+    private lateinit var labelEspecie: View
+    private lateinit var sectionEspecie: View
+    private lateinit var sectionUltimoLugar: View
+    private lateinit var sectionMotivosDenuncia: View
+    private lateinit var etMotivoCustom: EditText
+    private var motivoDenuncia = "Maltrato"
+    private var esOtroMotivo = false
 
     private val pickerGaleria = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -84,10 +94,17 @@ class CrearPublicacionActivity : AppCompatActivity() {
         chipPerdida = findViewById(R.id.chip_perdida)
         chipEncontrada = findViewById(R.id.chip_encontrada)
         chipAdopcion = findViewById(R.id.chip_adopcion)
+        chipDenuncia = findViewById(R.id.chip_denuncia)
         chipPerro = findViewById(R.id.chip_especie_perro)
         chipGato = findViewById(R.id.chip_especie_gato)
         imgFoto = findViewById(R.id.img_foto)
         tvFotoHint = findViewById(R.id.tv_foto_hint)
+        labelNombre = findViewById(R.id.label_nombre)
+        labelEspecie = findViewById(R.id.label_especie)
+        sectionEspecie = findViewById(R.id.section_especie)
+        sectionUltimoLugar = findViewById(R.id.section_ultimo_lugar)
+        sectionMotivosDenuncia = findViewById(R.id.section_motivos_denuncia)
+        etMotivoCustom = findViewById(R.id.et_motivo_custom)
 
         
         findViewById<View>(R.id.contenedor_foto).setOnClickListener {
@@ -97,8 +114,29 @@ class CrearPublicacionActivity : AppCompatActivity() {
         chipPerdida.setOnClickListener { seleccionarTipo("Perdida") }
         chipEncontrada.setOnClickListener { seleccionarTipo("Encontrada") }
         chipAdopcion.setOnClickListener { seleccionarTipo("Adopcion") }
+        chipDenuncia.setOnClickListener { seleccionarTipo("Denuncia") }
         chipPerro.setOnClickListener { seleccionarEspecie("Perro") }
         chipGato.setOnClickListener { seleccionarEspecie("Gato") }
+
+        val chipMaltrato = findViewById<TextView>(R.id.chip_maltrato)
+        val chipAbandono = findViewById<TextView>(R.id.chip_abandono)
+        val chipVentaIlegal = findViewById<TextView>(R.id.chip_venta_ilegal)
+        val chipMotivoOtro = findViewById<TextView>(R.id.chip_motivo_otro)
+        val motivoChips = listOf(chipMaltrato, chipAbandono, chipVentaIlegal, chipMotivoOtro)
+        val motivos = listOf("Maltrato", "Abandono", "Venta ilegal", "Otro")
+        motivos.forEachIndexed { i, m ->
+            motivoChips[i].setOnClickListener {
+                esOtroMotivo = (m == "Otro")
+                motivoDenuncia = m
+                motivoChips.forEachIndexed { j, chip ->
+                    val activo = j == i
+                    chip.background = ContextCompat.getDrawable(this, if (activo) R.drawable.bg_chip_selected else R.drawable.bg_chip)
+                    chip.setTextColor(ContextCompat.getColor(this, if (activo) android.R.color.black else android.R.color.darker_gray))
+                }
+                etMotivoCustom.visibility = if (esOtroMotivo) View.VISIBLE else View.GONE
+                if (esOtroMotivo) etMotivoCustom.requestFocus()
+            }
+        }
 
         configurarMapa()
 
@@ -178,7 +216,8 @@ class CrearPublicacionActivity : AppCompatActivity() {
         listOf(
             chipPerdida to "Perdida",
             chipEncontrada to "Encontrada",
-            chipAdopcion to "Adopcion"
+            chipAdopcion to "Adopcion",
+            chipDenuncia to "Denuncia"
         ).forEach { (chip, t) ->
             val activo = t == tipo
             chip.background = if (activo) {
@@ -190,6 +229,48 @@ class CrearPublicacionActivity : AppCompatActivity() {
                 if (activo) ContextCompat.getColor(this, android.R.color.black)
                 else ContextCompat.getColor(this, android.R.color.darker_gray)
             )
+        }
+        if (::pinSeleccion.isInitialized) {
+            val icono = when (tipo) {
+                "Perdida" -> R.drawable.ic_pin_rojo
+                "Encontrada" -> R.drawable.ic_pin_verde
+                "Adopcion" -> R.drawable.ic_pin_naranja
+                "Denuncia" -> R.drawable.ic_pin_denuncia
+                else -> R.drawable.ic_pin_rojo
+            }
+            pinSeleccion.icon = ContextCompat.getDrawable(this, icono)
+            map.invalidate()
+        }
+
+        when (tipo) {
+            "Denuncia" -> {
+                labelNombre.visibility = View.GONE
+                etNombre.visibility = View.GONE
+                labelEspecie.visibility = View.GONE
+                sectionEspecie.visibility = View.GONE
+                sectionUltimoLugar.visibility = View.GONE
+                sectionMotivosDenuncia.visibility = View.VISIBLE
+            }
+            "Adopcion" -> {
+                labelNombre.visibility = View.VISIBLE
+                labelNombre.text = "Nombre de la mascota"
+                etNombre.visibility = View.VISIBLE
+                etNombre.hint = "Ej. Max, Luna..."
+                labelEspecie.visibility = View.VISIBLE
+                sectionEspecie.visibility = View.VISIBLE
+                sectionUltimoLugar.visibility = View.GONE
+                sectionMotivosDenuncia.visibility = View.GONE
+            }
+            else -> {
+                labelNombre.visibility = View.VISIBLE
+                labelNombre.text = "Nombre de la mascota"
+                etNombre.visibility = View.VISIBLE
+                etNombre.hint = "Ej. Max, Luna..."
+                labelEspecie.visibility = View.VISIBLE
+                sectionEspecie.visibility = View.VISIBLE
+                sectionUltimoLugar.visibility = View.VISIBLE
+                sectionMotivosDenuncia.visibility = View.GONE
+            }
         }
     }
 
@@ -216,6 +297,40 @@ class CrearPublicacionActivity : AppCompatActivity() {
         val ultimoLugar = etUltimoLugar.text.toString().trim().ifEmpty { null }
         val punto = puntoSeleccionado
 
+        if (tipoSeleccionado == "Denuncia") {
+            val motivoFinal = if (esOtroMotivo) etMotivoCustom.text.toString().trim() else motivoDenuncia
+            if (motivoFinal.isEmpty()) {
+                mostrarError("Selecciona o escribe un motivo")
+                return
+            }
+            if (punto == null) {
+                mostrarError("Elige una ubicación en el mapa")
+                return
+            }
+            val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar)
+            button.isEnabled = false
+            val tieneFoto = !fotoUri.isNullOrBlank()
+            executor.execute {
+                try {
+                    ControladorDenuncias.insertarDenuncia(
+                        this, motivoFinal, descripcion,
+                        fotoUri, punto.latitude, punto.longitude
+                    )
+                    runOnUiThread {
+                        val msg = if (tieneFoto) "Denuncia enviada (foto subida)" else "Denuncia enviada"
+                        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                } catch (error: Exception) {
+                    runOnUiThread {
+                        button.isEnabled = true
+                        mostrarError(error.message ?: "No se pudo enviar la denuncia")
+                    }
+                }
+            }
+            return
+        }
+
         val error = ControladorPublicaciones.validarPublicacion(nombre, descripcion)
         if (error != null) {
             mostrarError(error)
@@ -228,6 +343,7 @@ class CrearPublicacionActivity : AppCompatActivity() {
 
         val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar)
         button.isEnabled = false
+        val tieneFoto = !fotoUri.isNullOrBlank()
         executor.execute {
             try {
                 val usuarioId = SesionManager.obtenerUsuarioId(this)
@@ -236,13 +352,14 @@ class CrearPublicacionActivity : AppCompatActivity() {
                     fotoUri, ultimoLugar, especie, punto.latitude, punto.longitude
                 )
                 runOnUiThread {
-                    Toast.makeText(this, "¡Publicación creada!", Toast.LENGTH_SHORT).show()
+                    val msg = if (tieneFoto) "Publicacion creada (foto subida)" else "Publicacion creada"
+                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                     finish()
                 }
             } catch (error: Exception) {
                 runOnUiThread {
                     button.isEnabled = true
-                    mostrarError(error.message ?: "No se pudo guardar la publicación")
+                    mostrarError(error.message ?: "No se pudo guardar la publicacion")
                 }
             }
         }

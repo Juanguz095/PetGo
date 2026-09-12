@@ -29,7 +29,7 @@ class DetalleDenunciaActivity : AppCompatActivity() {
                     finish(); return@runOnUiThread
                 }
                 val icono = when (d.motivo) {
-                    "Maltrato" -> "ðŸš¨"; "Abandono" -> "ðŸšï¸"; else -> "ðŸ’°"
+                    "Maltrato" -> "\uD83D\uDEA8"; "Abandono" -> "\uD83C\uDFE0"; else -> "\uD83D\uDCB0"
                 }
                 val img = findViewById<android.widget.ImageView>(R.id.img_foto)
                 val pl = findViewById<TextView>(R.id.tv_placeholder)

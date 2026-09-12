@@ -37,10 +37,10 @@ class AdaptadorAdopciones(
         val p = items[position]
 
         if (!p.foto.isNullOrBlank()) {
-            Glide.with(holder.itemView.context).load(p.foto).into(holder.imgFoto)
+            com.example.practicafinal.util.cargarImagen(holder.imgFoto, p.foto)
             holder.tvPlaceholder.visibility = View.GONE
         } else {
-            holder.imgFoto.setImageDrawable(null)
+            holder.imgFoto.setImageResource(android.R.drawable.ic_menu_gallery)
             holder.tvPlaceholder.visibility = View.VISIBLE
         }
 

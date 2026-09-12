@@ -21,6 +21,7 @@ import com.example.practicafinal.controlador.ControladorPublicaciones
 import com.example.practicafinal.db.DatabaseHelper
 import com.example.practicafinal.modelo.Albergue
 import com.example.practicafinal.modelo.Avistamiento;
+import com.example.practicafinal.modelo.Denuncia
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.session.SesionManager;
 import com.example.practicafinal.util.fechaRelativa
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private val marcPub = mutableListOf<Marker>();
     private val marcAvist = mutableListOf<Marker>()
     private val marcAlb = mutableListOf<Marker>()
+    private val marcDenuncias = mutableListOf<Marker>()
     private lateinit var pnl: View;
     private lateinit var pnlEmoji: TextView;
     private lateinit var pnlTit: TextView
@@ -54,6 +56,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pnlDesc: TextView
     private lateinit var pnlUbi: TextView;
     private lateinit var pnlEst: TextView;
+    private lateinit var pnlFoto: android.widget.ImageView
+    private lateinit var pnlBotonesTipo: android.widget.LinearLayout
+    private lateinit var pnlBtnIzq: MaterialButton
+    private lateinit var pnlBtnDer: MaterialButton
     private var pubActual: Publicacion? = null
     private var marcBusqAvist: MutableList<Polygon> = mutableListOf()
     private lateinit var btnCercanas: TextView
@@ -64,6 +70,7 @@ class MainActivity : AppCompatActivity() {
     private var publicacionesActuales: List<Publicacion> = emptyList()
     private var avistamientosActuales: List<Avistamiento> = emptyList()
     private var alberguesActuales: List<Albergue> = emptyList()
+    private var denunciasActuales: List<Denuncia> = emptyList()
 
     private val permiso = registerForActivityResult(ActivityResultContracts.RequestPermission()) { g ->
         if (g) centrarUsuario() else {
@@ -115,12 +122,13 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.panel_titulo); pnlTipo = findViewById(R.id.panel_tipo); pnlDesc =
             findViewById(R.id.panel_desc); pnlUbi = findViewById(R.id.panel_ubicacion); pnlEst =
             findViewById(R.id.panel_estado)
+        pnlFoto = findViewById(R.id.panel_foto)
+        pnlBotonesTipo = findViewById(R.id.panel_botones_tipo)
+        pnlBtnIzq = findViewById(R.id.panel_btn_izq)
+        pnlBtnDer = findViewById(R.id.panel_btn_der)
         pnl.findViewById<TextView>(R.id.panel_cerrar)
-            .setOnClickListener { ocultarPanel() }; pnl.findViewById<MaterialButton>(R.id.panel_whatsapp)
-            .setOnClickListener { enviarWA() }; pnl.findViewById<MaterialButton>(R.id.panel_compartir)
-            .setOnClickListener { compartir() }; pnl.findViewById<MaterialButton>(R.id.panel_ver)
-            .setOnClickListener { verAvist() }; pnl.findViewById<MaterialButton>(R.id.panel_resolver)
-            .setOnClickListener { resolver() }
+            .setOnClickListener { ocultarPanel() }; pnl.findViewById<MaterialButton>(R.id.panel_compartir)
+            .setOnClickListener { compartir() }
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_menu).setOnClickListener {
             startActivity(
                 Intent(this, MenuOpcionesActivity::class.java)
@@ -304,6 +312,7 @@ class MainActivity : AppCompatActivity() {
                             publicacionesActuales,
                             avistamientosActuales,
                             alberguesActuales,
+                            denunciasActuales,
                             publicacionesActuales.associate { it.id to it.nombre }
                         )
                     },
@@ -317,6 +326,7 @@ class MainActivity : AppCompatActivity() {
                             publicacionesActuales,
                             avistamientosActuales,
                             alberguesActuales,
+                            denunciasActuales,
                             publicacionesActuales.associate { it.id to it.nombre }
                         )
                     },
@@ -330,6 +340,21 @@ class MainActivity : AppCompatActivity() {
                             publicacionesActuales,
                             avistamientosActuales,
                             alberguesActuales,
+                            denunciasActuales,
+                            publicacionesActuales.associate { it.id to it.nombre }
+                        )
+                    },
+                    errorHandler
+                )
+                firebaseListeners += ControladorPublicaciones.observarDenuncias(
+                    this,
+                    { values ->
+                        denunciasActuales = values
+                        render(
+                            publicacionesActuales,
+                            avistamientosActuales,
+                            alberguesActuales,
+                            denunciasActuales,
                             publicacionesActuales.associate { it.id to it.nombre }
                         )
                     },
@@ -338,14 +363,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    private fun render(l: List<Publicacion>, a: List<Avistamiento>, alb: List<Albergue>, n: Map<Long, String>) {
+    private fun render(l: List<Publicacion>, a: List<Avistamiento>, alb: List<Albergue>, den: List<Denuncia>, n: Map<Long, String>) {
         marcPub.forEach { map.overlays.remove(it) }; marcPub.clear(); marcAvist.forEach { map.overlays.remove(it) }; marcAvist.clear(); marcAlb.forEach {
             map.overlays.remove(
                 it
             )
-        }; marcAlb.clear()
+        }; marcAlb.clear(); marcDenuncias.forEach { map.overlays.remove(it) }; marcDenuncias.clear()
         marcBusqAvist.forEach { map.overlays.remove(it) }; marcBusqAvist.clear()
-        for (pub in l) {
+        val activas = l.filter { it.estado != "Resuelta" && it.estado != "Adoptada" }
+        for (pub in activas) {
             val m = Marker(map); m.position = GeoPoint(pub.latitud, pub.longitud); m.icon =
                 ContextCompat.getDrawable(this, ico(pub)); m.setAnchor(
                 Marker.ANCHOR_CENTER,
@@ -383,6 +409,17 @@ class MainActivity : AppCompatActivity() {
                 }; true
             }; map.overlays.add(m); marcAlb.add(m)
         }
+        for (d in den) {
+            val m = Marker(map); m.position = GeoPoint(d.latitud, d.longitud); m.icon =
+                ContextCompat.getDrawable(this, R.drawable.ic_pin_denuncia); m.setAnchor(
+                Marker.ANCHOR_CENTER,
+                Marker.ANCHOR_BOTTOM
+            ); m.relatedObject = d; m.setOnMarkerClickListener { mk, _ ->
+                (mk.relatedObject as? Denuncia)?.let {
+                    centrarArriba(mk.position); mostrarDenuncia(it)
+                }; true
+            }; map.overlays.add(m); marcDenuncias.add(m)
+        }
 
         dibujarBusquedaColaborativa(l, a)
 
@@ -402,8 +439,13 @@ class MainActivity : AppCompatActivity() {
         pnlDesc.text = al.descripcion
         pnlUbi.text = al.direccion
         pnlEst.text = ""
-        pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled = false
-        pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = false
+        if (!al.foto.isNullOrBlank()) {
+            com.example.practicafinal.util.cargarImagen(pnlFoto, al.foto)
+            pnlFoto.visibility = View.VISIBLE
+        } else {
+            pnlFoto.visibility = View.GONE
+        }
+        pnlBotonesTipo.visibility = View.GONE
         pnl.visibility = View.VISIBLE
         pnl.alpha = 0f
         pnl.post {
@@ -416,7 +458,7 @@ class MainActivity : AppCompatActivity() {
         val u = userLoc; if (u == null) {
             btnCercanas.visibility = View.GONE; return
         };
-        val c = l.filter { it.estado != "Resuelta" }.size; if (c > 0) {
+        val c = l.filter { it.estado != "Resuelta" && it.estado != "Adoptada" }.size; if (c > 0) {
             btnCercanas.visibility = View.VISIBLE; btnCercanas.text = "Alertas cerca ($c)"
         } else btnCercanas.visibility = View.GONE
     }
@@ -424,7 +466,7 @@ class MainActivity : AppCompatActivity() {
     private fun dialogoCercanas() {
         val u = userLoc ?: return; exec.execute {
             val pubs =
-                ControladorPublicaciones.obtenerPublicaciones(this).filter { it.estado != "Resuelta" }; data class I(
+                ControladorPublicaciones.obtenerPublicaciones(this).filter { it.estado != "Resuelta" && it.estado != "Adoptada" }; data class I(
             val p: Publicacion,
             val km: Double
         );
@@ -468,7 +510,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun ico(p: Publicacion) = when {
-        p.estado == "Resuelta" -> R.drawable.ic_pin_gris; p.tipo == "Perdida" -> R.drawable.ic_pin_rojo; p.tipo == "Encontrada" -> R.drawable.ic_pin_verde; else -> R.drawable.ic_pin_naranja
+        p.estado == "Resuelta" || p.estado == "Adoptada" -> R.drawable.ic_pin_gris
+        p.tipo == "Perdida" -> R.drawable.ic_pin_rojo
+        p.tipo == "Encontrada" -> R.drawable.ic_pin_verde
+        else -> R.drawable.ic_pin_naranja
     }
 
     private fun dibujarBusquedaColaborativa(publicaciones: List<Publicacion>, avistamientos: List<Avistamiento>) {
@@ -513,26 +558,81 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showPanel(pub: Publicacion) {
-        pubActual = pub; pnlEmoji.text = when (pub.tipo) {
+        pubActual = pub
+        pnlEmoji.text = when (pub.tipo) {
             "Perdida" -> "PERDIDA"; "Encontrada" -> "ENCONTRADA"; else -> "ADOPCION"
         }
         pnlEmoji.setTextColor(ContextCompat.getColor(this, when (pub.tipo) {
             "Perdida" -> R.color.colorRed; "Encontrada" -> R.color.colorSuccess; else -> R.color.colorSecondary
         }))
         pnlEmoji.textSize = 14f
-        pnlTit.text = pub.nombre; pnlTipo.text =
-            if (pub.tipo == "Perdida" && pub.ultimoLugar != null) "Mascota perdida . Ultima vez: ${pub.ultimoLugar}" else tl(
-                pub.tipo
-            ); pnlDesc.text = pub.descripcion;
-        val d = GeoPoint(pub.latitud, pub.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }; pnlUbi.text =
-            if (d != null) "A %.1f km de ti".format(d) else "Lima, Peru";
-        val r = pub.estado == "Resuelta"; pnlEst.text =
-            if (r) "Resuelta . ${fechaRelativa(pub.fechaCreacion)}" else "Activa . ${fechaRelativa(pub.fechaCreacion)}"; pnlEst.setTextColor(
-            ContextCompat.getColor(this, if (r) android.R.color.darker_gray else R.color.verde_estado)
-        ); pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled =
-            !r; pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = !r; pnl.visibility =
-            View.VISIBLE; pnl.alpha = 0f; pnl.post {
-            pnl.translationY = pnl.height.toFloat(); pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
+        pnlTit.text = pub.nombre
+        pnlTipo.text = if (pub.tipo == "Perdida" && pub.ultimoLugar != null) "Mascota perdida . Ultima vez: ${pub.ultimoLugar}" else tl(pub.tipo)
+        pnlDesc.text = pub.descripcion
+        val d = GeoPoint(pub.latitud, pub.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }
+        pnlUbi.text = if (d != null) "A %.1f km de ti".format(d) else "Lima, Peru"
+        val r = pub.estado == "Resuelta"
+        val a = pub.estado == "Adoptada"
+        pnlEst.text = when {
+            r -> "Resuelta . ${fechaRelativa(pub.fechaCreacion)}"
+            a -> "Adoptada . ${fechaRelativa(pub.fechaCreacion)}"
+            else -> "Activa . ${fechaRelativa(pub.fechaCreacion)}"
+        }
+        pnlEst.setTextColor(ContextCompat.getColor(this, when {
+            r -> android.R.color.darker_gray
+            a -> R.color.colorSecondary
+            else -> R.color.verde_estado
+        }))
+
+        if (!pub.foto.isNullOrBlank()) {
+            com.example.practicafinal.util.cargarImagen(pnlFoto, pub.foto)
+            pnlFoto.visibility = View.VISIBLE
+        } else {
+            pnlFoto.setImageResource(android.R.drawable.ic_menu_gallery)
+            pnlFoto.visibility = View.VISIBLE
+        }
+
+        pnlBotonesTipo.visibility = View.VISIBLE
+        pnlBtnDer.visibility = View.GONE
+
+        when (pub.tipo) {
+            "Perdida", "Encontrada" -> {
+                pnlBtnIzq.text = "Ver detalles"
+                pnlBtnIzq.isEnabled = !r
+                pnlBtnIzq.setStrokeColorResource(R.color.colorSecondary)
+                pnlBtnIzq.setOnClickListener {
+                    startActivity(Intent(this, DetallePublicacionActivity::class.java).apply {
+                        putExtra(DetallePublicacionActivity.EXTRA_PUBLICACION_ID, pub.id)
+                    })
+                }
+            }
+            "Adopcion" -> {
+                pnlBtnIzq.text = "WhatsApp"
+                pnlBtnIzq.setStrokeColorResource(R.color.colorSuccess)
+                pnlBtnIzq.isEnabled = true
+                pnlBtnIzq.setOnClickListener { enviarWA() }
+
+                pnlBtnDer.text = "Mas detalles"
+                pnlBtnDer.setStrokeColorResource(R.color.colorSecondary)
+                pnlBtnDer.visibility = View.VISIBLE
+                pnlBtnDer.isEnabled = !a
+                pnlBtnDer.setOnClickListener {
+                    startActivity(Intent(this, DetalleAdopcionActivity::class.java).apply {
+                        putExtra(DetalleAdopcionActivity.EXTRA_PUBLICACION_ID, pub.id)
+                    })
+                }
+            }
+        }
+
+        if (r || a) {
+            pnlBotonesTipo.visibility = View.GONE
+        }
+
+        pnl.visibility = View.VISIBLE
+        pnl.alpha = 0f
+        pnl.post {
+            pnl.translationY = pnl.height.toFloat()
+            pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
         }
     }
 
@@ -548,8 +648,39 @@ class MainActivity : AppCompatActivity() {
         pnlUbi.text = if (d != null) "A %.1f km de ti".format(d) else "Lima, Peru"
         pnlEst.text = "Avistamiento . ${fechaRelativa(a.fecha)}"
         pnlEst.setTextColor(ContextCompat.getColor(this, R.color.ambar_estado))
-        pnl.findViewById<MaterialButton>(R.id.panel_ver).isEnabled = false
-        pnl.findViewById<MaterialButton>(R.id.panel_resolver).isEnabled = false
+        if (!a.foto.isNullOrBlank()) {
+            com.example.practicafinal.util.cargarImagen(pnlFoto, a.foto)
+            pnlFoto.visibility = View.VISIBLE
+        } else {
+            pnlFoto.visibility = View.GONE
+        }
+        pnlBotonesTipo.visibility = View.GONE
+        pnl.visibility = View.VISIBLE
+        pnl.alpha = 0f
+        pnl.post {
+            pnl.translationY = pnl.height.toFloat()
+            pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
+        }
+    }
+
+    private fun mostrarDenuncia(d: Denuncia) {
+        pubActual = null
+        pnlEmoji.text = ""
+        pnlEmoji.visibility = View.GONE
+        pnlTit.text = d.motivo
+        pnlTipo.text = "Denuncia anonima"
+        pnlDesc.text = d.descripcion.ifEmpty { "Reporte enviado por la comunidad." }
+        val d2 = GeoPoint(d.latitud, d.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }
+        pnlUbi.text = if (d2 != null) "A %.1f km de ti".format(d2) else "Lima, Peru"
+        pnlEst.text = "Reportado . ${fechaRelativa(d.fecha)}"
+        pnlEst.setTextColor(ContextCompat.getColor(this, R.color.colorRed))
+        if (!d.foto.isNullOrBlank()) {
+            com.example.practicafinal.util.cargarImagen(pnlFoto, d.foto)
+            pnlFoto.visibility = View.VISIBLE
+        } else {
+            pnlFoto.visibility = View.GONE
+        }
+        pnlBotonesTipo.visibility = View.GONE
         pnl.visibility = View.VISIBLE
         pnl.alpha = 0f
         pnl.post {
@@ -562,29 +693,6 @@ class MainActivity : AppCompatActivity() {
         pnl.animate().translationY(pnl.height.toFloat()).alpha(0f).setDuration(200)
             .withEndAction { pnl.visibility = View.GONE }.start(); pubActual =
             null; circBusq?.let { map.overlays.remove(it) }; circBusq = null; map.invalidate()
-    }
-
-    private fun verAvist() {
-        val p = pubActual ?: return;
-        val pt = userLoc ?: getLastLoc()?.let { GeoPoint(it.latitude, it.longitude) }; if (pt == null) {
-            Toast.makeText(this, "No tenemos tu ubicacion", Toast.LENGTH_SHORT).show(); return
-        }; exec.execute {
-            ControladorPublicaciones.actualizarAvistamiento(this, p.id, pt.latitude, pt.longitude); runOnUiThread {
-            Toast.makeText(this, "Gracias!", Toast.LENGTH_SHORT).show(); ocultarPanel(); cargarBD()
-        }
-        }
-    }
-
-    private fun resolver() {
-        val p = pubActual ?: return; exec.execute {
-            ControladorPublicaciones.resolver(this, p.id); runOnUiThread {
-            Toast.makeText(
-                this,
-                "Resuelta!",
-                Toast.LENGTH_SHORT
-            ).show(); ocultarPanel(); cargarBD()
-        }
-        }
     }
 
     private fun txt(pub: Publicacion) =

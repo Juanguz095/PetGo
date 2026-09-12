@@ -9,6 +9,7 @@ object SesionManager {
     private const val PREFS = "sesion"
     private const val KEY_ID = "usuario_id"
     private const val KEY_UID = "firebase_uid"
+    private const val KEY_ID_TOKEN = "firebase_id_token"
 
     fun guardarSesion(context: Context, id: Long) {
         prefs(context).edit().putLong(KEY_ID, id).apply()
@@ -17,6 +18,13 @@ object SesionManager {
     fun guardarSesion(context: Context, id: Long, firebaseUid: String) {
         prefs(context).edit().putLong(KEY_ID, id).putString(KEY_UID, firebaseUid).apply()
     }
+
+    fun guardarIdToken(context: Context, token: String) {
+        prefs(context).edit().putString(KEY_ID_TOKEN, token).apply()
+    }
+
+    fun obtenerIdToken(context: Context): String? =
+        prefs(context).getString(KEY_ID_TOKEN, null)
 
     fun guardarFirebaseUid(context: Context, uid: String) {
         prefs(context).edit().putString(KEY_UID, uid).apply()

@@ -36,7 +36,21 @@
                     android:background="@drawable/bg_chip" android:paddingStart="16dp"
                     android:paddingTop="8dp" android:paddingEnd="16dp" android:paddingBottom="8dp"
                     android:text="Venta ilegal" android:textColor="@color/text_secondary" android:textSize="13sp" />
+                <TextView android:id="@+id/chip_otro" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_chip" android:paddingStart="16dp"
+                    android:paddingTop="8dp" android:paddingEnd="16dp" android:paddingBottom="8dp"
+                    android:text="Otro" android:textColor="@color/text_secondary" android:textSize="13sp" />
             </LinearLayout>
+
+            <EditText android:id="@+id/et_motivo_custom" android:layout_width="match_parent"
+                android:layout_height="50dp" android:layout_marginTop="8dp"
+                android:background="@drawable/bg_search_field"
+                android:hint="Escribe el motivo" android:importantForAutofill="no"
+                android:inputType="text" android:paddingStart="14dp" android:paddingEnd="14dp"
+                android:singleLine="true" android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint" android:textSize="14sp"
+                android:visibility="gone" />
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" android:text="Descripción" android:textColor="@color/text_secondary"

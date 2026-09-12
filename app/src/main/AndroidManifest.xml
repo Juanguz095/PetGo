@@ -89,6 +89,9 @@
         <activity
             android:name=".NotificacionesActivity"
             android:exported="false" />
+        <activity
+            android:name=".DetallePublicacionActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

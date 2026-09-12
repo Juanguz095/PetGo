@@ -35,6 +35,7 @@ class DatabaseHelper(context: Context) {
 
     fun obtenerPublicaciones(): List<Publicacion> = repository.obtenerPublicaciones()
     fun obtenerPerdidas(): List<Publicacion> = repository.obtenerPerdidas()
+    fun obtenerAdopciones(): List<Publicacion> = repository.obtenerAdopciones()
     fun obtenerPorIdPublicacion(id: Long): Publicacion? = repository.obtenerPorIdPublicacion(id)
 
     fun insertarAvistamiento(
@@ -49,6 +50,7 @@ class DatabaseHelper(context: Context) {
         repository.obtenerAvistamientosPorPublicacion(publicacionId)
 
     fun marcarResuelta(id: Long) = repository.marcarResuelta(id)
+    fun marcarAdoptada(id: Long) = repository.marcarAdoptada(id)
     fun actualizarAvistamiento(id: Long, latitud: Double, longitud: Double) =
         repository.actualizarAvistamiento(id, latitud, longitud)
 
@@ -84,6 +86,11 @@ class DatabaseHelper(context: Context) {
         onChanged: (List<Albergue>) -> Unit,
         onError: (Exception) -> Unit
     ): ListenerRegistration = repository.observarAlbergues(onChanged, onError)
+
+    fun observarDenuncias(
+        onChanged: (List<Denuncia>) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration = repository.observarDenuncias(onChanged, onError)
 
     fun obtenerNotificaciones(): List<Map<String, Any>> = repository.obtenerNotificaciones()
     fun contarNoLeidas(): Int = repository.contarNoLeidas()

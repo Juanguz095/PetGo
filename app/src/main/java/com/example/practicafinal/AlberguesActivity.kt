@@ -116,7 +116,7 @@ class AlberguesActivity : AppCompatActivity() {
                 ControladorAlbergues.insertarAlbergue(
                     this,
                     "Hogar Peludo",
-                    "AdopciÃ³n responsable",
+                    "Adopción responsable",
                     "Calle Los Olivos 789",
                     "912345678",
                     null,
@@ -159,7 +159,7 @@ class AlberguesActivity : AppCompatActivity() {
                 }
                 (h.itemView.findViewById<TextView>(R.id.tv_nombre)).text = a.nombre
                 (h.itemView.findViewById<TextView>(R.id.tv_direccion)).text = a.direccion
-                (h.itemView.findViewById<TextView>(R.id.tv_telefono)).text = "ðŸ“ž ${a.telefono}"
+                (h.itemView.findViewById<TextView>(R.id.tv_telefono)).text = "📞 ${a.telefono}"
                 if (userLoc != null) (h.itemView.findViewById<TextView>(R.id.tv_distancia)).text = String.format(
                     Locale("es"),
                     "A %.1f km",

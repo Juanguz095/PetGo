@@ -54,12 +54,10 @@ class DetalleAdopcionActivity : AppCompatActivity() {
         val imgFoto = findViewById<android.widget.ImageView>(R.id.img_foto)
         val tvPlaceholder = findViewById<TextView>(R.id.tv_placeholder)
         if (!p.foto.isNullOrBlank()) {
-            Glide.with(this).load(p.foto).into(imgFoto)
+            com.example.practicafinal.util.cargarImagen(imgFoto, p.foto)
             tvPlaceholder.visibility = View.GONE
         } else {
             tvPlaceholder.visibility = View.VISIBLE
-
-        
         }
         val tvEspecie = findViewById<TextView>(R.id.tv_especie_detalle)
         if (!p.especie.isNullOrEmpty()) {
@@ -74,7 +72,7 @@ class DetalleAdopcionActivity : AppCompatActivity() {
 
         
         findViewById<TextView>(R.id.tv_ubicacion).apply {
-            text = "ðŸ“ Ver ubicaciÃ³n en el mapa"
+            text = "📍 Ver ubicación en el mapa"
             setOnClickListener {
                 val intent = Intent(this@DetalleAdopcionActivity, MainActivity::class.java).apply {
                     putExtra("centrar_lat", p.latitud)
@@ -101,12 +99,12 @@ class DetalleAdopcionActivity : AppCompatActivity() {
 
     private fun actualizarBotonFavorito(btn: com.google.android.material.button.MaterialButton) {
         val esFav = FavoritosManager.esFavorito(this, publicacionId)
-        btn.text = if (esFav) "â¤  Quitar de favoritos" else "ðŸ¤  Agregar a favoritos"
+        btn.text = if (esFav) "❤️  Quitar de favoritos" else "👍  Agregar a favoritos"
     }
 
     private fun contactarWhatsApp(p: Publicacion) {
         val texto =
-            "${p.nombre} Â· En adopciÃ³n\n${p.descripcion}\nðŸ“ https://maps.google.com/?q=${p.latitud},${p.longitud}"
+            "${p.nombre} Â· En adopción\n${p.descripcion}\n📍 https://maps.google.com/?q=${p.latitud},${p.longitud}"
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/?text=${Uri.encode(texto)}")))
         } catch (_: Exception) {

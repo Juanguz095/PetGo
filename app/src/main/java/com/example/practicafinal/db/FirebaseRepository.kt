@@ -100,17 +100,19 @@ class FirebaseRepository(private val context: Context) {
     }
 
     fun registrar(nombre: String, correo: String, contrasena: String, tipo: String = "Ciudadano"): Long {
-        val (_, localId) = restSignUp(correo.trim().lowercase(), contrasena)
+        val (idToken, localId) = restSignUp(correo.trim().lowercase(), contrasena)
         val id = legacyId(localId)
         com.example.practicafinal.session.SesionManager.guardarFirebaseUid(context, localId)
+        com.example.practicafinal.session.SesionManager.guardarIdToken(context, idToken)
         val user = Usuario(id, nombre.trim(), correo.trim().lowercase(), tipo)
         await(db.collection(USERS).document(localId).set(user.toFirestoreMap(localId)))
         return id
     }
 
     fun validarLogin(correo: String, contrasena: String): Usuario? {
-        val (_, localId) = restSignIn(correo.trim().lowercase(), contrasena)
+        val (idToken, localId) = restSignIn(correo.trim().lowercase(), contrasena)
         com.example.practicafinal.session.SesionManager.guardarFirebaseUid(context, localId)
+        com.example.practicafinal.session.SesionManager.guardarIdToken(context, idToken)
         val snapshot = await(db.collection(USERS).document(localId).get())
         if (snapshot.exists()) return snapshot.toUsuario(localId)
         val user = Usuario(
@@ -141,14 +143,14 @@ class FirebaseRepository(private val context: Context) {
     ): Long {
         val uid = currentUid()
         val id = newId()
-        val uploadedPhoto = foto?.let { uploadPhoto(it, "publicaciones/$id.jpg") }
+        val fotoFinal = foto?.let { procesarFoto(it) }
         val publication = Publicacion(
             id = id,
             usuarioId = usuarioId ?: legacyId(uid),
             tipo = tipo,
             nombre = nombre,
             descripcion = descripcion,
-            foto = uploadedPhoto,
+            foto = fotoFinal,
             ultimoLugar = ultimoLugar,
             especie = especie,
             latitud = latitud,
@@ -160,12 +162,41 @@ class FirebaseRepository(private val context: Context) {
         return id
     }
 
+    private fun procesarFoto(value: String): String {
+        val uri = Uri.parse(value)
+        if (uri.scheme == "http" || uri.scheme == "https") return value
+        if (uri.scheme == "android.resource") return value
+        return try {
+            val input = context.contentResolver.openInputStream(uri) ?: return value
+            val bitmap = BitmapFactory.decodeStream(input)
+            input.close()
+            if (bitmap == null) return value
+            val maxDim = 600
+            val scale = minOf(1f, maxDim.toFloat() / maxOf(bitmap.width, bitmap.height))
+            val resized = if (scale < 1f) Bitmap.createScaledBitmap(
+                bitmap, (bitmap.width * scale).toInt(), (bitmap.height * scale).toInt(), true
+            ) else bitmap
+            val baos = java.io.ByteArrayOutputStream()
+            resized.compress(Bitmap.CompressFormat.JPEG, 60, baos)
+            if (resized !== bitmap) resized.recycle()
+            val bytes = baos.toByteArray()
+            android.util.Log.d("FirebaseRepo", "Foto procesada: ${bytes.size} bytes")
+            "data:image/jpeg;base64," + android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+        } catch (e: Exception) {
+            android.util.Log.e("FirebaseRepo", "Error procesando foto: ${e.message}", e)
+            value
+        }
+    }
+
     fun obtenerPublicaciones(): List<Publicacion> =
         await(db.collection(PUBLICATIONS).orderBy("fechaCreacion").get()).documents
             .asReversed().map { it.toPublicacion() }
 
     fun obtenerPerdidas(): List<Publicacion> =
         obtenerPublicaciones().filter { it.tipo == "Perdida" }
+
+    fun obtenerAdopciones(): List<Publicacion> =
+        obtenerPublicaciones().filter { it.tipo == "Adopcion" && it.estado != "Adoptada" }
 
     fun obtenerPorIdPublicacion(id: Long): Publicacion? =
         await(db.collection(PUBLICATIONS).document(id.toString()).get()).takeIf { it.exists() }?.toPublicacion()
@@ -180,7 +211,7 @@ class FirebaseRepository(private val context: Context) {
     ): Long {
         val uid = currentUid()
         val id = newId()
-        val uploadedPhoto = foto?.let { uploadPhoto(it, "avistamientos/$id.jpg") }
+        val fotoFinal = foto?.let { procesarFoto(it) }
         val sighting = Avistamiento(
             id,
             publicacionId,
@@ -188,7 +219,7 @@ class FirebaseRepository(private val context: Context) {
             latitud,
             longitud,
             descripcion,
-            uploadedPhoto,
+            fotoFinal,
             System.currentTimeMillis()
         )
         await(db.collection(SIGHTINGS).document(id.toString()).set(sighting.toFirestoreMap(currentUid())))
@@ -232,6 +263,16 @@ class FirebaseRepository(private val context: Context) {
         await(ref.update("estado", "Resuelta"))
     }
 
+    fun marcarAdoptada(id: Long) {
+        val uid = currentUid()
+        val ref = db.collection(PUBLICATIONS).document(id.toString())
+        val snapshot = await(ref.get())
+        check(snapshot.getString("usuarioId") == currentUid()) {
+            "Solo el dueño puede marcar la publicación como adoptada"
+        }
+        await(ref.update("estado", "Adoptada"))
+    }
+
     fun actualizarAvistamiento(id: Long, latitud: Double, longitud: Double) {
         val uid = currentUid()
         val ref = db.collection(PUBLICATIONS).document(id.toString())
@@ -269,8 +310,8 @@ class FirebaseRepository(private val context: Context) {
     ): Long {
         val uid = currentUid()
         val id = newId()
-        val uploadedPhoto = foto?.let { uploadPhoto(it, "denuncias/$id.jpg") }
-        val report = Denuncia(id, motivo, descripcion, uploadedPhoto, latitud, longitud, System.currentTimeMillis())
+        val fotoFinal = foto?.let { procesarFoto(it) }
+        val report = Denuncia(id, motivo, descripcion, fotoFinal, latitud, longitud, System.currentTimeMillis())
         await(db.collection(REPORTS).document(id.toString()).set(report.toFirestoreMap(currentUid())))
         return id
     }
@@ -383,17 +424,37 @@ class FirebaseRepository(private val context: Context) {
             else onChanged(snapshot?.documents.orEmpty().map { it.toAlbergue() })
         }
 
+    fun observarDenuncias(
+        onChanged: (List<Denuncia>) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration = db.collection(REPORTS)
+        .addSnapshotListener { snapshot, error ->
+            if (error != null) onError(error)
+            else onChanged(snapshot?.documents.orEmpty().map { it.toDenuncia() })
+        }
+
     private fun uploadPhoto(value: String, path: String): String? {
         val uri = Uri.parse(value)
         if (uri.scheme == "http" || uri.scheme == "https" || uri.scheme == "android.resource") return value
         return try {
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                ?: return null
-            if (bytes.size.toLong() > MAX_IMAGE_BYTES) return null
+            if (bytes == null) {
+                android.util.Log.e("FirebaseRepo", "No se pudo leer la imagen desde: $value")
+                return null
+            }
+            android.util.Log.d("FirebaseRepo", "Imagen leida: ${bytes.size} bytes, path=$path")
+            if (bytes.size.toLong() > MAX_IMAGE_BYTES) {
+                android.util.Log.e("FirebaseRepo", "Imagen muy grande: ${bytes.size} bytes")
+                return null
+            }
             val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             val payload = if (bitmap == null) bytes else compress(bitmap)
-            uploadViaRest(path, payload)
+            android.util.Log.d("FirebaseRepo", "Imagen comprimida: ${payload.size} bytes, subiendo...")
+            val url = uploadViaRest(path, payload)
+            android.util.Log.d("FirebaseRepo", "Upload exitoso: $url")
+            url
         } catch (e: Exception) {
+            android.util.Log.e("FirebaseRepo", "Upload FAILED: ${e.message}", e)
             null
         }
     }
@@ -402,24 +463,29 @@ class FirebaseRepository(private val context: Context) {
         val bucket = "petgo-325bb.firebasestorage.app"
         val encodedPath = java.net.URLEncoder.encode(path, "UTF-8")
         val uploadUrl = URL("https://firebasestorage.googleapis.com/v0/b/$bucket/o?uploadType=media&name=$encodedPath")
+        android.util.Log.d("FirebaseRepo", "Uploading to: $uploadUrl, bytes: ${bytes.size}")
         val conn = (uploadUrl.openConnection() as HttpURLConnection).apply {
             requestMethod = "POST"
             setRequestProperty("Content-Type", "image/jpeg")
             setRequestProperty("Content-Length", bytes.size.toString())
             doOutput = true
             connectTimeout = 30000
-            readTimeout = 30000
+            readTimeout = 60000
         }
         conn.outputStream.use { it.write(bytes) }
         val code = conn.responseCode
+        android.util.Log.d("FirebaseRepo", "Upload response code: $code")
         val stream = if (code in 200..299) conn.inputStream else conn.errorStream
         val response = stream.bufferedReader().use { it.readText() }
         if (code !in 200..299) {
-            throw Exception("Upload failed: $response")
+            android.util.Log.e("FirebaseRepo", "Upload error: $response")
+            throw Exception("Upload failed ($code): $response")
         }
         val json = JSONObject(response)
         val downloadToken = json.getString("downloadTokens")
-        return "https://firebasestorage.googleapis.com/v0/b/$bucket/o/${encodedPath}?alt=media&token=$downloadToken"
+        val url = "https://firebasestorage.googleapis.com/v0/b/$bucket/o/${encodedPath}?alt=media&token=$downloadToken"
+        android.util.Log.d("FirebaseRepo", "Upload success: $url")
+        return url
     }
 
     private fun compress(bitmap: Bitmap): ByteArray {

@@ -38,9 +38,11 @@ class MisPublicacionesActivity : AppCompatActivity() {
             val propias = todas.filter { it.usuarioId == usuarioId }
             runOnUiThread {
                 tvVacio.visibility = if (propias.isEmpty()) View.VISIBLE else View.GONE
-                rv.adapter = AdaptadorPublicacionesPropias(propias) { publicacion ->
-                    resolverPublicacion(publicacion)
-                }
+                rv.adapter = AdaptadorPublicacionesPropias(
+                    propias,
+                    onResolver = { publicacion -> resolverPublicacion(publicacion) },
+                    onAdoptar = { publicacion -> adoptarPublicacion(publicacion) }
+                )
             }
         }
     }
@@ -49,7 +51,17 @@ class MisPublicacionesActivity : AppCompatActivity() {
         executor.execute {
             ControladorPublicaciones.resolver(this, publicacion.id)
             runOnUiThread {
-                Toast.makeText(this, "Publicación resuelta", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Publicacion resuelta", Toast.LENGTH_SHORT).show()
+                cargarPublicaciones()
+            }
+        }
+    }
+
+    private fun adoptarPublicacion(publicacion: com.example.practicafinal.modelo.Publicacion) {
+        executor.execute {
+            ControladorPublicaciones.adoptar(this, publicacion.id)
+            runOnUiThread {
+                Toast.makeText(this, "Mascota marcada como adoptada", Toast.LENGTH_SHORT).show()
                 cargarPublicaciones()
             }
         }

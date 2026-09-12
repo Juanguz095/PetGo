@@ -37,6 +37,8 @@ class CrearDenunciaActivity : AppCompatActivity() {
     private lateinit var tvError: TextView
     private lateinit var imgFoto: ImageView;
     private lateinit var tvHint: TextView
+    private lateinit var etMotivoCustom: EditText
+    private var esOtroMotivo = false
 
     private val picker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
@@ -59,6 +61,7 @@ class CrearDenunciaActivity : AppCompatActivity() {
 
         etDesc = findViewById(R.id.et_descripcion); tvError = findViewById(R.id.tv_error)
         imgFoto = findViewById(R.id.img_foto); tvHint = findViewById(R.id.tv_foto_hint)
+        etMotivoCustom = findViewById(R.id.et_motivo_custom)
         findViewById<View>(R.id.contenedor_foto).setOnClickListener { picker.launch("image/*") }
 
         val chips = listOf(
@@ -68,13 +71,33 @@ class CrearDenunciaActivity : AppCompatActivity() {
         )
         chips.forEach { (id, m) -> findViewById<TextView>(id).setOnClickListener { seleccionarMotivo(m, chips) } }
 
+        findViewById<TextView>(R.id.chip_otro).setOnClickListener {
+            esOtroMotivo = true
+            val allChips = chips + listOf(R.id.chip_otro to "Otro")
+            allChips.forEach { (id, cm) ->
+                val tv = findViewById<TextView>(id)
+                val activo = cm == "Otro"
+                tv.background = if (activo) ContextCompat.getDrawable(this, R.drawable.bg_chip_selected)
+                else ContextCompat.getDrawable(this, R.drawable.bg_chip)
+                tv.setTextColor(
+                    if (activo) ContextCompat.getColor(this, android.R.color.black)
+                    else ContextCompat.getColor(this, android.R.color.darker_gray)
+                )
+            }
+            etMotivoCustom.visibility = View.VISIBLE
+            etMotivoCustom.requestFocus()
+        }
+
         configurarMapa()
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_enviar).setOnClickListener { enviar() }
     }
 
     private fun seleccionarMotivo(m: String, chips: List<Pair<Int, String>>) {
         motivo = m
-        chips.forEach { (id, cm) ->
+        esOtroMotivo = false
+        etMotivoCustom.visibility = View.GONE
+        val allChips = chips + listOf(R.id.chip_otro to "Otro")
+        allChips.forEach { (id, cm) ->
             val tv = findViewById<TextView>(id)
             val activo = cm == m
             tv.background = if (activo) ContextCompat.getDrawable(this, R.drawable.bg_chip_selected)
@@ -127,6 +150,12 @@ class CrearDenunciaActivity : AppCompatActivity() {
     private fun enviar() {
         val desc = etDesc.text.toString().trim()
         val pt = punto
+        val motivoFinal = if (esOtroMotivo) etMotivoCustom.text.toString().trim() else motivo
+        if (motivoFinal.isEmpty()) {
+            tvError.text = "Escribe el motivo"
+            tvError.visibility = View.VISIBLE
+            return
+        }
         if (desc.isEmpty()) {
             tvError.text = "Escribe una descripción"
             tvError.visibility = View.VISIBLE
@@ -142,7 +171,7 @@ class CrearDenunciaActivity : AppCompatActivity() {
         exec.execute {
             try {
                 ControladorDenuncias.insertarDenuncia(
-                    this, motivo, desc, fotoUri, pt.latitude, pt.longitude
+                    this, motivoFinal, desc, fotoUri, pt.latitude, pt.longitude
                 )
                 runOnUiThread {
                     Toast.makeText(this, "Denuncia enviada", Toast.LENGTH_SHORT).show()

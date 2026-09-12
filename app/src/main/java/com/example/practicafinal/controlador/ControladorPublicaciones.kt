@@ -3,6 +3,7 @@
 import android.content.Context
 import com.example.practicafinal.db.DatabaseHelper
 import com.example.practicafinal.modelo.Avistamiento
+import com.example.practicafinal.modelo.Denuncia
 import com.example.practicafinal.modelo.Publicacion
 import com.google.firebase.firestore.ListenerRegistration
 
@@ -22,6 +23,8 @@ object ControladorPublicaciones {
 
     fun resolver(context: Context, id: Long) = DatabaseHelper(context).marcarResuelta(id)
 
+    fun adoptar(context: Context, id: Long) = DatabaseHelper(context).marcarAdoptada(id)
+
     fun reportarAvistamiento(
         context: Context, publicacionId: Long, usuarioId: Long?, latitud: Double, longitud: Double,
         descripcion: String, foto: String?
@@ -39,7 +42,7 @@ object ControladorPublicaciones {
         DatabaseHelper(context).obtenerPerdidas()
 
     fun obtenerAdopciones(context: Context): List<Publicacion> =
-        DatabaseHelper(context).obtenerPublicaciones().filter { it.tipo == "Adopcion" }
+        DatabaseHelper(context).obtenerAdopciones()
 
     fun obtenerAvistamientos(context: Context): List<Avistamiento> =
         DatabaseHelper(context).obtenerAvistamientos()
@@ -57,4 +60,8 @@ object ControladorPublicaciones {
     fun observarAvistamientos(
         context: Context, onChanged: (List<Avistamiento>) -> Unit, onError: (Exception) -> Unit
     ): ListenerRegistration = DatabaseHelper(context).observarAvistamientos(onChanged, onError)
+
+    fun observarDenuncias(
+        context: Context, onChanged: (List<Denuncia>) -> Unit, onError: (Exception) -> Unit
+    ): ListenerRegistration = DatabaseHelper(context).observarDenuncias(onChanged, onError)
 }
