@@ -370,7 +370,7 @@ class MainActivity : AppCompatActivity() {
             )
         }; marcAlb.clear(); marcDenuncias.forEach { map.overlays.remove(it) }; marcDenuncias.clear()
         marcBusqAvist.forEach { map.overlays.remove(it) }; marcBusqAvist.clear()
-        val activas = l.filter { it.estado != "Resuelta" && it.estado != "Adoptada" }
+        val activas = l.filter { it.estado != "Resuelta" && it.estado != "Adoptada" && !it.foto.isNullOrBlank() }
         for (pub in activas) {
             val m = Marker(map); m.position = GeoPoint(pub.latitud, pub.longitud); m.icon =
                 ContextCompat.getDrawable(this, ico(pub)); m.setAnchor(

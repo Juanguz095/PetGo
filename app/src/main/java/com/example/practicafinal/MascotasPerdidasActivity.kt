@@ -57,7 +57,8 @@ class MascotasPerdidasActivity : AppCompatActivity() {
                 rvPerdidas.adapter = AdaptadorPerdidas(
                     lista, avistPorId,
                     onSighting = { p -> reportarAvistamiento(p) },
-                    onVerAvistamientos = { p -> mostrarAvistamientos(p, avistPorId) }
+                    onVerAvistamientos = { p -> mostrarAvistamientos(p, avistPorId) },
+                    onVerMapa = { p -> verEnMapa(p) }
                 )
             }
         }
@@ -70,6 +71,15 @@ class MascotasPerdidasActivity : AppCompatActivity() {
                 putExtra(ReportarAvistamientoActivity.EXTRA_NOMBRE, publicacion.nombre)
             }
         )
+    }
+
+    private fun verEnMapa(publicacion: Publicacion) {
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            putExtra("centrar_lat", publicacion.latitud)
+            putExtra("centrar_lng", publicacion.longitud)
+            putExtra("mostrar_alerta", publicacion.id)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        })
     }
 
     private fun mostrarAvistamientos(

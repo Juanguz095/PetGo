@@ -17,7 +17,8 @@ class AdaptadorPerdidas(
     private val items: List<Publicacion>,
     private val avistPorPublicacion: Map<Long, List<Avistamiento>>,
     private val onSighting: (Publicacion) -> Unit,
-    private val onVerAvistamientos: (Publicacion) -> Unit
+    private val onVerAvistamientos: (Publicacion) -> Unit,
+    private val onVerMapa: (Publicacion) -> Unit
 ) : RecyclerView.Adapter<AdaptadorPerdidas.PerdidaViewHolder>() {
     class PerdidaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imgFoto: ImageView = view.findViewById(R.id.img_foto)
@@ -27,6 +28,7 @@ class AdaptadorPerdidas(
         val tvFecha: TextView = view.findViewById(R.id.tv_fecha)
         val tvEstado: TextView = view.findViewById(R.id.tv_estado)
         val btnVi: com.google.android.material.button.MaterialButton = view.findViewById(R.id.btn_vi)
+        val btnVerMapa: com.google.android.material.button.MaterialButton = view.findViewById(R.id.btn_ver_mapa)
         val tvAvist: TextView = view.findViewById(R.id.tv_avist)
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PerdidaViewHolder =
@@ -54,8 +56,9 @@ class AdaptadorPerdidas(
             p.estado == "Resuelta" -> android.R.color.darker_gray
             else -> R.color.verde_estado
         }))
-        holder.btnVi.isEnabled = !resuelta
+        holder.btnVi.visibility = if (resuelta) View.GONE else View.VISIBLE
         holder.btnVi.setOnClickListener { onSighting(p) }
+        holder.btnVerMapa.setOnClickListener { onVerMapa(p) }
         val count = avistPorPublicacion[p.id]?.size ?: 0
         holder.tvAvist.visibility = if (count > 0) View.VISIBLE else View.GONE
         holder.tvAvist.text = "👀 " + count + " avistamiento" + if (count > 1) "s" else ""

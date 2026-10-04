@@ -90,6 +90,16 @@
                 android:textSize="12sp"
                 app:strokeColor="#1E88E5" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_ver_mapa"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_marginTop="2dp"
+                android:text="📍 Ver en mapa"
+                android:textColor="#1E88E5"
+                android:textSize="11sp" />
+
             <TextView
                 android:id="@+id/tv_avist"
                 android:layout_width="wrap_content"
