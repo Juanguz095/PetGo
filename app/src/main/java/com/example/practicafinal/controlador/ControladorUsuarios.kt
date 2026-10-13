@@ -10,9 +10,9 @@ object ControladorUsuarios {
     
     fun validarRegistro(
         nombre: String, correo: String,
-        contrasena: String, confirmar: String
+        contrasena: String, confirmar: String, ciudad: String = ""
     ): String? {
-        if (nombre.isBlank() || correo.isBlank() || contrasena.isBlank() || confirmar.isBlank())
+        if (nombre.isBlank() || correo.isBlank() || contrasena.isBlank() || confirmar.isBlank() || ciudad.isBlank())
             return "Completa todos los campos"
         if (contrasena.length < 6)
             return "La contraseña debe tener al menos 6 caracteres"
@@ -22,8 +22,8 @@ object ControladorUsuarios {
     }
 
     
-    fun registrar(context: Context, nombre: String, correo: String, contrasena: String): Long? {
-        return DatabaseHelper(context).registrar(nombre, correo, contrasena)
+    fun registrar(context: Context, nombre: String, correo: String, contrasena: String, ciudad: String = ""): Long? {
+        return DatabaseHelper(context).registrar(nombre, correo, contrasena, "Ciudadano", ciudad)
     }
 
     

@@ -99,12 +99,12 @@ class FirebaseRepository(private val context: Context) {
         return json.getString("idToken") to json.getString("localId")
     }
 
-    fun registrar(nombre: String, correo: String, contrasena: String, tipo: String = "Ciudadano"): Long {
+    fun registrar(nombre: String, correo: String, contrasena: String, tipo: String = "Ciudadano", ciudad: String = ""): Long {
         val (idToken, localId) = restSignUp(correo.trim().lowercase(), contrasena)
         val id = legacyId(localId)
         com.example.practicafinal.session.SesionManager.guardarFirebaseUid(context, localId)
         com.example.practicafinal.session.SesionManager.guardarIdToken(context, idToken)
-        val user = Usuario(id, nombre.trim(), correo.trim().lowercase(), tipo)
+        val user = Usuario(id, nombre.trim(), correo.trim().lowercase(), tipo, ciudad.trim())
         await(db.collection(USERS).document(localId).set(user.toFirestoreMap(localId)))
         return id
     }
@@ -524,7 +524,8 @@ class FirebaseRepository(private val context: Context) {
         (get("legacyId") as? Number)?.toLong() ?: uid?.let(::legacyId) ?: id.toLongOrNull() ?: 0L,
         getString("nombre").orEmpty(),
         getString("correo").orEmpty(),
-        getString("tipo") ?: "Ciudadano"
+        getString("tipo") ?: "Ciudadano",
+        getString("ciudad").orEmpty()
     )
 
     private fun DocumentSnapshot.toPublicacion(): Publicacion = Publicacion(

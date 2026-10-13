@@ -1,96 +1,160 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_surface"
+    android:background="@color/fondo_lista"
     android:fitsSystemWindows="true"
     tools:context=".MascotasPerdidasActivity">
 
-    
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_surface"
-        app:elevation="2dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Mascotas perdidas"
-        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <ScrollView
-        android:id="@+id/scroll_header"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_card_list"
-        android:padding="14dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/fondo_lista"
+            android:elevation="0dp"
+            app:contentInsetStart="8dp"
+            app:contentInsetStartWithNavigation="6dp"
+            app:navigationIcon="@drawable/ic_back_cabecera"
+            app:title="Mascotas perdidas"
+            app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle"
+            app:titleTextColor="@color/tinta" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@android:color/transparent"
+            android:overScrollMode="never"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="14dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_filtro" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="9dp"
+                    android:background="@drawable/bg_chip_lista_on"
+                    android:gravity="center"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="Todas (3)"
+                    android:textColor="@color/tinta"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="9dp"
+                    android:background="@drawable/bg_chip_lista"
+                    android:gravity="center"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="Perros"
+                    android:textColor="@color/tinta"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_chip_lista"
+                    android:gravity="center"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="Gatos"
+                    android:textColor="@color/tinta"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </HorizontalScrollView>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="¿Perdiste una mascota?\nPublica con foto y último lugar visto"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
+                android:background="@drawable/bg_search_field"
+                android:drawableStart="@drawable/ic_buscar"
+                android:drawablePadding="8dp"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingStart="16dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="5dp"
+                android:text="Buscar mascota..."
+                android:textColor="@color/texto_suave"
+                android:textSize="14sp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_publicar"
                 style="@style/Widget.Material3.Button"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="Publicar"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="+"
+                android:textColor="@color/tinta"
+                android:textSize="30sp"
                 android:textStyle="bold"
-                app:backgroundTint="?attr/colorPrimary"
-                app:cornerRadius="20dp" />
+                app:backgroundTint="@color/amarillo"
+                app:cornerRadius="28dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
         </LinearLayout>
-    </ScrollView>
 
-    
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_perdidas"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scroll_header" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_perdidas"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingStart="16dp"
+            android:paddingEnd="11dp"
+            android:paddingBottom="24dp"
+            android:scrollbars="vertical" />
+    </LinearLayout>
 
-    
     <TextView
         android:id="@+id/tv_vacio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:gravity="center"
         android:text="🐾\nAún no hay mascotas perdidas publicadas"
-        android:textColor="@color/text_hint"
-        android:textSize="13sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textColor="@color/texto_suave"
+        android:textSize="14sp"
+        android:visibility="gone" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-
+</FrameLayout>

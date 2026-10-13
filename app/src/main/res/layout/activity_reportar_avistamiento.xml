@@ -4,22 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_surface"
-    tools:context=".ReportarAvistamientoActivity">
+    android:background="@color/crema"
+    tools:context=".ReportarAvistamientoActivity"
+    android:fitsSystemWindows="true">
 
     
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
+        android:layout_marginTop="12dp"
         android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_surface"
-        app:elevation="2dp"
+        android:layout_height="52dp"
+        android:background="@color/crema"
+        app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIcon="@drawable/ic_back_cabecera"
         app:title="Reportar avistamiento"
-        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle" />
+        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle"
+        app:contentInsetStartWithNavigation="6dp"
+        app:titleTextColor="@color/tinta" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -40,7 +44,7 @@
                 android:id="@+id/tv_mascota"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/tinta"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -49,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="¿Dónde la viste? Toca el mapa para indicarlo"
-                android:textColor="@color/text_hint"
+                android:textColor="@color/texto_suave"
                 android:textSize="12sp" />
 
             <org.osmdroid.views.MapView
@@ -64,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="📍 Toca el mapa para elegir el lugar del avistamiento"
-                android:textColor="@color/text_hint"
+                android:textColor="@color/texto_suave"
                 android:textSize="12sp" />
 
             
@@ -73,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Foto del avistamiento (opcional)"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/tinta"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -98,7 +102,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="📷\nAgregar foto"
-                    android:textColor="@color/text_hint"
+                    android:textColor="@color/texto_suave"
                     android:textSize="11sp"
                     android:gravity="center" />
             </FrameLayout>
@@ -109,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Detalle (opcional)"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/tinta"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -118,27 +122,45 @@
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/bg_search_field"
+                android:background="@drawable/bg_brutal_blanco"
                 android:gravity="top|start"
                 android:hint="Ej. Lo vi cruzando la avenida con collar rojo"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
-                android:padding="14dp"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_hint"
+                android:paddingStart="14dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="19dp"
+                android:paddingBottom="19dp"
+                android:textColor="@color/tinta"
+                android:textColorHint="@color/texto_suave"
                 android:textSize="14sp" />
 
-            <com.google.android.material.button.MaterialButton
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_sombra"
+                android:paddingEnd="5dp">
+
+                <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_reportar"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="16dp"
                 android:text="Reportar avistamiento"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
+                                android:textSize="14sp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:stateListAnimator="@null"
+                android:textAllCaps="false"
                 android:textStyle="bold"
-                app:backgroundTint="?attr/colorPrimary" />
+                android:textColor="@color/tinta"
+                app:backgroundTint="@color/tarjeta_amarilla"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp"  />
+
+            </FrameLayout>
 
         </LinearLayout>
     </ScrollView>

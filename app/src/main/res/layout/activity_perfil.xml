@@ -4,23 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_surface"
+    android:background="@color/crema"
     android:fitsSystemWindows="true"
     tools:context=".PerfilActivity">
 
-    
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
+        android:layout_marginTop="12dp"
         android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_surface"
-        app:elevation="2dp"
+        android:layout_height="52dp"
+        android:background="@color/crema"
+        android:elevation="0dp"
+        app:contentInsetStartWithNavigation="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIcon="@drawable/ic_back_cabecera"
         app:title="Perfil"
-        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle" />
+        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle"
+        app:titleTextColor="@color/tinta" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -40,7 +42,6 @@
             android:paddingEnd="20dp"
             android:paddingBottom="24dp">
 
-            
             <TextView
                 android:id="@+id/tv_avatar"
                 android:layout_width="88dp"
@@ -49,21 +50,19 @@
                 android:background="@drawable/bg_avatar"
                 android:gravity="center"
                 android:text="🐾"
-                android:textSize="44sp" />
+                android:textSize="42sp" />
 
-            
             <TextView
                 android:id="@+id/tv_nombre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:text="Usuario Demo"
-                android:textColor="@color/text_primary"
-                android:textSize="18sp"
+                android:textColor="@color/tinta"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
-            
             <TextView
                 android:id="@+id/tv_correo"
                 android:layout_width="wrap_content"
@@ -71,50 +70,49 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="2dp"
                 android:text="usuario@demo.com"
-                android:textColor="@color/text_hint"
+                android:textColor="@color/texto_suave"
                 android:textSize="13sp" />
 
-            
             <TextView
                 android:id="@+id/tv_tipo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_chip"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_pill_estado"
                 android:paddingStart="16dp"
-                android:paddingTop="6dp"
+                android:paddingTop="7dp"
                 android:paddingEnd="16dp"
-                android:paddingBottom="6dp"
+                android:paddingBottom="7dp"
                 android:text="Ciudadano"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:textColor="@color/tinta"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-            
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="26dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
+                    android:layout_marginEnd="7dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_stat"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
 
                     <TextView
                         android:id="@+id/tv_publicaciones"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="@color/text_primary"
-                        android:textSize="20sp"
+                        android:textColor="@color/tinta"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -122,29 +120,30 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Publicaciones"
-                        android:textColor="@color/text_hint"
-                        android:textSize="11sp" />
+                        android:textColor="@color/tinta"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_marginEnd="6dp"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginEnd="7dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_stat"
+                    android:background="@drawable/bg_stat_amarillo"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
 
                     <TextView
                         android:id="@+id/tv_denuncias"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="@color/text_primary"
-                        android:textSize="20sp"
+                        android:textColor="@color/tinta"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -152,28 +151,29 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Denuncias"
-                        android:textColor="@color/text_hint"
-                        android:textSize="11sp" />
+                        android:textColor="@color/tinta"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="7dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_stat"
+                    android:background="@drawable/bg_stat_azul"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
 
                     <TextView
                         android:id="@+id/tv_favoritos"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="@color/text_primary"
-                        android:textSize="20sp"
+                        android:textColor="@color/tinta"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -181,26 +181,31 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Favoritos"
-                        android:textColor="@color/text_hint"
-                        android:textSize="11sp" />
+                        android:textColor="@color/tinta"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
-            
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/bg_card_list"
+                android:layout_marginEnd="-5dp"
+                android:layout_marginTop="26dp"
+                android:background="@drawable/bg_card_lista"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:id="@+id/row_publicaciones"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="21dp"
+                    android:paddingBottom="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -214,30 +219,36 @@
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:text="Mis publicaciones"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                        android:textColor="@color/tinta"
+                        android:textSize="15sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=">"
-                        android:textColor="@color/text_disabled"
-                        android:textSize="16sp" />
+                        android:text="›"
+                        android:textColor="@color/tinta"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginStart="50dp"
-                    android:background="@color/bg_surface_variant" />
+                    android:layout_marginEnd="21dp"
+                    android:background="@color/tinta" />
 
                 <LinearLayout
                     android:id="@+id/row_denuncias"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="21dp"
+                    android:paddingBottom="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -251,30 +262,36 @@
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:text="Mis denuncias"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                        android:textColor="@color/tinta"
+                        android:textSize="15sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=">"
-                        android:textColor="@color/text_disabled"
-                        android:textSize="16sp" />
+                        android:text="›"
+                        android:textColor="@color/tinta"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginStart="50dp"
-                    android:background="@color/bg_surface_variant" />
+                    android:layout_marginEnd="21dp"
+                    android:background="@color/tinta" />
 
                 <LinearLayout
                     android:id="@+id/row_favoritos"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="21dp"
+                    android:paddingBottom="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -288,30 +305,36 @@
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:text="Mis favoritos"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                        android:textColor="@color/tinta"
+                        android:textSize="15sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=">"
-                        android:textColor="@color/text_disabled"
-                        android:textSize="16sp" />
+                        android:text="›"
+                        android:textColor="@color/tinta"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginStart="50dp"
-                    android:background="@color/bg_surface_variant" />
+                    android:layout_marginEnd="21dp"
+                    android:background="@color/tinta" />
 
                 <LinearLayout
                     android:id="@+id/row_configuracion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="21dp"
+                    android:paddingBottom="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -325,28 +348,32 @@
                         android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:text="Configuración"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                        android:textColor="@color/tinta"
+                        android:textSize="15sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=">"
-                        android:textColor="@color/text_disabled"
-                        android:textSize="16sp" />
+                        android:text="›"
+                        android:textColor="@color/tinta"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
-            
             <LinearLayout
                 android:id="@+id/row_cerrar_sesion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_card_list"
+                android:layout_marginEnd="-5dp"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_card_lista"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="21dp"
+                android:paddingBottom="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -360,23 +387,21 @@
                     android:layout_marginStart="14dp"
                     android:layout_weight="1"
                     android:text="Cerrar sesión"
-                    android:textColor="#E53935"
-                    android:textSize="14sp"
+                    android:textColor="@color/colorRed"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
                 android:text="v1.0"
-                android:textColor="@color/text_disabled"
+                android:textColor="@color/texto_suave"
                 android:textSize="11sp" />
 
         </LinearLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

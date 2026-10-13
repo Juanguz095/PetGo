@@ -143,6 +143,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.btn_leyenda).setOnClickListener {
             androidx.appcompat.app.AlertDialog.Builder(this).setTitle("Leyenda del mapa")
                 .setView(R.layout.dialog_leyenda).setPositiveButton("Entendido", null).show()
+                .also { com.example.practicafinal.util.Dialogos.aplicar(this, it) }
         }
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_zoom_in).setOnClickListener { map.controller.zoomIn() }
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_zoom_out).setOnClickListener { map.controller.zoomOut() }
@@ -505,6 +506,7 @@ class MainActivity : AppCompatActivity() {
             override fun getItemCount() = items.size
         }; androidx.appcompat.app.AlertDialog.Builder(this).setTitle("Alertas cercanas").setView(v)
             .setPositiveButton("Cerrar", null).show()
+            .also { com.example.practicafinal.util.Dialogos.aplicar(this, it) }
         }
         }
     }

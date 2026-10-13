@@ -19,6 +19,7 @@ class RegistroActivity : AppCompatActivity() {
     private lateinit var etCorreo: EditText
     private lateinit var etContrasena: EditText
     private lateinit var etConfirmar: EditText
+    private lateinit var etCiudad: EditText
     private lateinit var tvError: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,10 +33,14 @@ class RegistroActivity : AppCompatActivity() {
         etCorreo = findViewById(R.id.et_correo)
         etContrasena = findViewById(R.id.et_contrasena)
         etConfirmar = findViewById(R.id.et_confirmar)
+        etCiudad = findViewById(R.id.et_ciudad)
         tvError = findViewById(R.id.tv_error)
 
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar)
             .setOnClickListener { registrar() }
+
+        findViewById<android.widget.TextView>(R.id.tv_ir_login)
+            .setOnClickListener { finish() }
     }
 
     private fun registrar() {
@@ -43,8 +48,9 @@ class RegistroActivity : AppCompatActivity() {
         val correo = etCorreo.text.toString().trim()
         val contrasena = etContrasena.text.toString()
         val confirmar = etConfirmar.text.toString()
+        val ciudad = etCiudad.text.toString().trim()
 
-        val error = ControladorUsuarios.validarRegistro(nombre, correo, contrasena, confirmar)
+        val error = ControladorUsuarios.validarRegistro(nombre, correo, contrasena, confirmar, ciudad)
         if (error != null) {
             mostrarError(error); return
         }
@@ -52,7 +58,7 @@ class RegistroActivity : AppCompatActivity() {
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = false
         executor.execute {
             try {
-                val id = ControladorUsuarios.registrar(this, nombre, correo, contrasena)
+                val id = ControladorUsuarios.registrar(this, nombre, correo, contrasena, ciudad)
                 runOnUiThread {
                     findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = true
                     if (id != null) {

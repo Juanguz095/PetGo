@@ -58,7 +58,8 @@ class MascotasPerdidasActivity : AppCompatActivity() {
                     lista, avistPorId,
                     onSighting = { p -> reportarAvistamiento(p) },
                     onVerAvistamientos = { p -> mostrarAvistamientos(p, avistPorId) },
-                    onVerMapa = { p -> verEnMapa(p) }
+                    onVerMapa = { p -> verEnMapa(p) },
+                    onDetalles = { p -> verDetalles(p) }
                 )
             }
         }
@@ -80,6 +81,14 @@ class MascotasPerdidasActivity : AppCompatActivity() {
             putExtra("mostrar_alerta", publicacion.id)
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         })
+    }
+
+    private fun verDetalles(publicacion: Publicacion) {
+        startActivity(
+            Intent(this, DetallePublicacionActivity::class.java).apply {
+                putExtra(DetallePublicacionActivity.EXTRA_PUBLICACION_ID, publicacion.id)
+            }
+        )
     }
 
     private fun mostrarAvistamientos(
@@ -119,6 +128,7 @@ class MascotasPerdidasActivity : AppCompatActivity() {
             .setView(dialogView)
             .setPositiveButton("Cerrar", null)
             .show()
+            .also { com.example.practicafinal.util.Dialogos.aplicar(this, it) }
     }
 
     private class AvistViewHolder(view: View) : RecyclerView.ViewHolder(view) {

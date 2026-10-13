@@ -3,35 +3,45 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_surface"
-    android:orientation="vertical">
+    android:background="@color/crema"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
+        android:layout_marginTop="12dp"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_surface"
-        app:elevation="2dp"
-        app:navigationIcon="@drawable/ic_arrow_back"
+        android:layout_height="52dp"
+        android:background="@color/crema"
+        android:elevation="0dp"
+        app:contentInsetStartWithNavigation="6dp"
+        app:navigationIcon="@drawable/ic_back_cabecera"
         app:title="Notificaciones"
-        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle" />
+        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle"
+        app:titleTextColor="@color/tinta" />
 
     <TextView
         android:id="@+id/tv_marcar_leidas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/bg_surface_variant"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="6dp"
+        android:background="@drawable/bg_pill_estado"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center"
-        android:padding="10dp"
+        android:padding="12dp"
         android:text="Marcar todas como leídas"
-        android:textColor="@color/colorSecondary"
+        android:textColor="@color/tinta"
         android:textSize="13sp"
         android:textStyle="bold" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/bg_divider" />
+        android:layout_height="2dp"
+        android:background="@color/tinta" />
 
     <TextView
         android:id="@+id/tv_vacio"
@@ -39,8 +49,8 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="No tienes notificaciones"
-        android:textColor="@color/text_hint"
-        android:textSize="16sp"
+        android:textColor="@color/texto_suave"
+        android:textSize="15sp"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -48,6 +58,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:padding="8dp" />
+        android:paddingStart="16dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="11dp"
+        android:paddingBottom="20dp" />
 
 </LinearLayout>

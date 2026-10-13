@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="@color/bg_surface_variant" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:left="5dp" android:top="5dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/tinta" />
+        </shape>
+    </item>
+    <item android:right="5dp" android:bottom="5dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/tarjeta_amarilla" />
+            <stroke
+                android:width="2dp"
+                android:color="@color/tinta" />
+        </shape>
+    </item>
+</layer-list>

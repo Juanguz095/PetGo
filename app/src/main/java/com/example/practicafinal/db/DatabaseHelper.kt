@@ -16,8 +16,8 @@ class DatabaseHelper(context: Context) {
 
     private val repository = FirebaseRepository(context.applicationContext)
 
-    fun registrar(nombre: String, correo: String, contrasena: String, tipo: String = "Ciudadano"): Long? =
-        repository.registrar(nombre, correo, contrasena, tipo)
+    fun registrar(nombre: String, correo: String, contrasena: String, tipo: String = "Ciudadano", ciudad: String = ""): Long? =
+        repository.registrar(nombre, correo, contrasena, tipo, ciudad)
 
     fun validarLogin(correo: String, contrasena: String): Usuario? =
         repository.validarLogin(correo, contrasena)

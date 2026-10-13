@@ -4,28 +4,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_surface"
-    tools:context=".MisPublicacionesActivity">
+    android:background="@color/crema"
+    tools:context=".MisPublicacionesActivity"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
+        android:layout_marginTop="12dp"
         android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_surface"
-        app:elevation="2dp"
+        android:layout_height="52dp"
+        android:background="@color/crema"
+        android:elevation="0dp"
+        app:contentInsetStartWithNavigation="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIcon="@drawable/ic_back_cabecera"
         app:title="Mis publicaciones"
-        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle" />
+        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle"
+        app:titleTextColor="@color/tinta" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_publicaciones"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="11dp"
+        android:paddingBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +44,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Aún no has hecho ninguna publicación"
-        android:textColor="@color/text_hint"
+        android:textColor="@color/texto_suave"
         android:textSize="13sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -46,4 +53,3 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

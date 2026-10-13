@@ -4,221 +4,269 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_overlay"
-    tools:context=".MenuOpcionesActivity">
+    android:background="@color/crema"
+    tools:context=".MenuOpcionesActivity"
+    android:fitsSystemWindows="true">
 
-    
-    <LinearLayout
-        android:id="@+id/card_menu"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_marginTop="12dp"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="48dp"
-        android:background="@drawable/bg_card_menu"
-        android:elevation="12dp"
-        android:orientation="vertical"
-        android:padding="24dp"
+        android:layout_height="52dp"
+        android:background="@color/crema"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationContentDescription="Volver"
+        app:navigationIcon="@drawable/ic_back_cabecera"
+        app:title="Opciones"
+        app:titleTextAppearance="@style/TextAppearance.AdopcionesTitle"
+        app:titleTextColor="@color/tinta" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-        
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="🐾 Opciones"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="4dp"
-            android:text="¿Qué deseas hacer?"
-            android:textColor="@color/text_hint"
-            android:textSize="12sp" />
-
-        
         <LinearLayout
-            android:id="@+id/item_albergues"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
             android:orientation="vertical"
-            android:padding="6dp">
-
-            <TextView
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:background="@drawable/bg_circle_azul"
-                android:gravity="center"
-                android:text="🏠"
-                android:textSize="26sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:maxLines="2"
-                android:text="Albergues / Organizaciones"
-                android:textColor="@color/text_primary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:id="@+id/item_adopciones"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="6dp">
-
-                <TextView
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:background="@drawable/bg_circle_rosa"
-                    android:gravity="center"
-                    android:text="🐶"
-                    android:textSize="26sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:text="Adopciones"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/item_denuncias"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="6dp">
-
-                <TextView
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:background="@drawable/bg_circle_rojo"
-                    android:gravity="center"
-                    android:text="🚨"
-                    android:textSize="26sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:text="Denuncias anónimas"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </LinearLayout>
-
-        
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal">
+            android:paddingBottom="32dp"
+            android:paddingEnd="13dp"
+            android:paddingStart="18dp"
+            android:paddingTop="20dp">
 
             <LinearLayout
                 android:id="@+id/item_perdidas"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:background="@drawable/bg_brutal_rojo"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:paddingBottom="20dp"
+                android:paddingEnd="20dp"
+                android:paddingStart="15dp"
+                android:paddingTop="15dp">
 
-                <TextView
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:background="@drawable/bg_circle_ambar"
-                    android:gravity="center"
-                    android:text="🐾"
-                    android:textSize="26sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/icono_mascotas_perdidas" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:text="Mascotas perdidas"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp"
+                    android:layout_height="wrap_content"
+                    android:text="Mascotas Perdidas"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/item_perfil"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
+                android:id="@+id/item_adopciones"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:layout_marginTop="9dp"
+                android:background="@drawable/bg_brutal_amarillo"
                 android:orientation="vertical"
-                android:padding="6dp">
+                android:paddingBottom="20dp"
+                android:paddingEnd="20dp"
+                android:paddingStart="15dp"
+                android:paddingTop="15dp">
 
-                <TextView
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:background="@drawable/bg_circle_verde"
-                    android:gravity="center"
-                    android:text="👤"
-                    android:textSize="26sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/icono_adopcion" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:text="Perfil"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp"
+                    android:layout_height="wrap_content"
+                    android:text="Adopciones"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/item_albergues"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_marginEnd="11dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_brutal_azul"
+                    android:orientation="vertical"
+                    android:paddingBottom="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="15dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/icono_albergues" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Albergues"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/item_denuncias"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_brutal_magenta"
+                    android:orientation="vertical"
+                    android:paddingBottom="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="15dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/icono_denuncias" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Denuncias"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/item_favoritos"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_marginEnd="11dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_brutal_beige"
+                    android:orientation="vertical"
+                    android:paddingBottom="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="15dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/icono_favoritos" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Favoritos"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/item_seguimiento"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_brutal_naranja"
+                    android:orientation="vertical"
+                    android:paddingBottom="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="15dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/icono_seguimiento" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Seguimiento"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/item_anuncio"
+                android:layout_width="match_parent"
+                android:layout_height="154dp"
+                android:layout_marginTop="9dp"
+                android:background="@drawable/bg_anuncio"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Anuncio"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
         </LinearLayout>
-
-        
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_cerrar"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginTop="20dp"
-            android:text="✕  Cerrar"
-            android:textColor="@color/text_primary"
-            android:textSize="13sp"
-            app:strokeColor="@color/text_primary" />
-
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

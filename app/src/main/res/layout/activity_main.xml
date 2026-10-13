@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/crema"
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
@@ -27,7 +28,7 @@
         android:paddingEnd="10dp"
         android:paddingBottom="4dp"
         android:text="Mantén presionado el mapa para publicar"
-        android:textColor="@color/text_hint"
+        android:textColor="@color/texto_suave"
         android:textSize="11sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -46,7 +47,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="5dp"
         android:text="📖  Leyenda"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/tinta"
         android:textSize="11sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,7 +67,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="5dp"
         android:text="Alertas cerca"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/tinta"
         android:textSize="11sp"
         android:textStyle="bold"
         android:visibility="gone"
@@ -87,7 +88,7 @@
         android:paddingEnd="12dp"
         android:paddingBottom="5dp"
         android:text="🔔  Notificaciones"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/tinta"
         android:textSize="11sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -114,7 +115,10 @@
         android:background="@drawable/bg_panel_top"
         android:elevation="10dp"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="16dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -133,7 +137,7 @@
                 android:background="@drawable/bg_circle_rojo"
                 android:gravity="center"
                 android:text="✕"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/white"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -152,16 +156,22 @@
             android:id="@+id/panel_emoji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textSize="14sp" />
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_pill_estado"
+            android:paddingStart="12dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="4dp"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/panel_titulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/tinta"
+            android:textSize="17sp"
             android:textStyle="bold" />
 
         <TextView
@@ -169,7 +179,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textColor="@color/text_hint"
+            android:textColor="@color/texto_suave"
             android:textSize="12sp" />
 
         <TextView
@@ -177,7 +187,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/texto_suave"
             android:textSize="13sp"
             android:maxLines="3"
             android:ellipsize="end" />
@@ -187,7 +197,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="@color/text_hint"
+            android:textColor="@color/texto_suave"
             android:textSize="12sp" />
 
         <TextView
@@ -201,19 +211,23 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="14dp"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/panel_compartir"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="42dp"
                 android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
                 android:text="Compartir"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/tinta"
                 android:textSize="12sp"
-                app:strokeColor="@color/text_primary" />
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -228,21 +242,31 @@
                 android:id="@+id/panel_btn_izq"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="42dp"
                 android:layout_weight="1"
-                android:textColor="@color/text_primary"
-                android:textSize="12sp" />
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="@color/tinta"
+                android:textSize="12sp"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/panel_btn_der"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="42dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:textColor="@color/text_primary"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textColor="@color/tinta"
                 android:textSize="12sp"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
         </LinearLayout>
     </LinearLayout>
 

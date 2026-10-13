@@ -5,9 +5,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingStart="16dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="8dp">
+    android:paddingTop="10dp"
+    android:paddingEnd="11dp"
+    android:paddingBottom="12dp"
+    android:background="@android:color/transparent">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_avistamientos"
@@ -20,7 +21,7 @@
         android:layout_height="80dp"
         android:gravity="center"
         android:text="Aún no hay avistamientos reportados"
-        android:textColor="@color/text_hint"
+        android:textColor="@color/texto_suave"
         android:textSize="13sp"
         android:visibility="gone" />
 </LinearLayout>
