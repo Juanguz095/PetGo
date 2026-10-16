@@ -13,12 +13,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.practicafinal.controlador.ControladorAlbergues
 import com.example.practicafinal.controlador.ControladorPublicaciones
-import com.example.practicafinal.db.DatabaseHelper
 import com.example.practicafinal.modelo.Albergue
 import com.example.practicafinal.modelo.Avistamiento;
 import com.example.practicafinal.modelo.Denuncia
@@ -41,6 +42,9 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity() {
     private lateinit var map: MapView;
     private val exec = Executors.newSingleThreadExecutor()
+    private val locationHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private var locationListener: android.location.LocationListener? = null
+    private var locationTimeout: Runnable? = null
     private var userLoc: GeoPoint? = null;
     private var markerUsuario: Marker? = null
     private var circUser: Polygon? = null;
@@ -72,8 +76,8 @@ class MainActivity : AppCompatActivity() {
     private var alberguesActuales: List<Albergue> = emptyList()
     private var denunciasActuales: List<Denuncia> = emptyList()
 
-    private val permiso = registerForActivityResult(ActivityResultContracts.RequestPermission()) { g ->
-        if (g) centrarUsuario() else {
+    private val permiso = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permisos ->
+        if (permisos.values.any { it }) centrarUsuario() else {
             Toast.makeText(this, "Permiso denegado", Toast.LENGTH_SHORT).show(); centrarLima()
         }
     }
@@ -129,24 +133,24 @@ class MainActivity : AppCompatActivity() {
         pnl.findViewById<TextView>(R.id.panel_cerrar)
             .setOnClickListener { ocultarPanel() }; pnl.findViewById<MaterialButton>(R.id.panel_compartir)
             .setOnClickListener { compartir() }
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_menu).setOnClickListener {
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_menu).setOnClickListener {
             startActivity(
                 Intent(this, MenuOpcionesActivity::class.java)
             )
         }
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_perfil).setOnClickListener {
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_perfil).setOnClickListener {
             startActivity(
                 Intent(this, PerfilActivity::class.java)
             )
         }
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_recenter).setOnClickListener { centrarUsuario() }
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_recenter).setOnClickListener { centrarUsuario() }
         findViewById<TextView>(R.id.btn_leyenda).setOnClickListener {
             androidx.appcompat.app.AlertDialog.Builder(this).setTitle("Leyenda del mapa")
                 .setView(R.layout.dialog_leyenda).setPositiveButton("Entendido", null).show()
                 .also { com.example.practicafinal.util.Dialogos.aplicar(this, it) }
         }
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_zoom_in).setOnClickListener { map.controller.zoomIn() }
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_zoom_out).setOnClickListener { map.controller.zoomOut() }
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_zoom_in).setOnClickListener { map.controller.zoomIn() }
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_zoom_out).setOnClickListener { map.controller.zoomOut() }
         btnCercanas = findViewById(R.id.btn_cercanas); btnCercanas.setOnClickListener { dialogoCercanas() }
         btnNotificaciones = findViewById(R.id.btn_notificaciones)
         btnNotificaciones.setOnClickListener {
@@ -160,7 +164,7 @@ class MainActivity : AppCompatActivity() {
         }
         val alertaId = intent.getLongExtra("mostrar_alerta", -1L)
         if (alertaId != -1L) pendienteMostrarAlerta = alertaId
-        if (tienePermiso()) centrarUsuario() else permiso.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        if (tienePermiso()) centrarUsuario() else permiso.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -190,57 +194,64 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun tienePermiso() = ContextCompat.checkSelfPermission(
-        this,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
+    private fun tienePermiso() = com.example.practicafinal.util.tienePermisoUbicacion(this)
 
-    private fun getLastLoc(): Location? {
-        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager; return try {
-            lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-        } catch (_: SecurityException) {
-            null
-        }
+    private fun getLastLoc(): Location? = com.example.practicafinal.util.ultimaUbicacion(this)
+
+    private fun cancelarUbicacion() {
+        val manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationListener?.let { try { manager.removeUpdates(it) } catch (_: SecurityException) {} }
+        locationListener = null
+        locationTimeout?.let { locationHandler.removeCallbacks(it) }
+        locationTimeout = null
+    }
+
+    private fun mostrarUbicacion(loc: Location) {
+        userLoc = GeoPoint(loc.latitude, loc.longitude)
+        marcUser(userLoc!!)
+        circUser(userLoc!!)
+        map.controller.setZoom(19.5)
+        map.controller.setCenter(userLoc)
     }
 
     private fun centrarUsuario() {
-        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        var ubicado = false
-
+        cancelarUbicacion()
+        if (!tienePermiso()) {
+            permiso.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            return
+        }
+        getLastLoc()?.let { mostrarUbicacion(it); return }
+        val manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val callback = object : android.location.LocationListener {
             override fun onLocationChanged(loc: Location) {
-                if (ubicado) return
-                ubicado = true
-                try { lm.removeUpdates(this) } catch (_: Exception) {}
-                userLoc = GeoPoint(loc.latitude, loc.longitude)
-                marcUser(userLoc!!); circUser(userLoc!!)
-                map.controller.setZoom(19.5); map.controller.setCenter(userLoc)
+                cancelarUbicacion()
+                if (!isFinishing && !isDestroyed) mostrarUbicacion(loc)
             }
             @Deprecated("Deprecated in Java")
-            override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) {}
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
             override fun onProviderEnabled(provider: String) {}
             override fun onProviderDisabled(provider: String) {}
         }
-
+        locationListener = callback
         try {
-            if (tienePermiso()) {
-                if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER))
-                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500L, 5f, callback, mainLooper)
-                if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
-                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000L, 10f, callback, mainLooper)
-
-                android.os.Handler(mainLooper).postDelayed({
-                    if (!ubicado) {
-                        ubicado = true
-                        try { lm.removeUpdates(callback) } catch (_: Exception) {}
-                        centrarLima()
-                    }
-                }, 15000)
-            } else {
+            val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+                .filter { manager.isProviderEnabled(it) }
+            if (providers.isEmpty()) {
+                cancelarUbicacion()
+                Toast.makeText(this, "Activa la ubicación para encontrar alertas cercanas", Toast.LENGTH_SHORT).show()
                 centrarLima()
+                return
             }
+            providers.forEach { manager.requestLocationUpdates(it, 1000L, 5f, callback, mainLooper) }
+            locationTimeout = Runnable {
+                cancelarUbicacion()
+                if (!isFinishing && !isDestroyed) {
+                    Toast.makeText(this, "No se pudo obtener tu ubicación", Toast.LENGTH_SHORT).show()
+                    centrarLima()
+                }
+            }.also { locationHandler.postDelayed(it, 15000) }
         } catch (_: SecurityException) {
+            cancelarUbicacion()
             centrarLima()
         }
     }
@@ -287,21 +298,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cargarBD() {
-        exec.execute {
-            try {
-                DatabaseHelper(this).seedIfNeeded()
-            } catch (error: Exception) {
-                runOnUiThread {
-                    Toast.makeText(this, "No se pudo sincronizar con Firebase", Toast.LENGTH_LONG).show()
-                }
-                return@execute
-            }
-            if (listenersAttached) return@execute
-            runOnUiThread {
-                if (listenersAttached) return@runOnUiThread
+        ejecutarSeguro(exec) {
+            if (listenersAttached) return@ejecutarSeguro
+            actualizarUi {
+                if (listenersAttached) return@actualizarUi
                 listenersAttached = true
                 val errorHandler: (Exception) -> Unit = {
-                    runOnUiThread {
+                    actualizarUi {
                         Toast.makeText(this, "Error de sincronización o red", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -465,7 +468,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun dialogoCercanas() {
-        val u = userLoc ?: return; exec.execute {
+        val u = userLoc ?: return; ejecutarSeguro(exec) {
             val pubs =
                 ControladorPublicaciones.obtenerPublicaciones(this).filter { it.estado != "Resuelta" && it.estado != "Adoptada" }; data class I(
             val p: Publicacion,
@@ -473,9 +476,9 @@ class MainActivity : AppCompatActivity() {
         );
             val items =
                 pubs.map { I(it, GeoPoint(it.latitud, it.longitud).distanceToAsDouble(u) / 1000.0) }.sortedBy { it.km }
-                    .take(20); runOnUiThread {
+                    .take(20); actualizarUi {
             if (items.isEmpty()) {
-                Toast.makeText(this, "No hay alertas cercanas", Toast.LENGTH_SHORT).show(); return@runOnUiThread
+                Toast.makeText(this, "No hay alertas cercanas", Toast.LENGTH_SHORT).show(); return@actualizarUi
             };
             val v = android.view.LayoutInflater.from(this).inflate(R.layout.dialog_cercanas, null);
             val rv =
@@ -581,7 +584,7 @@ class MainActivity : AppCompatActivity() {
             else -> "Activa . ${fechaRelativa(pub.fechaCreacion)}"
         }
         pnlEst.setTextColor(ContextCompat.getColor(this, when {
-            r -> android.R.color.darker_gray
+            r -> R.color.texto_suave
             a -> R.color.colorSecondary
             else -> R.color.verde_estado
         }))
@@ -715,14 +718,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        super.onResume(); map.onResume(); cargarBD()
+        super.onResume(); if (::map.isInitialized) { map.onResume(); cargarBD() }
     }
 
     override fun onPause() {
-        super.onPause(); map.onPause()
+        super.onPause(); cancelarUbicacion(); if (::map.isInitialized) map.onPause()
     }
 
     override fun onDestroy() {
+        cancelarUbicacion()
+        if (::map.isInitialized) map.onDetach()
         firebaseListeners.forEach { it.remove() }
         firebaseListeners.clear()
         super.onDestroy(); exec.shutdown()

@@ -51,6 +51,7 @@
                     android:src="@drawable/ic_filtro" />
 
                 <TextView
+                    android:id="@+id/chip_todos"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginEnd="9dp"
@@ -58,12 +59,13 @@
                     android:gravity="center"
                     android:paddingStart="18dp"
                     android:paddingEnd="18dp"
-                    android:text="Todas (3)"
+                    android:text="Todas"
                     android:textColor="@color/tinta"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/chip_perros"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginEnd="9dp"
@@ -76,6 +78,7 @@
                     android:textSize="13sp" />
 
                 <TextView
+                    android:id="@+id/chip_gatos"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:background="@drawable/bg_chip_lista"
@@ -97,12 +100,13 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView
+            <EditText
+                android:id="@+id/et_buscar"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_search_field"
-                android:drawableStart="@drawable/ic_buscar"
+                app:drawableStartCompat="@drawable/ic_buscar"
                 android:drawablePadding="8dp"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
@@ -111,26 +115,29 @@
                 android:paddingTop="0dp"
                 android:paddingEnd="20dp"
                 android:paddingBottom="5dp"
-                android:text="Buscar mascota..."
-                android:textColor="@color/texto_suave"
+                android:hint="@string/search_pet"
+                android:inputType="text"
+                android:singleLine="true"
+                android:importantForAutofill="no"
+                android:textColor="@color/tinta"
+                android:textColorHint="@color/texto_suave"
                 android:textSize="14sp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_publicar"
-                style="@style/Widget.Material3.Button"
+                style="@style/Widget.PetGo.Button.Icon"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_marginStart="8dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="+"
-                android:textColor="@color/tinta"
-                android:textSize="30sp"
+                android:textColor="@color/petgo_button_text"
                 android:textStyle="bold"
                 app:backgroundTint="@color/amarillo"
-                app:cornerRadius="28dp"
                 app:strokeColor="@color/tinta"
-                app:strokeWidth="2dp" />
+                app:strokeWidth="2dp"
+                app:icon="@drawable/ic_fab_menu"
+                android:contentDescription="@string/publish_lost_pet" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -148,13 +155,13 @@
 
     <TextView
         android:id="@+id/tv_vacio"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center"
-        android:text="🐾\nAún no hay mascotas perdidas publicadas"
-        android:textColor="@color/texto_suave"
-        android:textSize="14sp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        style="@style/Widget.PetGo.EmptyState"
+        android:text="@string/empty_lost_pets"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_width="match_parent" />
 
 </FrameLayout>

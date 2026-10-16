@@ -1,10 +1,6 @@
 ﻿package com.example.practicafinal
 
-import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -14,13 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.practicafinal.controlador.ControladorAlbergues
 import com.example.practicafinal.modelo.Albergue
-import com.bumptech.glide.Glide
 import org.osmdroid.util.GeoPoint
 import java.util.Locale
 import java.util.concurrent.Executors
@@ -53,79 +50,34 @@ class AlberguesActivity : AppCompatActivity() {
         chipCercanos.setOnClickListener {
             ordenPorCercanos = true
             chipCercanos.background = ContextCompat.getDrawable(this, R.drawable.bg_chip_selected)
-            chipCercanos.setTextColor(ContextCompat.getColor(this, android.R.color.black))
+            chipCercanos.setTextColor(ContextCompat.getColor(this, R.color.tinta))
             chipAz.background = ContextCompat.getDrawable(this, R.drawable.bg_chip); chipAz.setTextColor(
             ContextCompat.getColor(
                 this,
-                android.R.color.darker_gray
+                R.color.texto_suave
             )
         ); mostrarLista()
         }
         chipAz.setOnClickListener {
             ordenPorCercanos = false
             chipAz.background = ContextCompat.getDrawable(this, R.drawable.bg_chip_selected)
-            chipAz.setTextColor(ContextCompat.getColor(this, android.R.color.black))
+            chipAz.setTextColor(ContextCompat.getColor(this, R.color.tinta))
             chipCercanos.background = ContextCompat.getDrawable(this, R.drawable.bg_chip); chipCercanos.setTextColor(
-            ContextCompat.getColor(this, android.R.color.darker_gray)
+            ContextCompat.getColor(this, R.color.texto_suave)
         ); mostrarLista()
         }
 
         cargar()
     }
 
-    private fun obtenerUbicacion(): GeoPoint? {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) return null
-        return try {
-            (getSystemService(Context.LOCATION_SERVICE) as LocationManager).let {
-                it.getLastKnownLocation(
-                    LocationManager.GPS_PROVIDER
-                ) ?: it.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-            }?.let { GeoPoint(it.latitude, it.longitude) }
-        } catch (_: SecurityException) {
-            null
-        }
-    }
+    private fun obtenerUbicacion(): GeoPoint? =
+        com.example.practicafinal.util.ultimaUbicacion(this)?.let { GeoPoint(it.latitude, it.longitude) }
 
     private fun cargar() {
-        exec.execute {
-            if (ControladorAlbergues.obtenerAlbergues(this).isEmpty()) {
-                ControladorAlbergues.insertarAlbergue(
-                    this,
-                    "Albergue Patitas",
-                    "Refugio de mascotas",
-                    "Av. Universitaria 123",
-                    "999888777",
-                    null,
-                    -12.0850,
-                    -77.0050
-                )
-                ControladorAlbergues.insertarAlbergue(
-                    this,
-                    "Refugio Huellitas",
-                    "Hogar temporal",
-                    "Jr. Las Flores 456",
-                    "987654321",
-                    null,
-                    -12.0200,
-                    -77.0800
-                )
-                ControladorAlbergues.insertarAlbergue(
-                    this,
-                    "Hogar Peludo",
-                    "Adopción responsable",
-                    "Calle Los Olivos 789",
-                    "912345678",
-                    null,
-                    -12.0760,
-                    -77.0620
-                )
-            }
-            albergues = ControladorAlbergues.obtenerAlbergues(this); userLoc = obtenerUbicacion()
-            runOnUiThread { mostrarLista() }
+        ejecutarSeguro(exec) {
+            val lista = ControladorAlbergues.obtenerAlbergues(this)
+            val ubicacion = obtenerUbicacion()
+            actualizarUi { albergues = lista; userLoc = ubicacion; mostrarLista() }
         }
     }
 
@@ -151,10 +103,10 @@ class AlberguesActivity : AppCompatActivity() {
                 val img = h.itemView.findViewById<android.widget.ImageView>(R.id.img_foto)
                 val pl = h.itemView.findViewById<TextView>(R.id.tv_placeholder)
                 if (!a.foto.isNullOrBlank()) {
-                    Glide.with(h.itemView.context).load(a.foto).into(img)
+                    com.example.practicafinal.util.cargarImagen(img, a.foto)
                     pl.visibility = View.GONE
                 } else {
-                    img.setImageDrawable(null)
+                    com.example.practicafinal.util.limpiarImagen(img)
                     pl.visibility = View.VISIBLE
                 }
                 (h.itemView.findViewById<TextView>(R.id.tv_nombre)).text = a.nombre

@@ -203,14 +203,15 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="55dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/bg_sombra"
-                android:paddingEnd="5dp">
+                android:paddingEnd="5dp"
+                android:layout_height="55dp"
+                android:paddingBottom="5dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_registrar"
-                    style="@style/Widget.Material3.Button"
+                    style="@style/Widget.PetGo.Button"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:minHeight="0dp"
@@ -218,7 +219,7 @@
                     android:stateListAnimator="@null"
                     android:text="Registrarme"
                     android:textAllCaps="false"
-                    android:textColor="@color/tinta"
+                    android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     app:backgroundTint="@color/verde_petgo"
@@ -236,7 +237,14 @@
                 android:text="¿Ya tienes una cuenta?"
                 android:textColor="@color/azul_enlace"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:minHeight="48dp"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true" />
 
         </LinearLayout>
     </ScrollView>

@@ -1,16 +1,17 @@
 package com.example.practicafinal
 
-import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import com.example.practicafinal.util.filtrarPublicaciones
+import androidx.appcompat.app.AlertDialog
+import com.example.practicafinal.util.Dialogos
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +29,7 @@ class AdopcionesActivity : AppCompatActivity() {
     private lateinit var rvAnimales: androidx.recyclerview.widget.RecyclerView
     private lateinit var tvFavCount: TextView
     private lateinit var tvOpciones: TextView
+    private lateinit var tvVacio: TextView
 
     private var publicaciones: List<Publicacion> = emptyList()
     private var filtroEspecie: String? = null
@@ -50,6 +52,7 @@ class AdopcionesActivity : AppCompatActivity() {
         rvAnimales = findViewById(R.id.rv_animales)
         tvFavCount = findViewById(R.id.tv_fav_count)
         tvOpciones = findViewById(R.id.tv_opciones)
+        tvVacio = findViewById(R.id.tv_vacio)
         chipRecientes = findViewById(R.id.chip_orden_recientes)
         chipCercanos = findViewById(R.id.chip_orden_cercanos)
         chipNombre = findViewById(R.id.chip_orden_nombre)
@@ -59,7 +62,7 @@ class AdopcionesActivity : AppCompatActivity() {
             startActivity(Intent(this, MisFavoritosActivity::class.java))
         }
 
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_agregar)
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_agregar)
             .setOnClickListener {
                 startActivity(Intent(this, CrearPublicacionActivity::class.java).apply {
                     putExtra(CrearPublicacionActivity.EXTRA_TIPO, "Adopcion")
@@ -76,30 +79,36 @@ class AdopcionesActivity : AppCompatActivity() {
         val chipPerros = findViewById<TextView>(R.id.chip_perros)
         val chipGatos = findViewById<TextView>(R.id.chip_gatos)
 
-        fun seleccionarChip(chip: TextView, tipo: String?) {
+        fun seleccionarChip(tipo: String?) {
             listOf(chipTodos to null, chipPerros to "Perro", chipGatos to "Gato").forEach { (c, t) ->
                 val activo = t == tipo
                 c.background = if (activo) ContextCompat.getDrawable(this, R.drawable.bg_chip_selected)
                 else ContextCompat.getDrawable(this, R.drawable.bg_chip)
                 c.setTextColor(
-                    if (activo) ContextCompat.getColor(this, android.R.color.black)
-                    else ContextCompat.getColor(this, android.R.color.darker_gray)
+                    if (activo) ContextCompat.getColor(this, R.color.tinta)
+                    else ContextCompat.getColor(this, R.color.texto_suave)
                 )
             }
             filtroEspecie = tipo
             aplicarFiltros()
         }
 
-        chipTodos.setOnClickListener { seleccionarChip(chipTodos, null) }
-        chipPerros.setOnClickListener { seleccionarChip(chipPerros, "Perro") }
-        chipGatos.setOnClickListener { seleccionarChip(chipGatos, "Gato") }
+        chipTodos.setOnClickListener { seleccionarChip(null) }
+        chipPerros.setOnClickListener { seleccionarChip("Perro") }
+        chipGatos.setOnClickListener { seleccionarChip("Gato") }
 
         chipRecientes.setOnClickListener { seleccionarOrden("recientes") }
         chipCercanos.setOnClickListener { seleccionarOrden("cercanos") }
         chipNombre.setOnClickListener { seleccionarOrden("nombre") }
 
+        findViewById<View>(R.id.btn_proceso).setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.adoption_process_title)
+                .setMessage(R.string.adoption_process_body)
+                .setPositiveButton(R.string.understood, null)
+                .show().also { Dialogos.aplicar(this, it) }
+        }
         obtenerUbicacion()
-        cargarAdopciones()
     }
 
     private fun seleccionarOrden(orden: String) {
@@ -109,49 +118,37 @@ class AdopcionesActivity : AppCompatActivity() {
             chip.background = if (activo) ContextCompat.getDrawable(this, R.drawable.bg_chip_selected)
             else ContextCompat.getDrawable(this, R.drawable.bg_chip)
             chip.setTextColor(
-                if (activo) ContextCompat.getColor(this, android.R.color.black)
-                else ContextCompat.getColor(this, android.R.color.darker_gray)
+                if (activo) ContextCompat.getColor(this, R.color.tinta)
+                else ContextCompat.getColor(this, R.color.texto_suave)
             )
         }
         aplicarFiltros()
     }
 
     private fun obtenerUbicacion() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-        ) return
-        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        try {
-            val loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-            if (loc != null) {
-                userLat = loc.latitude
-                userLng = loc.longitude
-            }
-        } catch (_: SecurityException) {}
+        com.example.practicafinal.util.ultimaUbicacion(this)?.let {
+            userLat = it.latitude
+            userLng = it.longitude
+        }
     }
 
     private fun cargarAdopciones() {
-        executor.execute {
-            publicaciones = ControladorPublicaciones.obtenerAdopciones(this)
-            runOnUiThread {
+        ejecutarSeguro(executor) {
+            val lista = ControladorPublicaciones.obtenerAdopciones(this)
+            actualizarUi {
+                publicaciones = lista
                 aplicarFiltros()
                 actualizarContadorFav()
-                val n = publicaciones.size
-                tvOpciones.text = if (n == 1) "1 opcion para adoptar" else "$n opciones para adoptar"
+
             }
         }
     }
 
     private fun aplicarFiltros() {
-        val texto = etBuscar.text.toString().trim().lowercase()
-        var filtradas = publicaciones.filter { p ->
-            val coincideNombre = p.nombre.lowercase().contains(texto) ||
-                    p.descripcion.lowercase().contains(texto)
-            val coincideEspecie = filtroEspecie == null ||
-                    p.especie?.equals(filtroEspecie, ignoreCase = true) == true
-            coincideNombre && coincideEspecie
-        }
+        var filtradas = filtrarPublicaciones(publicaciones, etBuscar.text.toString(), filtroEspecie)
+        val n = filtradas.size
+        tvOpciones.text = resources.getQuantityString(R.plurals.adoption_options, n, n)
+        tvVacio.visibility = if (filtradas.isEmpty()) View.VISIBLE else View.GONE
 
         filtradas = when (ordenActual) {
             "cercanos" -> {

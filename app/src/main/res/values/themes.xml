@@ -1,10 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Base.Theme.PracticaFinal" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:navigationBarColor">@color/crema</item>
+        <item name="colorPrimary">@color/verde_petgo</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/amarillo</item>
+        <item name="colorOnSecondary">@color/tinta</item>
+        <item name="colorSurface">@color/crema</item>
+        <item name="colorOnSurface">@color/tinta</item>
+        <item name="colorControlHighlight">@color/petgo_ripple</item>
+        <item name="materialButtonStyle">@style/Widget.PetGo.Button</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.PetGo.Dialog</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.PetGo.Dialog</item>
+        <!-- Android 8.0 solo admite iconos claros en la barra de navegación. -->
+        <item name="android:navigationBarColor">@color/tinta</item>
         <item name="android:statusBarColor">@color/crema</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowBackground">@color/crema</item>
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:fontFamily">@font/poppins</item>

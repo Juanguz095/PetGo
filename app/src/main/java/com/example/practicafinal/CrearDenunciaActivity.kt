@@ -1,9 +1,5 @@
 ﻿package com.example.practicafinal
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -11,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.practicafinal.controlador.ControladorDenuncias
@@ -80,8 +78,8 @@ class CrearDenunciaActivity : AppCompatActivity() {
                 tv.background = if (activo) ContextCompat.getDrawable(this, R.drawable.bg_chip_selected)
                 else ContextCompat.getDrawable(this, R.drawable.bg_chip)
                 tv.setTextColor(
-                    if (activo) ContextCompat.getColor(this, android.R.color.black)
-                    else ContextCompat.getColor(this, android.R.color.darker_gray)
+                    if (activo) ContextCompat.getColor(this, R.color.tinta)
+                    else ContextCompat.getColor(this, R.color.texto_suave)
                 )
             }
             etMotivoCustom.visibility = View.VISIBLE
@@ -103,8 +101,8 @@ class CrearDenunciaActivity : AppCompatActivity() {
             tv.background = if (activo) ContextCompat.getDrawable(this, R.drawable.bg_chip_selected)
             else ContextCompat.getDrawable(this, R.drawable.bg_chip)
             tv.setTextColor(
-                if (activo) ContextCompat.getColor(this, android.R.color.black)
-                else ContextCompat.getColor(this, android.R.color.darker_gray)
+                if (activo) ContextCompat.getColor(this, R.color.tinta)
+                else ContextCompat.getColor(this, R.color.texto_suave)
             )
         }
     }
@@ -130,22 +128,8 @@ class CrearDenunciaActivity : AppCompatActivity() {
         }))
     }
 
-    private fun obtenerUbicacion(): GeoPoint? {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) return null
-        return try {
-            (getSystemService(Context.LOCATION_SERVICE) as LocationManager).let { lm ->
-                lm.getLastKnownLocation(
-                    LocationManager.GPS_PROVIDER
-                ) ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-            }?.let { GeoPoint(it.latitude, it.longitude) }
-        } catch (_: SecurityException) {
-            null
-        }
-    }
+    private fun obtenerUbicacion(): GeoPoint? =
+        com.example.practicafinal.util.ultimaUbicacion(this)?.let { GeoPoint(it.latitude, it.longitude) }
 
     private fun enviar() {
         val desc = etDesc.text.toString().trim()
@@ -166,19 +150,20 @@ class CrearDenunciaActivity : AppCompatActivity() {
             tvError.visibility = View.VISIBLE
             return
         }
+        val foto = fotoUri
         val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_enviar)
         button.isEnabled = false
-        exec.execute {
+        ejecutarSeguro(exec) {
             try {
                 ControladorDenuncias.insertarDenuncia(
-                    this, motivoFinal, desc, fotoUri, pt.latitude, pt.longitude
+                    this, motivoFinal, desc, foto, pt.latitude, pt.longitude
                 )
-                runOnUiThread {
+                actualizarUi {
                     Toast.makeText(this, "Denuncia enviada", Toast.LENGTH_SHORT).show()
                     finish()
                 }
             } catch (error: Exception) {
-                runOnUiThread {
+                actualizarUi {
                     button.isEnabled = true
                     tvError.text = error.message ?: "No se pudo enviar la denuncia"
                     tvError.visibility = View.VISIBLE
@@ -195,6 +180,7 @@ class CrearDenunciaActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (::map.isInitialized) map.onDetach()
         super.onDestroy(); exec.shutdown()
     }
 }

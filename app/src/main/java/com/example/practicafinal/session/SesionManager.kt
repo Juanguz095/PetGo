@@ -9,41 +9,30 @@ object SesionManager {
     private const val PREFS = "sesion"
     private const val KEY_ID = "usuario_id"
     private const val KEY_UID = "firebase_uid"
-    private const val KEY_ID_TOKEN = "firebase_id_token"
 
     fun guardarSesion(context: Context, id: Long) {
-        prefs(context).edit().putLong(KEY_ID, id).apply()
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        guardarSesion(context, id, uid)
     }
 
     fun guardarSesion(context: Context, id: Long, firebaseUid: String) {
         prefs(context).edit().putLong(KEY_ID, id).putString(KEY_UID, firebaseUid).apply()
     }
 
-    fun guardarIdToken(context: Context, token: String) {
-        prefs(context).edit().putString(KEY_ID_TOKEN, token).apply()
-    }
-
-    fun obtenerIdToken(context: Context): String? =
-        prefs(context).getString(KEY_ID_TOKEN, null)
-
-    fun guardarFirebaseUid(context: Context, uid: String) {
-        prefs(context).edit().putString(KEY_UID, uid).apply()
-    }
-
     fun obtenerUsuarioId(context: Context): Long? {
-        val stored = prefs(context).getLong(KEY_ID, -1L)
-        if (stored != -1L) return stored
         val uid = currentFirebaseUid(context) ?: return null
+        val storedUid = prefs(context).getString(KEY_UID, null)
+        val storedId = prefs(context).getLong(KEY_ID, -1L)
+        if (storedUid == uid && storedId != -1L) return storedId
         val generated = legacyId(uid)
-        prefs(context).edit().putLong(KEY_ID, generated).putString(KEY_UID, uid).apply()
+        guardarSesion(context, generated, uid)
         return generated
     }
 
     fun currentFirebaseUid(context: Context? = null): String? =
-        context?.let { prefs(it).getString(KEY_UID, null) }
+        FirebaseAuth.getInstance().currentUser?.uid
 
-    fun tieneSesion(context: Context): Boolean =
-        prefs(context).getString(KEY_UID, null) != null || prefs(context).getLong(KEY_ID, -1L) != -1L
+    fun tieneSesion(context: Context): Boolean = currentFirebaseUid(context) != null
 
     fun cerrarSesion(context: Context) {
         prefs(context).edit().clear().apply()

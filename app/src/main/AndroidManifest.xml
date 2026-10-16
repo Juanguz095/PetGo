@@ -17,9 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PracticaFinal">
-        <meta-data
-            android:name="com.google.firebase.apiKey"
-            android:value="AIzaSyB0wKntYPlNf-0IqgXowwkmCSdviVJIejg" />
+
         <activity
             android:name=".SplashActivity"
             android:exported="true">

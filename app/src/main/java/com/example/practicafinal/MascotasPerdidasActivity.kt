@@ -6,7 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.EditText
+import androidx.core.widget.doAfterTextChanged
+import androidx.core.content.ContextCompat
+import com.example.practicafinal.util.filtrarPublicaciones
 import androidx.appcompat.app.AlertDialog
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +28,10 @@ class MascotasPerdidasActivity : AppCompatActivity() {
     private val executor = Executors.newSingleThreadExecutor()
     private lateinit var rvPerdidas: RecyclerView
     private lateinit var tvVacio: TextView
+    private lateinit var etBuscar: EditText
+    private var publicaciones: List<Publicacion> = emptyList()
+    private var avistPorId: Map<Long, List<Avistamiento>> = emptyMap()
+    private var filtroEspecie: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,26 +53,49 @@ class MascotasPerdidasActivity : AppCompatActivity() {
                 )
             }
 
-        cargarPerdidas()
+        etBuscar = findViewById(R.id.et_buscar)
+        etBuscar.doAfterTextChanged { mostrarPerdidas() }
+        listOf(R.id.chip_todos to null, R.id.chip_perros to "Perro", R.id.chip_gatos to "Gato")
+            .forEach { (id, especie) ->
+                findViewById<TextView>(id).setOnClickListener {
+                    filtroEspecie = especie
+                    mostrarPerdidas()
+                }
+            }
     }
 
     private fun cargarPerdidas() {
-        executor.execute {
+        ejecutarSeguro(executor) {
             val lista = ControladorPublicaciones.obtenerPerdidas(this)
-            val todosAvist = ControladorPublicaciones.obtenerAvistamientos(this)
-            val avistPorId = todosAvist.groupBy { it.publicacionId }
-
-            runOnUiThread {
-                tvVacio.visibility = if (lista.isEmpty()) View.VISIBLE else View.GONE
-                rvPerdidas.adapter = AdaptadorPerdidas(
-                    lista, avistPorId,
-                    onSighting = { p -> reportarAvistamiento(p) },
-                    onVerAvistamientos = { p -> mostrarAvistamientos(p, avistPorId) },
-                    onVerMapa = { p -> verEnMapa(p) },
-                    onDetalles = { p -> verDetalles(p) }
-                )
+            val avistamientos = ControladorPublicaciones.obtenerAvistamientos(this).groupBy { it.publicacionId }
+            actualizarUi {
+                publicaciones = lista
+                avistPorId = avistamientos
+                mostrarPerdidas()
             }
         }
+    }
+
+    private fun mostrarPerdidas() {
+        val filtradas = filtrarPublicaciones(publicaciones, etBuscar.text.toString(), filtroEspecie)
+        listOf(R.id.chip_todos to null, R.id.chip_perros to "Perro", R.id.chip_gatos to "Gato")
+            .forEach { (id, especie) ->
+                val chip = findViewById<TextView>(id)
+                val activo = filtroEspecie == especie
+                chip.setBackgroundResource(if (activo) R.drawable.bg_chip_lista_on else R.drawable.bg_chip_lista)
+                chip.setTextColor(ContextCompat.getColor(this, if (activo) R.color.tinta else R.color.texto_suave))
+                chip.isSelected = activo
+            }
+        findViewById<TextView>(R.id.chip_todos).text = getString(R.string.all_pets_count, publicaciones.size)
+        tvVacio.setText(if (publicaciones.isEmpty()) R.string.empty_lost_pets else R.string.no_pet_results)
+        tvVacio.visibility = if (filtradas.isEmpty()) View.VISIBLE else View.GONE
+        rvPerdidas.adapter = AdaptadorPerdidas(
+            filtradas, avistPorId,
+            onSighting = { p -> reportarAvistamiento(p) },
+            onVerAvistamientos = { p -> mostrarAvistamientos(p, avistPorId) },
+            onVerMapa = { p -> verEnMapa(p) },
+            onDetalles = { p -> verDetalles(p) }
+        )
     }
 
     private fun reportarAvistamiento(publicacion: Publicacion) {

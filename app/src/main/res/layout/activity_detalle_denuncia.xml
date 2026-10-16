@@ -20,9 +20,13 @@
             android:orientation="vertical" android:padding="20dp">
 
             <FrameLayout android:layout_width="match_parent" android:layout_height="200dp">
-                <ImageView android:id="@+id/img_foto" android:layout_width="match_parent"
+                <com.google.android.material.imageview.ShapeableImageView android:id="@+id/img_foto" android:layout_width="match_parent"
                     android:layout_height="match_parent" android:background="@drawable/bg_card_image"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.Photo"
+                    app:strokeColor="@color/tinta"
+                    app:strokeWidth="2dp"
+                    android:contentDescription="Foto de la mascota" />
                 <TextView android:id="@+id/tv_placeholder" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_gravity="center"
                     android:text="🚨" android:textSize="60sp" />
@@ -30,7 +34,7 @@
 
             <TextView android:id="@+id/tv_motivo" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:layout_marginTop="16dp"
-                android:textColor="#E53935" android:textSize="20sp" android:textStyle="bold" />
+                android:textColor="@color/colorRed" android:textSize="20sp" android:textStyle="bold" />
             <TextView android:id="@+id/tv_descripcion" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:layout_marginTop="8dp"
                 android:textColor="@color/texto_suave" android:textSize="14sp" />

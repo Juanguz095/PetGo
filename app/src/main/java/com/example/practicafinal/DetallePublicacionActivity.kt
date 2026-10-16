@@ -1,16 +1,15 @@
 package com.example.practicafinal
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.practicafinal.controlador.ControladorPublicaciones
 import com.example.practicafinal.modelo.Publicacion
-import com.bumptech.glide.Glide
 import java.util.concurrent.Executors
 
 class DetallePublicacionActivity : AppCompatActivity() {
@@ -36,10 +35,10 @@ class DetallePublicacionActivity : AppCompatActivity() {
     }
 
     private fun cargarPublicacion() {
-        executor.execute {
+        ejecutarSeguro(executor) {
             val pub = ControladorPublicaciones.obtenerPorId(this, publicacionId)
-            runOnUiThread {
-                if (pub == null) { finish(); return@runOnUiThread }
+            actualizarUi {
+                if (pub == null) { finish(); return@actualizarUi }
                 mostrar(pub)
             }
         }
@@ -62,7 +61,7 @@ class DetallePublicacionActivity : AppCompatActivity() {
 
         val tvEstado = findViewById<TextView>(R.id.tv_estado)
         when (p.estado) {
-            "Resuelta" -> { tvEstado.text = "Resuelta"; tvEstado.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray)) }
+            "Resuelta" -> { tvEstado.text = "Resuelta"; tvEstado.setTextColor(ContextCompat.getColor(this, R.color.texto_suave)) }
             "Adoptada" -> { tvEstado.text = "Adoptada"; tvEstado.setTextColor(ContextCompat.getColor(this, R.color.colorSecondary)) }
             else -> { tvEstado.text = "Activa"; tvEstado.setTextColor(ContextCompat.getColor(this, R.color.verde_estado)) }
         }

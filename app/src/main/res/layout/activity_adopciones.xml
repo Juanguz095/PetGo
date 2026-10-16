@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="❤"
-                android:textColor="#EF4444"
+                android:textColor="@color/colorRed"
                 android:textSize="16sp" />
 
             <TextView
@@ -170,15 +170,22 @@
                     android:textColorHint="@color/texto_suave"
                     android:textSize="14sp" />
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fab_agregar"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                <FrameLayout
                     android:layout_marginStart="8dp"
-                    android:contentDescription="Agregar mascota en adopcion"
-                    android:src="@drawable/ic_fab_menu"
-                    app:backgroundTint="@color/amarillo"
-                    app:tint="@color/tinta" />
+                    android:layout_width="61dp"
+                    android:background="@drawable/bg_sombra"
+                    android:paddingEnd="5dp"
+                    android:layout_height="61dp"
+                    android:paddingBottom="5dp">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/fab_agregar"
+                        style="@style/Widget.PetGo.Button.Icon"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:contentDescription="Agregar mascota en adopcion"
+                        app:icon="@drawable/ic_fab_menu"
+                        app:backgroundTint="@color/petgo_button_background" />
+                </FrameLayout>
             </LinearLayout>
 
             <TextView
@@ -191,56 +198,73 @@
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
-            <LinearLayout
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/chip_orden_recientes"
+                android:scrollbars="none"
+                android:fillViewport="true"
+                android:requiresFadingEdge="horizontal"
+                android:fadingEdgeLength="16dp">
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="34dp"
-                    android:background="@drawable/bg_chip_selected"
-                    android:gravity="center"
-                    android:paddingStart="16dp"
-                    android:paddingTop="0dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="4dp"
-                    android:text="Recientes"
-                    android:textColor="@color/tinta"
-                    android:textSize="12sp" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/chip_orden_cercanos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="34dp"
-                    android:layout_marginStart="9dp"
-                    android:background="@drawable/bg_chip"
-                    android:gravity="center"
-                    android:paddingStart="16dp"
-                    android:paddingTop="0dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="4dp"
-                    android:text="Más cercanos"
-                    android:textColor="@color/tinta"
-                    android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/chip_orden_recientes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:background="@drawable/bg_chip_selected"
+                        android:gravity="center"
+                        android:paddingStart="16dp"
+                        android:paddingTop="0dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="4dp"
+                        android:text="Recientes"
+                        android:textColor="@color/tinta"
+                        android:textSize="12sp" />
 
-                <TextView
-                    android:id="@+id/chip_orden_nombre"
-                    android:layout_width="wrap_content"
-                    android:layout_height="34dp"
-                    android:layout_marginStart="9dp"
-                    android:background="@drawable/bg_chip"
-                    android:gravity="center"
-                    android:paddingStart="16dp"
-                    android:paddingTop="0dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="4dp"
-                    android:text="Nombre"
-                    android:textColor="@color/tinta"
-                    android:textSize="12sp" />
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/chip_orden_cercanos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:layout_marginStart="9dp"
+                        android:background="@drawable/bg_chip"
+                        android:gravity="center"
+                        android:paddingStart="16dp"
+                        android:paddingTop="0dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="4dp"
+                        android:text="Más cercanos"
+                        android:textColor="@color/tinta"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/chip_orden_nombre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:layout_marginStart="9dp"
+                        android:background="@drawable/bg_chip"
+                        android:gravity="center"
+                        android:paddingStart="16dp"
+                        android:paddingTop="0dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="4dp"
+                        android:text="Nombre"
+                        android:textColor="@color/tinta"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/tv_vacio"
+                style="@style/Widget.PetGo.EmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/no_adoption_results"
+                android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_animales"
@@ -401,14 +425,14 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_proceso"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.PetGo.Button.Outlined"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="16dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:text="Conocer el proceso completo"
-                android:textColor="@color/tinta"
+                android:textColor="@color/petgo_button_text"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 app:cornerRadius="12dp"

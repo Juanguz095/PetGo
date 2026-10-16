@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.practicafinal.R
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.util.fechaRelativa
@@ -16,7 +15,9 @@ class AdaptadorPublicacionesPropias(
     private val items: List<Publicacion>,
     private val mostrarBotonResolver: Boolean = true,
     private val onResolver: (Publicacion) -> Unit,
-    private val onAdoptar: ((Publicacion) -> Unit)? = null
+    private val onAdoptar: ((Publicacion) -> Unit)? = null,
+    private val onQuitarFavorito: ((Publicacion) -> Unit)? = null,
+    private val onAbrir: ((Publicacion) -> Unit)? = null
 ) : RecyclerView.Adapter<AdaptadorPublicacionesPropias.PubViewHolder>() {
     class PubViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imgFoto: ImageView = view.findViewById(R.id.img_foto)
@@ -35,7 +36,7 @@ class AdaptadorPublicacionesPropias(
             com.example.practicafinal.util.cargarImagen(holder.imgFoto, p.foto)
             holder.tvPlaceholder.visibility = View.GONE
         } else {
-            holder.imgFoto.setImageResource(android.R.drawable.ic_menu_gallery)
+            com.example.practicafinal.util.cargarImagen(holder.imgFoto, null)
             holder.tvPlaceholder.visibility = View.GONE
         }
         holder.tvNombre.text = p.nombre
@@ -53,11 +54,15 @@ class AdaptadorPublicacionesPropias(
         }
         holder.tvEstado.setTextColor(ContextCompat.getColor(holder.itemView.context, when {
             p.estado == "Adoptada" -> R.color.colorSecondary
-            p.estado == "Resuelta" -> android.R.color.darker_gray
+            p.estado == "Resuelta" -> R.color.texto_suave
             else -> R.color.verde_estado
         }))
-        holder.btnResolver.visibility = if (resuelta || !mostrarBotonResolver) View.GONE else View.VISIBLE
-        if (p.tipo == "Adopcion" && onAdoptar != null) {
+        holder.itemView.setOnClickListener { onAbrir?.invoke(p) }
+        holder.btnResolver.visibility = if (onQuitarFavorito != null || (!resuelta && mostrarBotonResolver)) View.VISIBLE else View.GONE
+        if (onQuitarFavorito != null) {
+            holder.btnResolver.text = "Quitar de favoritos"
+            holder.btnResolver.setOnClickListener { onQuitarFavorito(p) }
+        } else if (p.tipo == "Adopcion" && onAdoptar != null) {
             holder.btnResolver.text = "Marcar adoptada"
             holder.btnResolver.setOnClickListener { onAdoptar(p) }
         } else {

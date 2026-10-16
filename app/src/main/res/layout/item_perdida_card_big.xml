@@ -16,11 +16,15 @@
         android:layout_height="200dp"
         android:background="@drawable/bg_card_foto">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_foto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.CardPhoto"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="2dp"
+            android:contentDescription="Foto de la mascota" />
 
         <TextView
             android:id="@+id/tv_placeholder"
@@ -132,16 +136,16 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_ver_mapa"
-                style="@style/Widget.Material3.Button"
+                style="@style/Widget.PetGo.Button"
                 android:layout_width="0dp"
-                android:layout_height="42dp"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
                 android:text="VER EN MAPA"
-                android:textColor="@color/tinta"
+                android:textColor="@color/petgo_button_text"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 app:backgroundTint="@color/amarillo"
@@ -151,9 +155,9 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_detalles"
-                style="@style/Widget.Material3.Button"
+                style="@style/Widget.PetGo.Button"
                 android:layout_width="0dp"
-                android:layout_height="42dp"
+                android:layout_height="48dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:insetTop="0dp"
@@ -161,7 +165,7 @@
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
                 android:text="MÁS DETALLES"
-                android:textColor="@color/tinta"
+                android:textColor="@color/petgo_button_text"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 app:backgroundTint="@color/white"
@@ -172,9 +176,9 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_vi"
-            style="@style/Widget.Material3.Button"
+            style="@style/Widget.PetGo.Button"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="48dp"
             android:layout_marginTop="8dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"

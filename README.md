@@ -33,7 +33,7 @@ Aplicación Android para conectar a la comunidad con mascotas perdidas, encontra
 - Enlace para ver la ubicación en el mapa de la aplicación
 
 ### Usuarios
-- Registro e inicio de sesión con contraseñas encriptadas (SHA-256 con sal)
+- Registro e inicio de sesión con Firebase Authentication
 - Sesión persistente en el dispositivo
 - Perfil de usuario y cierre de sesión
 
@@ -47,15 +47,17 @@ Aplicación Android para conectar a la comunidad con mascotas perdidas, encontra
 |---|---|
 | Lenguaje | Kotlin (Android nativo) |
 | Mapas | osmdroid (OpenStreetMap) |
-| Base de datos | SQLite (SQLiteOpenHelper) |
-| Encriptación | SHA-256 con sal aleatoria |
-| Sesión y favoritos | SharedPreferences |
+| Base de datos | Cloud Firestore (DatabaseHelper conserva la API anterior) |
+| Autenticación | Firebase Authentication, correo y contraseña |
+| Sesión y favoritos | Sesión del SDK; favoritos locales por cuenta y sincronizados con Firestore |
+| Imágenes | Glide; fotos comprimidas guardadas en Firestore |
 
 ## Requisitos
 
 - Android 8.0 (API 26) o superior
 - Conexión a internet para cargar los mapas
-- Android Studio (Arctic Fox o superior)
+- Android Studio compatible con la versión de AGP declarada en el proyecto
+- Configuración de Firebase según [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
 
 ## Instalación
 
@@ -96,12 +98,12 @@ app/src/main/java/com/example/practicafinal/
 
 ## Limitaciones conocidas
 
-- Los datos se almacenan localmente en el dispositivo. Para compartir información entre usuarios se requiere un backend (por ejemplo, Firebase).
-- La actualización de la versión de la base de datos reinicia los datos de ejemplo.
+- Las operaciones compartidas requieren conexión con Firebase; los favoritos también tienen una copia local por cuenta.
+- Las fotos se guardan comprimidas dentro del documento de Firestore. Storage está reservado para una futura migración; sus reglas ya limitan las cargas por propietario.
+- No hay notificaciones push entre dispositivos. Los avisos al dueño aparecen en la sección de notificaciones de la app.
 - Proyecto académico: práctica final.
 
 ## Documentación
 
-- [EXPLICACION_LOGICA.md](EXPLICACION_LOGICA.md): explicación de la lógica con el código real
-- [EXPLICACION_SIMPLE.md](EXPLICACION_SIMPLE.md): explicación en lenguaje claro
-- [EXPLICACION_TECNICA.md](EXPLICACION_TECNICA.md): documentación técnica detallada
+- [Revisión del proyecto](docs/revision-proyecto.md): correcciones, comprobaciones y pendientes
+- [Configuración de Firebase](FIREBASE_SETUP.md): configuración y publicación de reglas

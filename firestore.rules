@@ -1,9 +1,63 @@
-﻿rules_version = '2';
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+    function signedIn() {
+      return request.auth != null;
+    }
+    function owner(data) {
+      return signedIn() && data.usuarioId == request.auth.uid;
+    }
+
+    match /usuarios/{uid} {
+      allow read, create, update, delete: if signedIn() && request.auth.uid == uid;
+      match /favoritos/{id} {
+        allow read, write: if signedIn() && request.auth.uid == uid;
+      }
+    }
+    match /publicaciones/{id} {
+      allow read: if signedIn();
+      allow create: if owner(request.resource.data)
+        && request.resource.data.estado == 'Activa';
+      allow update: if owner(resource.data)
+        && request.resource.data.usuarioId == resource.data.usuarioId;
+      allow delete: if owner(resource.data);
+    }
+    match /avistamientos/{id} {
+      allow read: if signedIn();
+      allow create: if owner(request.resource.data)
+        && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.tipo == 'Perdida'
+        && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.estado == 'Activa';
+      allow update: if owner(resource.data)
+        && request.resource.data.usuarioId == resource.data.usuarioId
+        && request.resource.data.publicacionId == resource.data.publicacionId;
+      allow delete: if owner(resource.data);
+    }
+    match /albergues/{id} {
+      allow read: if signedIn();
+      allow create: if owner(request.resource.data);
+      allow update: if owner(resource.data)
+        && request.resource.data.usuarioId == resource.data.usuarioId;
+      allow delete: if owner(resource.data);
+    }
+    match /denuncias/{id} {
+      allow read, delete: if owner(resource.data);
+      allow create: if owner(request.resource.data)
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() > 0;
+      allow update: if owner(resource.data)
+        && request.resource.data.usuarioId == resource.data.usuarioId;
+    }
+    match /notificaciones/{id} {
+      allow read, delete: if signedIn() && resource.data.usuarioDestinoId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.usuarioOrigenId == request.auth.uid
+        && request.resource.data.tipo == 'avistamiento'
+        && request.resource.data.leida == false
+        && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.usuarioId == request.resource.data.usuarioDestinoId;
+      allow update: if signedIn() && resource.data.usuarioDestinoId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['leida'])
+        && request.resource.data.leida is bool;
     }
   }
 }

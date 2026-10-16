@@ -2,7 +2,6 @@
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 object FavoritosManager {
@@ -10,11 +9,13 @@ object FavoritosManager {
     private const val PREFS = "favoritos"
     private const val KEY_FAVS = "ids_favoritos"
     private const val SUBCOLECCION = "favoritos"
+    private const val REVISION = "revision_local"
 
     fun esFavorito(context: Context, publicacionId: Long): Boolean =
         localIds(context).contains(publicacionId.toString())
 
     fun toggle(context: Context, publicacionId: Long): Boolean {
+        val uid = SesionManager.currentFirebaseUid(context) ?: return false
         val set = localIds(context).toMutableSet()
         val key = publicacionId.toString()
         val agregado = if (set.contains(key)) {
@@ -25,8 +26,7 @@ object FavoritosManager {
             true
         }
         saveLocal(context, set)
-        val uid = SesionManager.currentFirebaseUid(context)
-        if (uid != null) {
+        run {
             val ref = FirebaseFirestore.getInstance().collection("usuarios")
                 .document(uid).collection(SUBCOLECCION).document(key)
             if (agregado) {
@@ -38,13 +38,21 @@ object FavoritosManager {
         return agregado
     }
 
-    fun sincronizar(context: Context) {
-        val uid = SesionManager.currentFirebaseUid(context) ?: return
+    fun sincronizar(context: Context, onComplete: () -> Unit = {}) {
+        val appContext = context.applicationContext
+        val uid = SesionManager.currentFirebaseUid(appContext) ?: return onComplete()
+        val revision = prefs(appContext).getLong(REVISION, 0L)
         FirebaseFirestore.getInstance().collection("usuarios").document(uid)
             .collection(SUBCOLECCION).get()
             .addOnSuccessListener { snapshot ->
-                saveLocal(context, snapshot.documents.mapNotNull { it.id }.toSet())
+                // Una respuesta antigua no debe sobrescribir una pulsación reciente ni otra cuenta.
+                if (SesionManager.currentFirebaseUid(appContext) == uid &&
+                    prefs(appContext).getLong(REVISION, 0L) == revision) {
+                    saveLocal(appContext, snapshot.documents.map { it.id }.toSet())
+                }
+                onComplete()
             }
+            .addOnFailureListener { onComplete() }
     }
 
     fun contar(context: Context): Int = localIds(context).size
@@ -55,9 +63,11 @@ object FavoritosManager {
         prefs(context).getStringSet(KEY_FAVS, emptySet()).orEmpty()
 
     private fun saveLocal(context: Context, values: Set<String>) {
-        prefs(context).edit().putStringSet(KEY_FAVS, values.toSet()).apply()
+        val preferences = prefs(context)
+        preferences.edit().putStringSet(KEY_FAVS, values.toSet())
+            .putLong(REVISION, preferences.getLong(REVISION, 0L) + 1L).apply()
     }
 
     private fun prefs(context: Context): SharedPreferences =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        context.getSharedPreferences("${PREFS}_${SesionManager.currentFirebaseUid(context) ?: "sin_sesion"}", Context.MODE_PRIVATE)
 }

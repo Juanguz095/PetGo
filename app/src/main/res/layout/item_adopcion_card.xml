@@ -16,11 +16,15 @@
         android:layout_height="240dp"
         android:background="@drawable/bg_card_foto">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_foto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.CardPhoto"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="2dp"
+            android:contentDescription="Foto de la mascota" />
 
         <TextView
             android:id="@+id/tv_placeholder"
@@ -58,7 +62,7 @@
             android:paddingBottom="4dp"
             android:text="Nuevo"
             android:textColor="@color/white"
-            android:textSize="10sp"
+            android:textSize="11sp"
             android:textStyle="bold"
             android:visibility="gone" />
     </FrameLayout>

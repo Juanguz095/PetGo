@@ -34,6 +34,7 @@ class DatabaseHelper(context: Context) {
     )
 
     fun obtenerPublicaciones(): List<Publicacion> = repository.obtenerPublicaciones()
+    fun obtenerPropias(): List<Publicacion> = repository.obtenerPropias()
     fun obtenerPerdidas(): List<Publicacion> = repository.obtenerPerdidas()
     fun obtenerAdopciones(): List<Publicacion> = repository.obtenerAdopciones()
     fun obtenerPorIdPublicacion(id: Long): Publicacion? = repository.obtenerPorIdPublicacion(id)

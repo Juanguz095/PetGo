@@ -6,11 +6,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.practicafinal.controlador.ControladorPublicaciones
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.session.FavoritosManager
-import com.bumptech.glide.Glide
 import java.util.concurrent.Executors
 
 class DetalleAdopcionActivity : AppCompatActivity() {
@@ -38,11 +39,11 @@ class DetalleAdopcionActivity : AppCompatActivity() {
     }
 
     private fun cargarPublicacion() {
-        executor.execute {
+        ejecutarSeguro(executor) {
             val publicacion = ControladorPublicaciones.obtenerPorId(this, publicacionId)
-            runOnUiThread {
+            actualizarUi {
                 if (publicacion == null) {
-                    finish(); return@runOnUiThread
+                    finish(); return@actualizarUi
                 }
                 mostrar(publicacion)
             }
@@ -104,7 +105,7 @@ class DetalleAdopcionActivity : AppCompatActivity() {
 
     private fun contactarWhatsApp(p: Publicacion) {
         val texto =
-            "${p.nombre} Â· En adopción\n${p.descripcion}\n📍 https://maps.google.com/?q=${p.latitud},${p.longitud}"
+            "${p.nombre} · En adopción\n${p.descripcion}\n📍 https://maps.google.com/?q=${p.latitud},${p.longitud}"
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/?text=${Uri.encode(texto)}")))
         } catch (_: Exception) {

@@ -15,12 +15,16 @@
         android:layout_width="72dp"
         android:layout_height="72dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_foto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/bg_card_image"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.Photo"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="2dp"
+            android:contentDescription="Foto de la mascota" />
 
         <TextView
             android:id="@+id/tv_placeholder"
@@ -76,7 +80,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_resolver"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.PetGo.Button.Outlined"
             android:layout_width="match_parent"
             android:layout_height="38dp"
             android:layout_marginTop="8dp"
@@ -85,7 +89,7 @@
             android:stateListAnimator="@null"
             android:text="✓  Resolver"
             android:textAllCaps="false"
-            android:textColor="@color/tinta"
+            android:textColor="@color/petgo_button_text"
             android:textSize="12sp"
             android:textStyle="bold"
             app:cornerRadius="11dp"

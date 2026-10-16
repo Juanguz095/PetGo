@@ -41,12 +41,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp">
 
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/img_foto"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/bg_card_image"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.Photo"
+                    app:strokeColor="@color/tinta"
+                    app:strokeWidth="2dp"
+                    android:contentDescription="Foto de la mascota" />
 
                 <TextView
                     android:id="@+id/tv_placeholder"
@@ -66,7 +70,7 @@
                     android:paddingTop="4dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="4dp"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/white"
                     android:textSize="12sp"
                     android:textStyle="bold" />
             </FrameLayout>
@@ -124,12 +128,12 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_avistamiento"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.PetGo.Button.Outlined"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="20dp"
                 android:text="Registrar avistamiento"
-                android:textColor="@color/tinta"
+                android:textColor="@color/petgo_button_text"
                 android:textSize="13sp"
                 android:visibility="gone"
                 android:minHeight="0dp"
@@ -144,12 +148,12 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_compartir"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.PetGo.Button.Outlined"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="10dp"
                 android:text="Compartir"
-                android:textColor="@color/tinta"
+                android:textColor="@color/petgo_button_text"
                 android:textSize="13sp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"

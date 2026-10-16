@@ -54,21 +54,22 @@
 
             <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
                 android:background="@drawable/bg_sombra"
-                android:paddingEnd="5dp">
+                android:paddingEnd="5dp"
+                android:layout_height="53dp"
+                android:paddingBottom="5dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_denunciar"
-                    style="@style/Widget.Material3.Button"
+                    style="@style/Widget.PetGo.Button"
                     android:layout_width="wrap_content"
-                    android:layout_height="44dp"
+                    android:layout_height="48dp"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
                     android:stateListAnimator="@null"
                     android:text="Denunciar"
                     android:textAllCaps="false"
-                    android:textColor="@color/tinta"
+                    android:textColor="@color/petgo_button_text"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:backgroundTint="@color/tarjeta_amarilla"
@@ -96,15 +97,15 @@
 
     <TextView
         android:id="@+id/tv_vacio"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="No hay denuncias aún"
-        android:textColor="@color/texto_suave"
-        android:textSize="13sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        style="@style/Widget.PetGo.EmptyState"
+        android:text="@string/empty_reports"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_width="0dp"
+        app:layout_constraintTop_toBottomOf="@id/scroll_header" />
 </androidx.constraintlayout.widget.ConstraintLayout>

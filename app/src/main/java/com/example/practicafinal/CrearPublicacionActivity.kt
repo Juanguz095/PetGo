@@ -1,9 +1,5 @@
 ﻿package com.example.practicafinal
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -11,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.practicafinal.controlador.ControladorPublicaciones
@@ -131,7 +129,7 @@ class CrearPublicacionActivity : AppCompatActivity() {
                 motivoChips.forEachIndexed { j, chip ->
                     val activo = j == i
                     chip.background = ContextCompat.getDrawable(this, if (activo) R.drawable.bg_chip_selected else R.drawable.bg_chip)
-                    chip.setTextColor(ContextCompat.getColor(this, if (activo) android.R.color.black else android.R.color.darker_gray))
+                    chip.setTextColor(ContextCompat.getColor(this, if (activo) R.color.tinta else R.color.texto_suave))
                 }
                 etMotivoCustom.visibility = if (esOtroMotivo) View.VISIBLE else View.GONE
                 if (esOtroMotivo) etMotivoCustom.requestFocus()
@@ -162,7 +160,8 @@ class CrearPublicacionActivity : AppCompatActivity() {
                 )
             )
         )
-        map.setMultiTouchControls(false)
+        map.setMultiTouchControls(true)
+        map.setBuiltInZoomControls(false)
         map.controller.setZoom(18.0)
 
         
@@ -197,19 +196,8 @@ class CrearPublicacionActivity : AppCompatActivity() {
         )
     }
 
-    private fun obtenerUbicacionActual(): GeoPoint? {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-        ) return null
-        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return try {
-            val loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-            loc?.let { GeoPoint(it.latitude, it.longitude) }
-        } catch (_: SecurityException) {
-            null
-        }
-    }
+    private fun obtenerUbicacionActual(): GeoPoint? =
+        com.example.practicafinal.util.ultimaUbicacion(this)?.let { GeoPoint(it.latitude, it.longitude) }
 
     private fun seleccionarTipo(tipo: String) {
         tipoSeleccionado = tipo
@@ -226,8 +214,8 @@ class CrearPublicacionActivity : AppCompatActivity() {
                 ContextCompat.getDrawable(this, R.drawable.bg_chip)
             }
             (chip as TextView).setTextColor(
-                if (activo) ContextCompat.getColor(this, android.R.color.black)
-                else ContextCompat.getColor(this, android.R.color.darker_gray)
+                if (activo) ContextCompat.getColor(this, R.color.tinta)
+                else ContextCompat.getColor(this, R.color.texto_suave)
             )
         }
         if (::pinSeleccion.isInitialized) {
@@ -284,8 +272,8 @@ class CrearPublicacionActivity : AppCompatActivity() {
                 ContextCompat.getDrawable(this, R.drawable.bg_chip)
             }
             (chip as TextView).setTextColor(
-                if (activo) ContextCompat.getColor(this, android.R.color.black)
-                else ContextCompat.getColor(this, android.R.color.darker_gray)
+                if (activo) ContextCompat.getColor(this, R.color.tinta)
+                else ContextCompat.getColor(this, R.color.texto_suave)
             )
         }
     }
@@ -294,10 +282,16 @@ class CrearPublicacionActivity : AppCompatActivity() {
         val nombre = etNombre.text.toString().trim()
         val descripcion = etDescripcion.text.toString().trim()
         val especie = especieSeleccionada
+        val tipo = tipoSeleccionado
+        val foto = fotoUri
         val ultimoLugar = etUltimoLugar.text.toString().trim().ifEmpty { null }
         val punto = puntoSeleccionado
 
         if (tipoSeleccionado == "Denuncia") {
+            if (descripcion.isBlank()) {
+                mostrarError("Escribe una descripción")
+                return
+            }
             val motivoFinal = if (esOtroMotivo) etMotivoCustom.text.toString().trim() else motivoDenuncia
             if (motivoFinal.isEmpty()) {
                 mostrarError("Selecciona o escribe un motivo")
@@ -310,19 +304,19 @@ class CrearPublicacionActivity : AppCompatActivity() {
             val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar)
             button.isEnabled = false
             val tieneFoto = !fotoUri.isNullOrBlank()
-            executor.execute {
+            ejecutarSeguro(executor) {
                 try {
                     ControladorDenuncias.insertarDenuncia(
                         this, motivoFinal, descripcion,
-                        fotoUri, punto.latitude, punto.longitude
+                        foto, punto.latitude, punto.longitude
                     )
-                    runOnUiThread {
+                    actualizarUi {
                         val msg = if (tieneFoto) "Denuncia enviada (foto subida)" else "Denuncia enviada"
                         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                         finish()
                     }
                 } catch (error: Exception) {
-                    runOnUiThread {
+                    actualizarUi {
                         button.isEnabled = true
                         mostrarError(error.message ?: "No se pudo enviar la denuncia")
                     }
@@ -344,20 +338,20 @@ class CrearPublicacionActivity : AppCompatActivity() {
         val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar)
         button.isEnabled = false
         val tieneFoto = !fotoUri.isNullOrBlank()
-        executor.execute {
+        ejecutarSeguro(executor) {
             try {
                 val usuarioId = SesionManager.obtenerUsuarioId(this)
                 ControladorPublicaciones.publicar(
-                    this, usuarioId, tipoSeleccionado, nombre, descripcion,
-                    fotoUri, ultimoLugar, especie, punto.latitude, punto.longitude
+                    this, usuarioId, tipo, nombre, descripcion,
+                    foto, ultimoLugar, especie, punto.latitude, punto.longitude
                 )
-                runOnUiThread {
+                actualizarUi {
                     val msg = if (tieneFoto) "Publicacion creada (foto subida)" else "Publicacion creada"
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                     finish()
                 }
             } catch (error: Exception) {
-                runOnUiThread {
+                actualizarUi {
                     button.isEnabled = true
                     mostrarError(error.message ?: "No se pudo guardar la publicacion")
                 }
@@ -380,6 +374,7 @@ class CrearPublicacionActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (::map.isInitialized) map.onDetach()
         super.onDestroy()
         executor.shutdown()
     }

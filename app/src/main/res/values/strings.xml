@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">PetGo</string>
+    <string name="empty_favorites">Todavía no tienes favoritos\nGuarda las mascotas que te gustaría ayudar.</string>
+    <string name="empty_posts">Tu primera publicación empieza aquí\nComparte una alerta para que la comunidad te ayude.</string>
+    <string name="empty_reports">Todavía no hay denuncias\nTus reportes aparecerán en este espacio.</string>
+    <string name="empty_shelters">No encontramos albergues\nPrueba con otro nombre o ubicación.</string>
+    <string name="empty_lost_pets">No hay mascotas perdidas publicadas\nLas nuevas alertas aparecerán aquí.</string>
+    <string name="empty_notifications">Estás al día\nLos nuevos avisos de la comunidad aparecerán aquí.</string>
+    <string name="publish_lost_pet">Publicar mascota perdida</string>
+    <string name="operation_failed">No se pudo completar la operación. Comprueba tu conexión y vuelve a intentarlo.</string>
+    <string name="all_pets_count">Todas (%1$d)</string>
+    <string name="search_pet">Buscar por nombre, especie o ubicación</string>
+    <string name="no_pet_results">No encontramos mascotas\nPrueba otra búsqueda o cambia el filtro.</string>
+    <string name="no_adoption_results">No encontramos adopciones\nPrueba otra búsqueda o cambia el filtro.</string>
+    <string name="adoption_process_title">Adopción responsable</string>
+    <string name="adoption_process_body">1. Conoce a la mascota y lee su descripción.\n\n2. Contacta con la persona o el albergue que la cuida para consultar sus requisitos.\n\n3. Coordina una visita y confirma que puedes cubrir sus cuidados y necesidades.\n\n4. Acuerda la entrega y el seguimiento con su responsable.</string>
+    <string name="understood">Entendido</string>
+    <plurals name="adoption_options">
+        <item quantity="one">%d opción para adoptar</item>
+        <item quantity="other">%d opciones para adoptar</item>
+    </plurals>
 </resources>

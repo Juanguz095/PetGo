@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.practicafinal.controlador.ControladorUsuarios
 import com.example.practicafinal.session.FavoritosManager
@@ -53,10 +55,10 @@ class LoginActivity : AppCompatActivity() {
         }
 
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login).isEnabled = false
-        executor.execute {
+        ejecutarSeguro(executor) {
             try {
                 val usuario = ControladorUsuarios.iniciarSesion(this, correo, contrasena)
-                runOnUiThread {
+                actualizarUi {
                     findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login).isEnabled = true
                     if (usuario != null) {
                         SesionManager.guardarSesion(this, usuario.id)
@@ -68,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
             } catch (e: Exception) {
-                runOnUiThread {
+                actualizarUi {
                     findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login).isEnabled = true
                     mostrarError(traducirErrorFirebase(e))
                 }
@@ -76,24 +78,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun traducirErrorFirebase(e: Exception): String {
-        val msg = e.message ?: ""
-        return when {
-            msg.contains("USER_NOT_FOUND", true) || msg.contains("user-not-found", true) ->
-                "No existe una cuenta con ese correo"
-            msg.contains("wrong-password", true) || msg.contains("INVALID_PASSWORD", true) ->
-                "Contraseña incorrecta"
-            msg.contains("INVALID_EMAIL", true) || msg.contains("malformed", true) ->
-                "El correo electrónico no es válido"
-            msg.contains("TOO_MANY_REQUESTS", true) || msg.contains("too-many-requests", true) ->
-                "Demasiados intentos. Espera unos minutos"
-            msg.contains("network", true) || msg.contains("timeout", true) || msg.contains("unavailable", true) ->
-                "Sin conexión a internet. Verifica tu red"
-            msg.contains("API key not valid", true) || msg.contains("api_key", true) ->
-                "Error de configuración de Firebase"
-            else -> "Error: ${e.localizedMessage ?: "Error desconocido"}"
-        }
-    }
+    private fun traducirErrorFirebase(e: Exception): String =
+        com.example.practicafinal.util.mensajeErrorAuth(e, registro = false)
 
     private fun mostrarError(mensaje: String) {
         tvError.text = mensaje

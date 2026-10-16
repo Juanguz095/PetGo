@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.practicafinal.controlador.ControladorUsuarios
 import com.example.practicafinal.session.FavoritosManager
@@ -56,10 +58,10 @@ class RegistroActivity : AppCompatActivity() {
         }
 
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = false
-        executor.execute {
+        ejecutarSeguro(executor) {
             try {
                 val id = ControladorUsuarios.registrar(this, nombre, correo, contrasena, ciudad)
-                runOnUiThread {
+                actualizarUi {
                     findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = true
                     if (id != null) {
                         SesionManager.guardarSesion(this, id)
@@ -71,7 +73,7 @@ class RegistroActivity : AppCompatActivity() {
                     }
                 }
             } catch (e: Exception) {
-                runOnUiThread {
+                actualizarUi {
                     findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = true
                     mostrarError(traducirErrorFirebase(e))
                 }
@@ -79,22 +81,8 @@ class RegistroActivity : AppCompatActivity() {
         }
     }
 
-    private fun traducirErrorFirebase(e: Exception): String {
-        val msg = e.message ?: ""
-        return when {
-            msg.contains("EMAIL_ALREADY_IN_USE", true) || msg.contains("email-already-in-use", true) ->
-                "Ese correo ya está registrado"
-            msg.contains("WEAK_PASSWORD", true) || msg.contains("password", true) && msg.contains("too short", true) ->
-                "La contraseña es muy débil (mínimo 6 caracteres)"
-            msg.contains("INVALID_EMAIL", true) || msg.contains("malformed", true) ->
-                "El correo electrónico no es válido"
-            msg.contains("network", true) || msg.contains("timeout", true) || msg.contains("unavailable", true) ->
-                "Sin conexión a internet. Verifica tu red"
-            msg.contains("API key not valid", true) || msg.contains("api_key", true) ->
-                "Error de configuración de Firebase"
-            else -> "Error: ${e.localizedMessage ?: "Error desconocido"}"
-        }
-    }
+    private fun traducirErrorFirebase(e: Exception): String =
+        com.example.practicafinal.util.mensajeErrorAuth(e, registro = true)
 
     private fun mostrarError(mensaje: String) {
         tvError.text = mensaje

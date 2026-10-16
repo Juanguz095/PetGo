@@ -17,11 +17,15 @@
         android:layout_height="104dp"
         android:background="@drawable/bg_foto_borde">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_foto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.Photo"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="2dp"
+            android:contentDescription="Foto del albergue" />
 
         <TextView
             android:id="@+id/tv_placeholder"

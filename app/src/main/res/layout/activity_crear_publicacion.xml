@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true"
     tools:context=".CrearPublicacionActivity">
 
-    
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_marginTop="12dp"
@@ -43,7 +43,7 @@
             android:paddingEnd="20dp"
             android:paddingBottom="28dp">
 
-            
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -60,66 +60,66 @@
                 android:requiresFadingEdge="horizontal"
                 android:fadingEdgeLength="16dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/chip_perdida"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_chip_selected"
-                    android:paddingStart="16dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="12dp"
-                    android:text="Perdida"
-                    android:textColor="@color/tinta"
-                    android:textSize="13sp" />
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/chip_encontrada"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:background="@drawable/bg_chip"
-                    android:paddingStart="16dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="12dp"
-                    android:text="Encontrada"
-                    android:textColor="@color/texto_suave"
-                    android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/chip_perdida"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_chip_selected"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="12dp"
+                        android:text="Perdida"
+                        android:textColor="@color/tinta"
+                        android:textSize="13sp" />
 
-                <TextView
-                    android:id="@+id/chip_adopcion"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:background="@drawable/bg_chip"
-                    android:paddingStart="16dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="12dp"
-                    android:text="Adopción"
-                    android:textColor="@color/texto_suave"
-                    android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/chip_encontrada"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_chip"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="12dp"
+                        android:text="Encontrada"
+                        android:textColor="@color/texto_suave"
+                        android:textSize="13sp" />
 
-                <TextView
-                    android:id="@+id/chip_denuncia"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:background="@drawable/bg_chip"
-                    android:paddingStart="16dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="12dp"
-                    android:text="Denuncia"
-                    android:textColor="@color/texto_suave"
-                    android:textSize="13sp" />
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/chip_adopcion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_chip"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="12dp"
+                        android:text="Adopción"
+                        android:textColor="@color/texto_suave"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/chip_denuncia"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_chip"
+                        android:paddingStart="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="20dp"
+                        android:paddingBottom="12dp"
+                        android:text="Denuncia"
+                        android:textColor="@color/texto_suave"
+                        android:textSize="13sp" />
+                </LinearLayout>
             </HorizontalScrollView>
 
             <LinearLayout
@@ -138,68 +138,76 @@
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/chip_maltrato"
+                    android:scrollbars="none"
+                    android:fillViewport="true"
+                    android:requiresFadingEdge="horizontal"
+                    android:fadingEdgeLength="16dp">
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_chip_selected"
-                        android:paddingStart="16dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="12dp"
-                        android:text="Maltrato"
-                        android:textColor="@color/tinta"
-                        android:textSize="13sp" />
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/chip_abandono"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_chip"
-                        android:paddingStart="16dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="12dp"
-                        android:text="Abandono"
-                        android:textColor="@color/texto_suave"
-                        android:textSize="13sp" />
+                        <TextView
+                            android:id="@+id/chip_maltrato"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_chip_selected"
+                            android:paddingStart="16dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="20dp"
+                            android:paddingBottom="12dp"
+                            android:text="Maltrato"
+                            android:textColor="@color/tinta"
+                            android:textSize="13sp" />
 
-                    <TextView
-                        android:id="@+id/chip_venta_ilegal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_chip"
-                        android:paddingStart="16dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="12dp"
-                        android:text="Venta ilegal"
-                        android:textColor="@color/texto_suave"
-                        android:textSize="13sp" />
+                        <TextView
+                            android:id="@+id/chip_abandono"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_chip"
+                            android:paddingStart="16dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="20dp"
+                            android:paddingBottom="12dp"
+                            android:text="Abandono"
+                            android:textColor="@color/texto_suave"
+                            android:textSize="13sp" />
 
-                    <TextView
-                        android:id="@+id/chip_motivo_otro"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_chip"
-                        android:paddingStart="16dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="20dp"
-                        android:paddingBottom="12dp"
-                        android:text="Otro"
-                        android:textColor="@color/texto_suave"
-                        android:textSize="13sp" />
+                        <TextView
+                            android:id="@+id/chip_venta_ilegal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_chip"
+                            android:paddingStart="16dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="20dp"
+                            android:paddingBottom="12dp"
+                            android:text="Venta ilegal"
+                            android:textColor="@color/texto_suave"
+                            android:textSize="13sp" />
 
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/chip_motivo_otro"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_chip"
+                            android:paddingStart="16dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="20dp"
+                            android:paddingBottom="12dp"
+                            android:text="Otro"
+                            android:textColor="@color/texto_suave"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+                </HorizontalScrollView>
 
                 <EditText
                     android:id="@+id/et_motivo_custom"
@@ -208,11 +216,11 @@
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_brutal_blanco"
                     android:gravity="center_vertical"
-                android:hint="Escribe el motivo"
+                    android:hint="Escribe el motivo"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     android:paddingBottom="5dp"
-                android:paddingStart="15dp"
+                    android:paddingStart="15dp"
                     android:paddingEnd="20dp"
                     android:singleLine="true"
                     android:textColor="@color/tinta"
@@ -222,7 +230,7 @@
 
             </LinearLayout>
 
-            
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -241,11 +249,15 @@
                 android:clickable="true"
                 android:focusable="true">
 
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/img_foto"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.Photo"
+                    app:strokeColor="@color/tinta"
+                    app:strokeWidth="2dp"
+                    android:contentDescription="Foto de la mascota" />
 
                 <TextView
                     android:id="@+id/tv_foto_hint"
@@ -258,7 +270,7 @@
                     android:gravity="center" />
             </FrameLayout>
 
-            
+
             <TextView
                 android:id="@+id/label_nombre"
                 android:layout_width="wrap_content"
@@ -287,7 +299,7 @@
                 android:textColorHint="@color/texto_suave"
                 android:textSize="14sp" />
 
-            
+
             <TextView
                 android:id="@+id/label_especie"
                 android:layout_width="wrap_content"
@@ -355,11 +367,11 @@
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_brutal_blanco"
                     android:gravity="center_vertical"
-                android:hint="Ej. Parque Kennedy, Miraflores"
+                    android:hint="Ej. Parque Kennedy, Miraflores"
                     android:importantForAutofill="no"
                     android:inputType="text"
                     android:paddingBottom="5dp"
-                android:paddingStart="15dp"
+                    android:paddingStart="15dp"
                     android:paddingEnd="20dp"
                     android:singleLine="true"
                     android:textColor="@color/tinta"
@@ -368,7 +380,7 @@
 
             </LinearLayout>
 
-            
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -396,7 +408,7 @@
                 android:textColorHint="@color/texto_suave"
                 android:textSize="14sp" />
 
-            
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -421,41 +433,42 @@
                 android:textColor="@color/texto_suave"
                 android:textSize="12sp" />
 
-            
+
             <TextView
                 android:id="@+id/tv_error"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:textColor="#E53935"
+                android:textColor="@color/colorRed"
                 android:textSize="12sp"
                 android:visibility="gone" />
 
-            
+
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_sombra"
-                android:paddingEnd="5dp">
+                android:paddingEnd="5dp"
+                android:layout_height="55dp"
+                android:paddingBottom="5dp">
 
                 <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_publicar"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Publicar"
-                                android:textSize="14sp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:stateListAnimator="@null"
-                android:textAllCaps="false"
-                android:textStyle="bold"
-                android:textColor="@color/tinta"
-                app:backgroundTint="@color/tarjeta_amarilla"
-                app:cornerRadius="11dp"
-                app:strokeColor="@color/tinta"
-                app:strokeWidth="2dp"  />
+                    android:id="@+id/btn_publicar"
+                    style="@style/Widget.PetGo.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="Publicar"
+                    android:textSize="14sp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:stateListAnimator="@null"
+                    android:textAllCaps="false"
+                    android:textStyle="bold"
+                    android:textColor="@color/petgo_button_text"
+                    app:backgroundTint="@color/tarjeta_amarilla"
+                    app:cornerRadius="11dp"
+                    app:strokeColor="@color/tinta"
+                    app:strokeWidth="2dp"  />
 
             </FrameLayout>
 

@@ -59,7 +59,7 @@ class AdaptadorPerdidas(
             com.example.practicafinal.util.cargarImagen(holder.imgFoto, p.foto)
             holder.tvPlaceholder.visibility = View.GONE
         } else {
-            holder.imgFoto.setImageResource(android.R.drawable.ic_menu_gallery)
+            com.example.practicafinal.util.cargarImagen(holder.imgFoto, null)
             holder.tvPlaceholder.visibility = View.GONE
         }
         holder.tvNombre.text = p.nombre
@@ -82,7 +82,7 @@ class AdaptadorPerdidas(
                 holder.itemView.context,
                 when {
                     p.estado == "Adoptada" -> R.color.azul_enlace
-                    p.estado == "Resuelta" -> android.R.color.darker_gray
+                    p.estado == "Resuelta" -> R.color.texto_suave
                     else -> R.color.verde_petgo
                 }
             )

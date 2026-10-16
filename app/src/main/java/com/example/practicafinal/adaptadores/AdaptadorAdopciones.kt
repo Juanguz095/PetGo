@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.practicafinal.R
 import com.example.practicafinal.modelo.Publicacion
 import org.osmdroid.util.GeoPoint
@@ -40,7 +39,7 @@ class AdaptadorAdopciones(
             com.example.practicafinal.util.cargarImagen(holder.imgFoto, p.foto)
             holder.tvPlaceholder.visibility = View.GONE
         } else {
-            holder.imgFoto.setImageResource(android.R.drawable.ic_menu_gallery)
+            com.example.practicafinal.util.cargarImagen(holder.imgFoto, null)
             holder.tvPlaceholder.visibility = View.VISIBLE
         }
 

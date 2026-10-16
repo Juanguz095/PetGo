@@ -2,8 +2,9 @@
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
+import com.bumptech.glide.Glide
+import android.util.Base64
 import com.example.practicafinal.modelo.Albergue
 import com.example.practicafinal.modelo.Avistamiento
 import com.example.practicafinal.modelo.Denuncia
@@ -15,15 +16,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.storage.FirebaseStorage
-import org.json.JSONObject
-import java.io.ByteArrayOutputStream
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import kotlin.math.abs
 
 class FirebaseRepository(private val context: Context) {
 
@@ -41,93 +35,36 @@ class FirebaseRepository(private val context: Context) {
         get() = FirebaseFirestore.getInstance()
     private val auth: FirebaseAuth
         get() = FirebaseAuth.getInstance()
-    private val storage: FirebaseStorage
-        get() = FirebaseStorage.getInstance()
 
-    private fun currentUid(): String = com.example.practicafinal.session.SesionManager.currentFirebaseUid(context) ?: ""
+    private fun currentUid(): String = checkNotNull(com.example.practicafinal.session.SesionManager.currentFirebaseUid(context)) { "Inicia sesión para continuar" }
     private fun <T> await(task: Task<T>): T = Tasks.await(task, 30, TimeUnit.SECONDS)
 
-    private fun restApiKey(): String = "AIzaSyB0wKntYPlNf-0IqgXowwkmCSdviVJIejg"
-
-    private fun restSignUp(email: String, password: String): Pair<String, String> {
-        val key = restApiKey()
-        val url = URL("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$key")
-        val conn = (url.openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            setRequestProperty("Content-Type", "application/json")
-            doOutput = true
-        }
-        val body = JSONObject().apply {
-            put("email", email)
-            put("password", password)
-            put("returnSecureToken", true)
-        }
-        OutputStreamWriter(conn.outputStream).use { it.write(body.toString()) }
-        val code = conn.responseCode
-        val stream = if (code in 200..299) conn.inputStream else conn.errorStream
-        val response = stream.bufferedReader().use { it.readText() }
-        val json = JSONObject(response)
-        if (code !in 200..299) {
-            val msg = json.optJSONObject("error")?.optString("message") ?: "Error desconocido"
-            throw Exception(msg)
-        }
-        return json.getString("idToken") to json.getString("localId")
-    }
-
-    private fun restSignIn(email: String, password: String): Pair<String, String> {
-        val key = restApiKey()
-        val url = URL("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=$key")
-        val conn = (url.openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            setRequestProperty("Content-Type", "application/json")
-            doOutput = true
-        }
-        val body = JSONObject().apply {
-            put("email", email)
-            put("password", password)
-            put("returnSecureToken", true)
-        }
-        OutputStreamWriter(conn.outputStream).use { it.write(body.toString()) }
-        val code = conn.responseCode
-        val stream = if (code in 200..299) conn.inputStream else conn.errorStream
-        val response = stream.bufferedReader().use { it.readText() }
-        val json = JSONObject(response)
-        if (code !in 200..299) {
-            val msg = json.optJSONObject("error")?.optString("message") ?: "Error desconocido"
-            throw Exception(msg)
-        }
-        return json.getString("idToken") to json.getString("localId")
-    }
-
     fun registrar(nombre: String, correo: String, contrasena: String, tipo: String = "Ciudadano", ciudad: String = ""): Long {
-        val (idToken, localId) = restSignUp(correo.trim().lowercase(), contrasena)
-        val id = legacyId(localId)
-        com.example.practicafinal.session.SesionManager.guardarFirebaseUid(context, localId)
-        com.example.practicafinal.session.SesionManager.guardarIdToken(context, idToken)
-        val user = Usuario(id, nombre.trim(), correo.trim().lowercase(), tipo, ciudad.trim())
-        await(db.collection(USERS).document(localId).set(user.toFirestoreMap(localId)))
+        val normalizedEmail = correo.trim().lowercase(java.util.Locale.ROOT)
+        val firebaseUser = checkNotNull(await(auth.createUserWithEmailAndPassword(normalizedEmail, contrasena)).user)
+        val id = legacyId(firebaseUser.uid)
+        val user = Usuario(id, nombre.trim(), normalizedEmail, tipo, ciudad.trim())
+        await(db.collection(USERS).document(firebaseUser.uid).set(user.toFirestoreMap(firebaseUser.uid)))
+        com.example.practicafinal.session.SesionManager.guardarSesion(context, id, firebaseUser.uid)
         return id
     }
 
     fun validarLogin(correo: String, contrasena: String): Usuario? {
-        val (idToken, localId) = restSignIn(correo.trim().lowercase(), contrasena)
-        com.example.practicafinal.session.SesionManager.guardarFirebaseUid(context, localId)
-        com.example.practicafinal.session.SesionManager.guardarIdToken(context, idToken)
-        val snapshot = await(db.collection(USERS).document(localId).get())
-        if (snapshot.exists()) return snapshot.toUsuario(localId)
-        val user = Usuario(
-            legacyId(localId),
-            correo.trim().lowercase().substringBefore("@"),
-            correo.trim().lowercase(),
-            "Ciudadano"
-        )
-        await(db.collection(USERS).document(localId).set(user.toFirestoreMap(localId)))
+        val normalizedEmail = correo.trim().lowercase(java.util.Locale.ROOT)
+        val firebaseUser = checkNotNull(await(auth.signInWithEmailAndPassword(normalizedEmail, contrasena)).user)
+        val snapshot = await(db.collection(USERS).document(firebaseUser.uid).get())
+        val user = if (snapshot.exists()) snapshot.toUsuario(firebaseUser.uid) else {
+            Usuario(legacyId(firebaseUser.uid), normalizedEmail.substringBefore("@"), normalizedEmail, "Ciudadano")
+                .also { await(db.collection(USERS).document(firebaseUser.uid).set(it.toFirestoreMap(firebaseUser.uid))) }
+        }
+        com.example.practicafinal.session.SesionManager.guardarSesion(context, user.id, firebaseUser.uid)
         return user
     }
 
     fun obtenerPorId(id: Long): Usuario? {
-        val result = await(db.collection(USERS).whereEqualTo("legacyId", id).limit(1).get())
-        return result.documents.firstOrNull()?.toUsuario(result.documents.first().getString("uid"))
+        val uid = currentUid()
+        val snapshot = await(db.collection(USERS).document(uid).get())
+        return snapshot.takeIf { it.exists() }?.toUsuario(uid)?.takeIf { it.id == id }
     }
 
     fun insertarPublicacion(
@@ -158,37 +95,33 @@ class FirebaseRepository(private val context: Context) {
             fechaCreacion = System.currentTimeMillis(),
             estado = "Activa"
         )
-        await(db.collection(PUBLICATIONS).document(id.toString()).set(publication.toFirestoreMap(currentUid())))
+        await(db.collection(PUBLICATIONS).document(id.toString()).set(publication.toFirestoreMap(uid)))
         return id
     }
 
     private fun procesarFoto(value: String): String {
         val uri = Uri.parse(value)
-        if (uri.scheme == "http" || uri.scheme == "https") return value
-        if (uri.scheme == "android.resource") return value
-        var bitmap: Bitmap? = null
-        var resized: Bitmap? = null
-        return try {
-            val input = context.contentResolver.openInputStream(uri) ?: return value
-            bitmap = BitmapFactory.decodeStream(input)
-            input.close()
-            if (bitmap == null) return value
-            val maxDim = 600
-            val scale = minOf(1f, maxDim.toFloat() / maxOf(bitmap.width, bitmap.height))
-            resized = if (scale < 1f) Bitmap.createScaledBitmap(
-                bitmap, (bitmap.width * scale).toInt(), (bitmap.height * scale).toInt(), true
+        if (uri.scheme in listOf("http", "https", "android.resource")) return value
+        val target = Glide.with(context).asBitmap().load(uri).submit(600, 600)
+        try {
+            val bitmap = target.get(30, TimeUnit.SECONDS)
+            val scale = minOf(1f, 600f / maxOf(bitmap.width, bitmap.height))
+            val resized = if (scale < 1f) Bitmap.createScaledBitmap(
+                bitmap, maxOf(1, (bitmap.width * scale).toInt()), maxOf(1, (bitmap.height * scale).toInt()), true
             ) else bitmap
-            val baos = java.io.ByteArrayOutputStream()
-            resized.compress(Bitmap.CompressFormat.JPEG, 60, baos)
-            val bytes = baos.toByteArray()
-            android.util.Log.d("FirebaseRepo", "Foto procesada: ${bytes.size} bytes")
-            "data:image/jpeg;base64," + android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
-        } catch (e: Exception) {
-            android.util.Log.e("FirebaseRepo", "Error procesando foto: ${e.message}", e)
-            value
+            try {
+                val output = java.io.ByteArrayOutputStream()
+                check(resized.compress(Bitmap.CompressFormat.JPEG, 60, output)) { "No se pudo comprimir la foto" }
+                val bytes = output.toByteArray()
+                check(bytes.size <= 700 * 1024) { "La foto supera el tamaño permitido" }
+                return "data:image/jpeg;base64," + Base64.encodeToString(bytes, Base64.NO_WRAP)
+            } finally {
+                if (resized !== bitmap) resized.recycle()
+            }
+        } catch (error: Exception) {
+            throw IllegalArgumentException("No se pudo leer la foto. Selecciónala de nuevo.", error)
         } finally {
-            if (resized != null && resized !== bitmap) resized.recycle()
-            bitmap?.recycle()
+            Glide.with(context).clear(target)
         }
     }
 
@@ -196,11 +129,15 @@ class FirebaseRepository(private val context: Context) {
         await(db.collection(PUBLICATIONS).orderBy("fechaCreacion").get()).documents
             .asReversed().map { it.toPublicacion() }
 
+    fun obtenerPropias(): List<Publicacion> =
+        await(db.collection(PUBLICATIONS).whereEqualTo("usuarioId", currentUid()).get()).documents
+            .map { it.toPublicacion() }.sortedByDescending { it.fechaCreacion }
+
     fun obtenerPerdidas(): List<Publicacion> =
         obtenerPublicaciones().filter { it.tipo == "Perdida" }
 
     fun obtenerAdopciones(): List<Publicacion> =
-        obtenerPublicaciones().filter { it.tipo == "Adopcion" && it.estado != "Adoptada" }
+        obtenerPublicaciones().filter { it.tipo == "Adopcion" && it.estado == "Activa" }
 
     fun obtenerPorIdPublicacion(id: Long): Publicacion? =
         await(db.collection(PUBLICATIONS).document(id.toString()).get()).takeIf { it.exists() }?.toPublicacion()
@@ -226,9 +163,12 @@ class FirebaseRepository(private val context: Context) {
             fotoFinal,
             System.currentTimeMillis()
         )
-        await(db.collection(SIGHTINGS).document(id.toString()).set(sighting.toFirestoreMap(currentUid())))
-
+        val batch = db.batch()
         val pubSnapshot = await(db.collection(PUBLICATIONS).document(publicacionId.toString()).get())
+        check(pubSnapshot.exists() && pubSnapshot.getString("tipo") == "Perdida" && pubSnapshot.getString("estado") == "Activa") {
+            "Esta alerta ya no admite avistamientos"
+        }
+        batch.set(db.collection(SIGHTINGS).document(id.toString()), sighting.toFirestoreMap(uid))
         val ownerUid = pubSnapshot.getString("usuarioId")
         val petName = pubSnapshot.getString("nombre") ?: "la mascota"
         if (!ownerUid.isNullOrEmpty() && ownerUid != uid) {
@@ -245,8 +185,9 @@ class FirebaseRepository(private val context: Context) {
                 "fecha" to System.currentTimeMillis(),
                 "leida" to false
             )
-            await(db.collection(NOTIFICATIONS).document(notifId.toString()).set(notif))
+            batch.set(db.collection(NOTIFICATIONS).document(notifId.toString()), notif)
         }
+        await(batch.commit())
         return id
     }
 
@@ -280,10 +221,10 @@ class FirebaseRepository(private val context: Context) {
 
     fun actualizarAvistamiento(id: Long, latitud: Double, longitud: Double) {
         val uid = currentUid()
-        val ref = db.collection(PUBLICATIONS).document(id.toString())
+        val ref = db.collection(SIGHTINGS).document(id.toString())
         val snapshot = await(ref.get())
-        check(snapshot.getString("usuarioId") == currentUid()) {
-            "Solo el dueño puede actualizar esta publicación"
+        check(snapshot.getString("usuarioId") == uid) {
+            "Solo quien reportó el avistamiento puede actualizarlo"
         }
         await(ref.update(mapOf("latitud" to latitud, "longitud" to longitud)))
     }
@@ -299,7 +240,7 @@ class FirebaseRepository(private val context: Context) {
     ): Long {
         val id = newId()
         val shelter = Albergue(id, nombre, descripcion, direccion, telefono, foto, latitud, longitud)
-        await(db.collection(SHELTERS).document(id.toString()).set(shelter.toFirestoreMap()))
+        await(db.collection(SHELTERS).document(id.toString()).set(shelter.toFirestoreMap() + mapOf("usuarioId" to currentUid())))
         return id
     }
 
@@ -317,7 +258,7 @@ class FirebaseRepository(private val context: Context) {
         val id = newId()
         val fotoFinal = foto?.let { procesarFoto(it) }
         val report = Denuncia(id, motivo, descripcion, fotoFinal, latitud, longitud, System.currentTimeMillis())
-        await(db.collection(REPORTS).document(id.toString()).set(report.toFirestoreMap(currentUid())))
+        await(db.collection(REPORTS).document(id.toString()).set(report.toFirestoreMap(uid)))
         return id
     }
 
@@ -332,8 +273,7 @@ class FirebaseRepository(private val context: Context) {
         val uid = currentUid()
         if (uid.isEmpty()) return emptyList()
         return await(db.collection(NOTIFICATIONS)
-            .whereEqualTo("usuarioDestinoId", uid)
-            .orderBy("fecha").get()).documents.mapNotNull { doc ->
+            .whereEqualTo("usuarioDestinoId", uid).get()).documents.mapNotNull { doc ->
             val map = mutableMapOf<String, Any>()
             map["id"] = doc.id
             map["mensaje"] = doc.getString("mensaje").orEmpty()
@@ -368,11 +308,11 @@ class FirebaseRepository(private val context: Context) {
             .whereEqualTo("usuarioDestinoId", uid)
             .whereEqualTo("leida", false)
             .get())
-        val batch = db.batch()
-        for (doc in snapshot.documents) {
-            batch.update(doc.reference, "leida", true)
+        snapshot.documents.chunked(500).forEach { documents ->
+            val batch = db.batch()
+            documents.forEach { batch.update(it.reference, "leida", true) }
+            await(batch.commit())
         }
-        await(batch.commit())
     }
 
     fun seedIfNeeded() {
@@ -399,7 +339,7 @@ class FirebaseRepository(private val context: Context) {
                 Albergue(2000000002L, "Refugio Huellitas", "Hogar temporal", "Jr. Las Flores 456", "987654321", "android.resource://com.example.practicafinal/drawable/albergue_huellitas", -12.0200, -77.0800),
                 Albergue(2000000003L, "Hogar Peludo", "Adopción responsable", "Calle Los Olivos 789", "912345678", "android.resource://com.example.practicafinal/drawable/albergue_peludo", -12.0760, -77.0620)
             )
-            seeds.forEach { a -> await(shelters.document(a.id.toString()).set(a.toFirestoreMap())) }
+            seeds.forEach { a -> await(shelters.document(a.id.toString()).set(a.toFirestoreMap() + mapOf("usuarioId" to currentUid()))) }
         }
         prefs.edit().putBoolean("seeded", true).apply()
     }
@@ -434,90 +374,13 @@ class FirebaseRepository(private val context: Context) {
     fun observarDenuncias(
         onChanged: (List<Denuncia>) -> Unit,
         onError: (Exception) -> Unit
-    ): ListenerRegistration = db.collection(REPORTS)
+    ): ListenerRegistration = db.collection(REPORTS).whereEqualTo("usuarioId", currentUid())
         .addSnapshotListener { snapshot, error ->
             if (error != null) onError(error)
             else onChanged(snapshot?.documents.orEmpty().map { it.toDenuncia() })
         }
 
-    private fun uploadPhoto(value: String, path: String): String? {
-        val uri = Uri.parse(value)
-        if (uri.scheme == "http" || uri.scheme == "https" || uri.scheme == "android.resource") return value
-        return try {
-            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-            if (bytes == null) {
-                android.util.Log.e("FirebaseRepo", "No se pudo leer la imagen desde: $value")
-                return null
-            }
-            android.util.Log.d("FirebaseRepo", "Imagen leida: ${bytes.size} bytes, path=$path")
-            if (bytes.size.toLong() > MAX_IMAGE_BYTES) {
-                android.util.Log.e("FirebaseRepo", "Imagen muy grande: ${bytes.size} bytes")
-                return null
-            }
-            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            val payload = if (bitmap == null) bytes else compress(bitmap)
-            android.util.Log.d("FirebaseRepo", "Imagen comprimida: ${payload.size} bytes, subiendo...")
-            val url = uploadViaRest(path, payload)
-            android.util.Log.d("FirebaseRepo", "Upload exitoso: $url")
-            url
-        } catch (e: Exception) {
-            android.util.Log.e("FirebaseRepo", "Upload FAILED: ${e.message}", e)
-            null
-        }
-    }
-
-    private fun uploadViaRest(path: String, bytes: ByteArray): String {
-        val bucket = "petgo-325bb.firebasestorage.app"
-        val encodedPath = java.net.URLEncoder.encode(path, "UTF-8")
-        val uploadUrl = URL("https://firebasestorage.googleapis.com/v0/b/$bucket/o?uploadType=media&name=$encodedPath")
-        android.util.Log.d("FirebaseRepo", "Uploading to: $uploadUrl, bytes: ${bytes.size}")
-        val conn = (uploadUrl.openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            setRequestProperty("Content-Type", "image/jpeg")
-            setRequestProperty("Content-Length", bytes.size.toString())
-            doOutput = true
-            connectTimeout = 30000
-            readTimeout = 60000
-        }
-        conn.outputStream.use { it.write(bytes) }
-        val code = conn.responseCode
-        android.util.Log.d("FirebaseRepo", "Upload response code: $code")
-        val stream = if (code in 200..299) conn.inputStream else conn.errorStream
-        val response = stream.bufferedReader().use { it.readText() }
-        if (code !in 200..299) {
-            android.util.Log.e("FirebaseRepo", "Upload error: $response")
-            throw Exception("Upload failed ($code): $response")
-        }
-        val json = JSONObject(response)
-        val downloadToken = json.getString("downloadTokens")
-        val url = "https://firebasestorage.googleapis.com/v0/b/$bucket/o/${encodedPath}?alt=media&token=$downloadToken"
-        android.util.Log.d("FirebaseRepo", "Upload success: $url")
-        return url
-    }
-
-    private fun compress(bitmap: Bitmap): ByteArray {
-        val maxDimension = 1600
-        val scale = minOf(1f, maxDimension.toFloat() / maxOf(bitmap.width, bitmap.height))
-        val resized = if (scale < 1f) Bitmap.createScaledBitmap(
-            bitmap, (bitmap.width * scale).toInt(), (bitmap.height * scale).toInt(), true
-        ) else bitmap
-        try {
-            var quality = 85
-            var result: ByteArray
-            do {
-                val output = ByteArrayOutputStream()
-                resized.compress(Bitmap.CompressFormat.JPEG, quality, output)
-                result = output.toByteArray()
-                quality -= 10
-            } while (result.size > MAX_IMAGE_BYTES && quality >= 35)
-            check(result.size.toLong() <= MAX_IMAGE_BYTES) { "La imagen comprimida supera 5 MB" }
-            return result
-        } finally {
-            if (resized !== bitmap) resized.recycle()
-        }
-    }
-
-    private fun newId(): Long = abs(UUID.randomUUID().mostSignificantBits).let { if (it == 0L) 1L else it }
+    private fun newId(): Long = (UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE).let { if (it == 0L) 1L else it }
     private fun legacyId(uid: String): Long = (uid.hashCode().toLong() and Long.MAX_VALUE).let { if (it == 0L) 1L else it }
 
     private fun DocumentSnapshot.toUsuario(uid: String?): Usuario = Usuario(

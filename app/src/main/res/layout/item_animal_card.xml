@@ -15,12 +15,16 @@
         android:layout_width="match_parent"
         android:layout_height="132dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_animal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/bg_card_image"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.Photo"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="2dp"
+            android:contentDescription="Foto de la mascota" />
 
         <TextView
             android:id="@+id/tv_emoji"
@@ -40,8 +44,8 @@
             android:paddingTop="3dp"
             android:paddingEnd="8dp"
             android:paddingBottom="3dp"
-            android:textColor="#FFFFFF"
-            android:textSize="10sp"
+            android:textColor="@color/white"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </FrameLayout>
 

@@ -6,7 +6,7 @@
     <color name="ambar_estado">#F57F17</color>
     <color name="ic_launcher_background">#FFFFFF</color>
 
-    <color name="colorPrimary">#FF6750A4</color>
+    <color name="colorPrimary">@color/verde_petgo</color>
 
     <color name="colorSecondary">#FF1E88E5</color>
     <color name="colorSuccess">#43A047</color>
@@ -49,4 +49,5 @@
     <color name="fondo_lista">#FFFBF0</color>
     <color name="gris_icono">#FFEAEAEA</color>
     <color name="gris_foto">#FFEDEDED</color>
+    <color name="petgo_ripple">#24111111</color>
 </resources>

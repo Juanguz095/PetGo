@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="14dp"
@@ -16,11 +17,15 @@
         android:layout_height="92dp"
         android:background="@drawable/bg_foto_borde">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_foto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.Photo"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="2dp"
+            android:contentDescription="Foto de la mascota" />
 
         <TextView
             android:id="@+id/tv_placeholder"
@@ -42,7 +47,7 @@
             android:paddingEnd="8dp"
             android:paddingBottom="3dp"
             android:textColor="@color/white"
-            android:textSize="9sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </FrameLayout>
 
@@ -107,7 +112,7 @@
                 android:paddingTop="2dp"
                 android:paddingEnd="9dp"
                 android:paddingBottom="3dp"
-                android:textSize="10.5sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
 

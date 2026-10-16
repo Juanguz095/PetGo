@@ -1,9 +1,5 @@
 ﻿package com.example.practicafinal
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -11,10 +7,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.practicafinal.controlador.ControladorPublicaciones
-import com.example.practicafinal.db.DatabaseHelper
 import com.example.practicafinal.session.SesionManager
 import com.example.practicafinal.util.NotificacionHelper
 import com.example.practicafinal.util.decodificarImagen
@@ -126,19 +123,8 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
         )
     }
 
-    private fun obtenerUbicacionActual(): GeoPoint? {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-        ) return null
-        val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return try {
-            val loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-            loc?.let { GeoPoint(it.latitude, it.longitude) }
-        } catch (_: SecurityException) {
-            null
-        }
-    }
+    private fun obtenerUbicacionActual(): GeoPoint? =
+        com.example.practicafinal.util.ultimaUbicacion(this)?.let { GeoPoint(it.latitude, it.longitude) }
 
     private fun reportar() {
         val publicacionId = intent.getLongExtra(EXTRA_PUBLICACION_ID, -1L)
@@ -148,35 +134,40 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
             return
         }
         val descripcion = etDescripcion.text.toString().trim()
+        val foto = fotoAvistUri
         val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_reportar)
         button.isEnabled = false
-        executor.execute {
+        ejecutarSeguro(executor) {
             try {
                 val usuarioId = SesionManager.obtenerUsuarioId(this)
                 ControladorPublicaciones.reportarAvistamiento(
                     this, publicacionId, usuarioId, punto.latitude, punto.longitude,
-                    descripcion, fotoAvistUri
+                    descripcion, foto
                 )
 
-                val pub = ControladorPublicaciones.obtenerPorId(this, publicacionId)
-                if (pub != null) {
-                    NotificacionHelper.notificarAvistamiento(
-                        this,
-                        publicacionId.toInt(),
-                        pub.nombre,
-                        descripcion,
-                        publicacionId,
-                        punto.latitude,
-                        punto.longitude
-                    )
+                try {
+                    val pub = ControladorPublicaciones.obtenerPorId(this, publicacionId)
+                    if (pub != null) {
+                        NotificacionHelper.notificarAvistamiento(
+                            this,
+                            publicacionId.toInt(),
+                            pub.nombre,
+                            descripcion,
+                            publicacionId,
+                            punto.latitude,
+                            punto.longitude
+                        )
+                    }
+                } catch (error: Exception) {
+                    android.util.Log.w("PetGo", "No se pudo mostrar el aviso local", error)
                 }
 
-                runOnUiThread {
+                actualizarUi {
                     Toast.makeText(this, "Avistamiento reportado!", Toast.LENGTH_SHORT).show()
                     finish()
                 }
             } catch (error: Exception) {
-                runOnUiThread {
+                actualizarUi {
                     button.isEnabled = true
                     Toast.makeText(
                         this,
@@ -198,6 +189,7 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        if (::map.isInitialized) map.onDetach()
         super.onDestroy()
         executor.shutdown()
     }

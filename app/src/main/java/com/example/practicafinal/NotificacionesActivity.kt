@@ -6,7 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,19 +34,18 @@ class NotificacionesActivity : AppCompatActivity() {
         rvNotificaciones.layoutManager = LinearLayoutManager(this)
 
         findViewById<TextView>(R.id.tv_marcar_leidas).setOnClickListener {
-            executor.execute {
+            ejecutarSeguro(executor) {
                 DatabaseHelper(this).marcarTodasLeidas()
-                runOnUiThread { cargarNotificaciones() }
+                actualizarUi { cargarNotificaciones() }
             }
         }
 
-        cargarNotificaciones()
     }
 
     private fun cargarNotificaciones() {
-        executor.execute {
+        ejecutarSeguro(executor) {
             val notifs = DatabaseHelper(this).obtenerNotificaciones()
-            runOnUiThread {
+            actualizarUi {
                 if (notifs.isEmpty()) {
                     tvVacio.visibility = View.VISIBLE
                     rvNotificaciones.visibility = View.GONE
@@ -55,7 +55,7 @@ class NotificacionesActivity : AppCompatActivity() {
                     rvNotificaciones.adapter = AdaptadorNotificacion(notifs) { notif ->
                         val pubId = (notif["publicacionId"] as? String)?.toLongOrNull()
                         if (pubId != null) {
-                            executor.execute {
+                            ejecutarSeguro(executor) {
                                 DatabaseHelper(this).marcarNotificacionLeida(notif["id"] as String)
                             }
                             val intent = Intent(this, MainActivity::class.java)

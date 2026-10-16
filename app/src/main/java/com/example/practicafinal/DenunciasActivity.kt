@@ -6,11 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.practicafinal.controlador.ControladorDenuncias
-import com.bumptech.glide.Glide
 import com.example.practicafinal.util.fechaRelativa
 import java.util.concurrent.Executors
 
@@ -29,7 +30,6 @@ class DenunciasActivity : AppCompatActivity() {
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_denunciar).setOnClickListener {
             startActivity(Intent(this, CrearDenunciaActivity::class.java))
         }
-        cargar()
     }
 
     private fun iconoMotivo(m: String) = when (m) {
@@ -37,9 +37,9 @@ class DenunciasActivity : AppCompatActivity() {
     }
 
     private fun cargar() {
-        exec.execute {
+        ejecutarSeguro(exec) {
             val lista = ControladorDenuncias.obtenerDenuncias(this)
-            runOnUiThread {
+            actualizarUi {
                 tvVacio.visibility = if (lista.isEmpty()) View.VISIBLE else View.GONE
                 rv.adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     override fun onCreateViewHolder(p: ViewGroup, v: Int) = object : RecyclerView.ViewHolder(
@@ -52,10 +52,10 @@ class DenunciasActivity : AppCompatActivity() {
                         val pl = h.itemView.findViewById<TextView>(R.id.tv_placeholder)
                         pl.text = iconoMotivo(d.motivo)
                         if (!d.foto.isNullOrBlank()) {
-                            Glide.with(h.itemView.context).load(d.foto).into(img)
+                            com.example.practicafinal.util.cargarImagen(img, d.foto)
                             pl.visibility = View.GONE
                         } else {
-                            img.setImageDrawable(null)
+                            com.example.practicafinal.util.limpiarImagen(img)
                             pl.visibility = View.VISIBLE
                         }
                         (h.itemView.findViewById<TextView>(R.id.tv_motivo)).text =

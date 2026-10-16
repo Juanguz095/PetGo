@@ -4,7 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.practicafinal.controlador.ControladorDenuncias
 import com.example.practicafinal.controlador.ControladorPublicaciones
@@ -24,33 +25,6 @@ class PerfilActivity : AppCompatActivity() {
         findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
             .setNavigationOnClickListener { finish() }
 
-        val tvNombre = findViewById<TextView>(R.id.tv_nombre)
-        val tvCorreo = findViewById<TextView>(R.id.tv_correo)
-        val tvTipo = findViewById<TextView>(R.id.tv_tipo)
-        val tvPublicaciones = findViewById<TextView>(R.id.tv_publicaciones)
-        val tvDenuncias = findViewById<TextView>(R.id.tv_denuncias)
-        val tvFavoritos = findViewById<TextView>(R.id.tv_favoritos)
-
-        val usuarioId = SesionManager.obtenerUsuarioId(this)
-
-        
-        executor.execute {
-            val usuario = usuarioId?.let { ControladorUsuarios.obtenerPorId(this, it) }
-            val pubCount = if (usuarioId != null)
-                ControladorPublicaciones.obtenerPublicaciones(this).count { it.usuarioId == usuarioId } else 0
-            val denCount = ControladorDenuncias.obtenerDenuncias(this).size
-            val favCount = FavoritosManager.contar(this)
-            runOnUiThread {
-                usuario?.let {
-                    tvNombre.text = it.nombre; tvCorreo.text = it.correo; tvTipo.text = it.tipo
-                }
-                tvPublicaciones.text = pubCount.toString()
-                tvDenuncias.text = denCount.toString()
-                tvFavoritos.text = favCount.toString()
-            }
-        }
-
-        
         findViewById<View>(R.id.row_cerrar_sesion).setOnClickListener {
             SesionManager.cerrarSesion(this)
             startActivity(Intent(this, LoginActivity::class.java).apply {
@@ -82,17 +56,22 @@ class PerfilActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        
-        executor.execute {
+        ejecutarSeguro(executor) {
             val usuarioId = SesionManager.obtenerUsuarioId(this)
-            val pubCount = if (usuarioId != null)
-                ControladorPublicaciones.obtenerPublicaciones(this).count { it.usuarioId == usuarioId } else 0
-            val denCount = ControladorDenuncias.obtenerDenuncias(this).size
-            val favCount = FavoritosManager.contar(this)
-            runOnUiThread {
-                findViewById<TextView>(R.id.tv_publicaciones).text = pubCount.toString()
-                findViewById<TextView>(R.id.tv_denuncias).text = denCount.toString()
-                findViewById<TextView>(R.id.tv_favoritos).text = favCount.toString()
+            val usuario = usuarioId?.let { ControladorUsuarios.obtenerPorId(this, it) }
+            val publicaciones = if (usuarioId != null)
+                ControladorPublicaciones.obtenerPropias(this).size else 0
+            val denuncias = ControladorDenuncias.obtenerDenuncias(this).size
+            val favoritos = FavoritosManager.contar(this)
+            actualizarUi {
+                usuario?.let {
+                    findViewById<TextView>(R.id.tv_nombre).text = it.nombre
+                    findViewById<TextView>(R.id.tv_correo).text = it.correo
+                    findViewById<TextView>(R.id.tv_tipo).text = it.tipo
+                }
+                findViewById<TextView>(R.id.tv_publicaciones).text = publicaciones.toString()
+                findViewById<TextView>(R.id.tv_denuncias).text = denuncias.toString()
+                findViewById<TextView>(R.id.tv_favoritos).text = favoritos.toString()
             }
         }
     }

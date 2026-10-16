@@ -8,7 +8,7 @@
     tools:context=".ReportarAvistamientoActivity"
     android:fitsSystemWindows="true">
 
-    
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_marginTop="12dp"
@@ -71,7 +71,7 @@
                 android:textColor="@color/texto_suave"
                 android:textSize="12sp" />
 
-            
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -90,11 +90,15 @@
                 android:clickable="true"
                 android:focusable="true">
 
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/img_foto_avist"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Foto del avistamiento"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.Photo"
+                    app:strokeColor="@color/tinta"
+                    app:strokeWidth="2dp" />
 
                 <TextView
                     android:id="@+id/tv_foto_hint_avist"
@@ -107,7 +111,7 @@
                     android:gravity="center" />
             </FrameLayout>
 
-            
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -137,28 +141,29 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_sombra"
-                android:paddingEnd="5dp">
+                android:paddingEnd="5dp"
+                android:layout_height="55dp"
+                android:paddingBottom="5dp">
 
                 <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_reportar"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Reportar avistamiento"
-                                android:textSize="14sp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:stateListAnimator="@null"
-                android:textAllCaps="false"
-                android:textStyle="bold"
-                android:textColor="@color/tinta"
-                app:backgroundTint="@color/tarjeta_amarilla"
-                app:cornerRadius="11dp"
-                app:strokeColor="@color/tinta"
-                app:strokeWidth="2dp"  />
+                    android:id="@+id/btn_reportar"
+                    style="@style/Widget.PetGo.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="Reportar avistamiento"
+                    android:textSize="14sp"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:stateListAnimator="@null"
+                    android:textAllCaps="false"
+                    android:textStyle="bold"
+                    android:textColor="@color/petgo_button_text"
+                    app:backgroundTint="@color/tarjeta_amarilla"
+                    app:cornerRadius="11dp"
+                    app:strokeColor="@color/tinta"
+                    app:strokeWidth="2dp"  />
 
             </FrameLayout>
 

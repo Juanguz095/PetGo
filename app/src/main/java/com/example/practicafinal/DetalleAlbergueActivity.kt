@@ -6,10 +6,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.practicafinal.controlador.ControladorAlbergues
-import com.bumptech.glide.Glide
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
@@ -20,6 +21,7 @@ import java.util.concurrent.Executors
 class DetalleAlbergueActivity : AppCompatActivity() {
 
     private val exec = Executors.newSingleThreadExecutor()
+    private lateinit var map: MapView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,21 +30,22 @@ class DetalleAlbergueActivity : AppCompatActivity() {
         setContentView(R.layout.activity_detalle_albergue)
         findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar).setNavigationOnClickListener { finish() }
 
+        map = findViewById(R.id.mapa_albergue)
         val id = intent.getLongExtra("albergue_id", -1L)
         if (id == -1L) {
             finish(); return
         }
 
-        exec.execute {
+        ejecutarSeguro(exec) {
             val a = ControladorAlbergues.obtenerAlbergues(this).find { it.id == id }
-            runOnUiThread {
+            actualizarUi {
                 if (a == null) {
-                    finish(); return@runOnUiThread
+                    finish(); return@actualizarUi
                 }
                 val img = findViewById<android.widget.ImageView>(R.id.img_foto)
                 val pl = findViewById<TextView>(R.id.tv_placeholder)
                 if (!a.foto.isNullOrBlank()) {
-                    Glide.with(this).load(a.foto).into(img)
+                    com.example.practicafinal.util.cargarImagen(img, a.foto)
                     pl.visibility = View.GONE
                 } else {
                     pl.visibility = View.VISIBLE
@@ -53,7 +56,6 @@ class DetalleAlbergueActivity : AppCompatActivity() {
                 findViewById<TextView>(R.id.tv_direccion).text = a.direccion
 
                 
-                val map = findViewById<MapView>(R.id.mapa_albergue)
                 map.setUseDataConnection(true)
                 map.setTileSource(
                     XYTileSource(
@@ -75,14 +77,14 @@ class DetalleAlbergueActivity : AppCompatActivity() {
                     Marker.ANCHOR_BOTTOM
                 )
                 })
-                map.invalidate(); map.onResume()
+                map.invalidate()
 
                 findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_whatsapp).setOnClickListener {
                     try {
                         startActivity(
                             Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://wa.me/51${a.telefono}?text=Hola ${a.nombre}")
+                                Uri.parse("https://wa.me/51${a.telefono.filter(Char::isDigit)}?text=${Uri.encode("Hola ${a.nombre}")}")
                             )
                         )
                     } catch (_: Exception) {
@@ -97,7 +99,18 @@ class DetalleAlbergueActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::map.isInitialized) map.onResume()
+    }
+
+    override fun onPause() {
+        if (::map.isInitialized) map.onPause()
+        super.onPause()
+    }
+
     override fun onDestroy() {
+        if (::map.isInitialized) map.onDetach()
         super.onDestroy(); exec.shutdown()
     }
 }

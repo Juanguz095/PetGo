@@ -8,6 +8,13 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 
 class SplashActivity : AppCompatActivity() {
+    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val continuar = Runnable {
+        if (!isFinishing && !isDestroyed) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +41,12 @@ class SplashActivity : AppCompatActivity() {
         anim.start()
 
         
-        logo.postDelayed({
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }, 1600)
+        handler.postDelayed(continuar, 1600)
+    }
+
+    override fun onDestroy() {
+        handler.removeCallbacks(continuar)
+        findViewById<ImageView>(R.id.img_logo).animate().cancel()
+        super.onDestroy()
     }
 }

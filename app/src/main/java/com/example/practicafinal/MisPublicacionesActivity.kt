@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.example.practicafinal.util.ejecutarSeguro
+import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.practicafinal.adaptadores.AdaptadorPublicacionesPropias
@@ -33,10 +35,9 @@ class MisPublicacionesActivity : AppCompatActivity() {
 
     private fun cargarPublicaciones() {
         val usuarioId = SesionManager.obtenerUsuarioId(this) ?: return
-        executor.execute {
-            val todas = ControladorPublicaciones.obtenerPublicaciones(this)
-            val propias = todas.filter { it.usuarioId == usuarioId }
-            runOnUiThread {
+        ejecutarSeguro(executor) {
+            val propias = ControladorPublicaciones.obtenerPropias(this)
+            actualizarUi {
                 tvVacio.visibility = if (propias.isEmpty()) View.VISIBLE else View.GONE
                 rv.adapter = AdaptadorPublicacionesPropias(
                     propias,
@@ -48,9 +49,9 @@ class MisPublicacionesActivity : AppCompatActivity() {
     }
 
     private fun resolverPublicacion(publicacion: com.example.practicafinal.modelo.Publicacion) {
-        executor.execute {
+        ejecutarSeguro(executor) {
             ControladorPublicaciones.resolver(this, publicacion.id)
-            runOnUiThread {
+            actualizarUi {
                 Toast.makeText(this, "Publicacion resuelta", Toast.LENGTH_SHORT).show()
                 cargarPublicaciones()
             }
@@ -58,9 +59,9 @@ class MisPublicacionesActivity : AppCompatActivity() {
     }
 
     private fun adoptarPublicacion(publicacion: com.example.practicafinal.modelo.Publicacion) {
-        executor.execute {
+        ejecutarSeguro(executor) {
             ControladorPublicaciones.adoptar(this, publicacion.id)
-            runOnUiThread {
+            actualizarUi {
                 Toast.makeText(this, "Mascota marcada como adoptada", Toast.LENGTH_SHORT).show()
                 cargarPublicaciones()
             }

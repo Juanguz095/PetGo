@@ -35,6 +35,8 @@ object ControladorPublicaciones {
     fun obtenerPublicaciones(context: Context): List<Publicacion> =
         DatabaseHelper(context).obtenerPublicaciones()
 
+    fun obtenerPropias(context: Context): List<Publicacion> = DatabaseHelper(context).obtenerPropias()
+
     fun obtenerPorId(context: Context, id: Long): Publicacion? =
         DatabaseHelper(context).obtenerPorIdPublicacion(id)
 
