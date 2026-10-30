@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import com.example.practicafinal.util.filtrarPublicaciones
 import androidx.appcompat.app.AlertDialog
 import com.example.practicafinal.util.Dialogos
@@ -19,6 +20,7 @@ import com.example.practicafinal.adaptadores.AdaptadorAdopciones
 import com.example.practicafinal.controlador.ControladorPublicaciones
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.session.FavoritosManager
+import com.google.firebase.firestore.DocumentSnapshot
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.Executors
 
@@ -36,6 +38,14 @@ class AdopcionesActivity : AppCompatActivity() {
     private var ordenActual = "recientes"
     private var userLat: Double? = null
     private var userLng: Double? = null
+    private var radioKm: Double? = null
+    private var cursorPagina: DocumentSnapshot? = null
+    private var hayMas = false
+    private var cargando = false
+    private var primeraPaginaCargada = false
+    private var actualizarAlVolver = false
+    private lateinit var btnCargarMas: com.google.android.material.button.MaterialButton
+    private lateinit var btnRadio: TextView
 
     private lateinit var chipRecientes: TextView
     private lateinit var chipCercanos: TextView
@@ -57,6 +67,10 @@ class AdopcionesActivity : AppCompatActivity() {
         chipCercanos = findViewById(R.id.chip_orden_cercanos)
         chipNombre = findViewById(R.id.chip_orden_nombre)
         rvAnimales.layoutManager = LinearLayoutManager(this)
+        btnCargarMas = findViewById(R.id.btn_cargar_mas)
+        btnCargarMas.setOnClickListener { cargarAdopciones(reset = false) }
+        btnRadio = findViewById(R.id.btn_radio)
+        btnRadio.setOnClickListener { mostrarMenuRadio() }
 
         findViewById<View>(R.id.btn_favoritos).setOnClickListener {
             startActivity(Intent(this, MisFavoritosActivity::class.java))
@@ -64,6 +78,7 @@ class AdopcionesActivity : AppCompatActivity() {
 
         findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_agregar)
             .setOnClickListener {
+                actualizarAlVolver = true
                 startActivity(Intent(this, CrearPublicacionActivity::class.java).apply {
                     putExtra(CrearPublicacionActivity.EXTRA_TIPO, "Adopcion")
                 })
@@ -112,6 +127,11 @@ class AdopcionesActivity : AppCompatActivity() {
     }
 
     private fun seleccionarOrden(orden: String) {
+        if (orden == "cercanos" && (userLat == null || userLng == null)) {
+            Toast.makeText(this, "No hay una ubicación reciente; se mostrarán primero las publicaciones nuevas", Toast.LENGTH_LONG).show()
+            seleccionarOrden("recientes")
+            return
+        }
         ordenActual = orden
         listOf(chipRecientes to "recientes", chipCercanos to "cercanos", chipNombre to "nombre").forEach { (chip, o) ->
             val activo = o == orden
@@ -125,6 +145,25 @@ class AdopcionesActivity : AppCompatActivity() {
         aplicarFiltros()
     }
 
+    private fun mostrarMenuRadio() {
+        if (userLat == null || userLng == null) {
+            Toast.makeText(this, "Necesitas una ubicación reciente para filtrar por distancia", Toast.LENGTH_LONG).show()
+            return
+        }
+        androidx.appcompat.widget.PopupMenu(this, btnRadio).apply {
+            listOf("Todas las distancias" to null, "Hasta 5 km" to 5.0, "Hasta 10 km" to 10.0, "Hasta 25 km" to 25.0)
+                .forEach { (label, value) ->
+                    menu.add(label).setOnMenuItemClickListener {
+                        radioKm = value
+                        btnRadio.text = if (value == null) "Radio: todas" else "Radio: ${value.toInt()} km"
+                        aplicarFiltros()
+                        true
+                    }
+                }
+            show()
+        }
+    }
+
     private fun obtenerUbicacion() {
         com.example.practicafinal.util.ultimaUbicacion(this)?.let {
             userLat = it.latitude
@@ -132,22 +171,54 @@ class AdopcionesActivity : AppCompatActivity() {
         }
     }
 
-    private fun cargarAdopciones() {
+    private fun cargarAdopciones(reset: Boolean = true) {
+        if (cargando) return
+        if (!reset && !hayMas) return
+        if (reset) {
+            cursorPagina = null
+            publicaciones = emptyList()
+        }
+        cargando = true
+        btnCargarMas.isEnabled = false
         ejecutarSeguro(executor) {
-            val lista = ControladorPublicaciones.obtenerAdopciones(this)
-            actualizarUi {
-                publicaciones = lista
-                aplicarFiltros()
-                actualizarContadorFav()
-
+            try {
+                val pagina = ControladorPublicaciones.obtenerPagina(this, "Adopcion", cursorPagina)
+                actualizarUi {
+                    cursorPagina = pagina.cursor
+                    hayMas = pagina.hayMas
+                    primeraPaginaCargada = true
+                    cargando = false
+                    btnCargarMas.isEnabled = true
+                    btnCargarMas.visibility = if (hayMas) View.VISIBLE else View.GONE
+                    publicaciones = (if (reset) emptyList() else publicaciones) +
+                        pagina.items.filter { it.estado == "Activa" }
+                    aplicarFiltros(preserveScroll = !reset)
+                    actualizarContadorFav()
+                }
+            } catch (error: Exception) {
+                actualizarUi { cargando = false; btnCargarMas.isEnabled = true }
+                throw error
             }
         }
     }
 
-    private fun aplicarFiltros() {
+    private fun aplicarFiltros(preserveScroll: Boolean = false) {
         var filtradas = filtrarPublicaciones(publicaciones, etBuscar.text.toString(), filtroEspecie)
+        radioKm?.let { radio ->
+            val origen = userLat?.let { lat -> userLng?.let { lng -> GeoPoint(lat, lng) } }
+            if (origen != null) {
+                filtradas = filtradas.filter {
+                    GeoPoint(it.latitud, it.longitud).distanceToAsDouble(origen) <= radio * 1000.0
+                }
+            }
+        }
         val n = filtradas.size
-        tvOpciones.text = resources.getQuantityString(R.plurals.adoption_options, n, n)
+        tvOpciones.text = resources.getQuantityString(R.plurals.adoption_options, n, n, publicaciones.size)
+        tvVacio.setText(
+            if (filtradas.isEmpty() && publicaciones.isNotEmpty() && hayMas)
+                R.string.search_more_loaded
+            else R.string.no_adoption_results
+        )
         tvVacio.visibility = if (filtradas.isEmpty()) View.VISIBLE else View.GONE
 
         filtradas = when (ordenActual) {
@@ -164,12 +235,20 @@ class AdopcionesActivity : AppCompatActivity() {
             else -> filtradas.sortedByDescending { it.fechaCreacion }
         }
 
+        val layoutManager = rvAnimales.layoutManager as? LinearLayoutManager
+        val firstVisible = layoutManager?.findFirstVisibleItemPosition() ?: 0
+        val firstOffset = rvAnimales.getChildAt(0)?.top ?: 0
         rvAnimales.adapter = AdaptadorAdopciones(filtradas, userLat, userLng) { publicacion ->
             startActivity(
                 Intent(this, DetalleAdopcionActivity::class.java).apply {
                     putExtra(DetalleAdopcionActivity.EXTRA_PUBLICACION_ID, publicacion.id)
                 }
             )
+        }
+        if (preserveScroll && firstVisible >= 0) {
+            rvAnimales.post { layoutManager?.scrollToPositionWithOffset(firstVisible, firstOffset) }
+        } else {
+            rvAnimales.scrollToPosition(0)
         }
     }
 
@@ -181,7 +260,10 @@ class AdopcionesActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        cargarAdopciones()
+        if (!primeraPaginaCargada || actualizarAlVolver) {
+            actualizarAlVolver = false
+            cargarAdopciones()
+        }
     }
 
     override fun onDestroy() {

@@ -5,8 +5,10 @@ import com.example.practicafinal.modelo.Albergue
 import com.example.practicafinal.modelo.Avistamiento
 import com.example.practicafinal.modelo.Denuncia
 import com.example.practicafinal.modelo.Publicacion
+import com.example.practicafinal.modelo.ResultadoRegistro
 import com.example.practicafinal.modelo.Usuario
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.DocumentSnapshot
 
 /**
  * Fachada de compatibilidad. Conserva la API que usan los Activities,
@@ -16,8 +18,10 @@ class DatabaseHelper(context: Context) {
 
     private val repository = FirebaseRepository(context.applicationContext)
 
-    fun registrar(nombre: String, correo: String, contrasena: String, tipo: String = "Ciudadano", ciudad: String = ""): Long? =
+    fun registrar(nombre: String, correo: String, contrasena: String, tipo: String = "Ciudadano", ciudad: String = ""): ResultadoRegistro =
         repository.registrar(nombre, correo, contrasena, tipo, ciudad)
+
+    fun reintentarGuardarPerfilPendiente(): Usuario? = repository.reintentarGuardarPerfilPendiente()
 
     fun validarLogin(correo: String, contrasena: String): Usuario? =
         repository.validarLogin(correo, contrasena)
@@ -25,25 +29,61 @@ class DatabaseHelper(context: Context) {
     fun obtenerPorId(id: Long): Usuario? =
         repository.obtenerPorId(id)
 
+    fun pushHabilitado(): Boolean = repository.pushHabilitado()
+
+    fun actualizarPushHabilitado(habilitadas: Boolean) =
+        repository.actualizarPushHabilitado(habilitadas)
+
+    fun quitarDispositivoPushActual() = repository.quitarDispositivoPushActual()
+
+    fun registrarTokenPushSiHabilitado(token: String) =
+        repository.registrarTokenPushSiHabilitado(token)
+
     fun insertarPublicacion(
         usuarioId: Long?, tipo: String, nombre: String, descripcion: String,
         foto: String?, ultimoLugar: String?, especie: String?,
-        latitud: Double, longitud: Double
+        latitud: Double, longitud: Double, contactoWhatsapp: String? = null,
+        fechaPerdida: Long? = null, recompensa: String? = null,
+        color: String? = null, tamano: String? = null, senasParticulares: String? = null
     ): Long = repository.insertarPublicacion(
-        usuarioId, tipo, nombre, descripcion, foto, ultimoLugar, especie, latitud, longitud
+        usuarioId, tipo, nombre, descripcion, foto, ultimoLugar, especie, latitud, longitud,
+        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares
     )
 
+    fun actualizarPublicacion(
+        id: Long, tipo: String, nombre: String, descripcion: String, foto: String?,
+        ultimoLugar: String?, especie: String?, latitud: Double, longitud: Double,
+        contactoWhatsapp: String?, fechaPerdida: Long? = null, recompensa: String? = null,
+        color: String? = null, tamano: String? = null, senasParticulares: String? = null
+    ) = repository.actualizarPublicacion(
+        id, tipo, nombre, descripcion, foto, ultimoLugar, especie, latitud, longitud,
+        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares
+    )
+
+    fun eliminarPublicacion(id: Long) = repository.eliminarPublicacion(id)
+
     fun obtenerPublicaciones(): List<Publicacion> = repository.obtenerPublicaciones()
+    fun obtenerPaginaPublicaciones(tipo: String?, after: DocumentSnapshot?, pageSize: Int = 24) =
+        repository.obtenerPaginaPublicaciones(tipo, after, pageSize)
+    fun obtenerPaginaPropias(after: DocumentSnapshot?, pageSize: Int = 24) =
+        repository.obtenerPaginaPropias(after, pageSize)
+    fun obtenerPaginaAlbergues(after: DocumentSnapshot?, pageSize: Int = 24) =
+        repository.obtenerPaginaAlbergues(after, pageSize)
     fun obtenerPropias(): List<Publicacion> = repository.obtenerPropias()
+    fun contarPropias(): Long = repository.contarPropias()
     fun obtenerPerdidas(): List<Publicacion> = repository.obtenerPerdidas()
+    fun obtenerEncontradas(): List<Publicacion> = repository.obtenerEncontradas()
     fun obtenerAdopciones(): List<Publicacion> = repository.obtenerAdopciones()
     fun obtenerPorIdPublicacion(id: Long): Publicacion? = repository.obtenerPorIdPublicacion(id)
+    fun obtenerCoordenadasPublicacion(id: Long): Pair<Double, Double>? =
+        repository.obtenerCoordenadasPublicacion(id)
 
     fun insertarAvistamiento(
-        publicacionId: Long, usuarioId: Long?, latitud: Double, longitud: Double,
-        descripcion: String, foto: String?
+        publicacionId: Long?, usuarioId: Long?, latitud: Double, longitud: Double,
+        descripcion: String, foto: String?, fechaAvistamiento: Long = System.currentTimeMillis(),
+        especie: String? = null
     ): Long = repository.insertarAvistamiento(
-        publicacionId, usuarioId, latitud, longitud, descripcion, foto
+        publicacionId, usuarioId, latitud, longitud, descripcion, foto, fechaAvistamiento, especie
     )
 
     fun obtenerAvistamientos(): List<Avistamiento> = repository.obtenerAvistamientos()
@@ -54,13 +94,13 @@ class DatabaseHelper(context: Context) {
     fun marcarAdoptada(id: Long) = repository.marcarAdoptada(id)
     fun actualizarAvistamiento(id: Long, latitud: Double, longitud: Double) =
         repository.actualizarAvistamiento(id, latitud, longitud)
-
-    fun insertarAlbergue(
-        nombre: String, descripcion: String, direccion: String,
-        telefono: String, foto: String?, latitud: Double, longitud: Double
-    ): Long = repository.insertarAlbergue(
-        nombre, descripcion, direccion, telefono, foto, latitud, longitud
-    )
+    fun obtenerCoordenadasAvistamiento(id: Long): Pair<Double, Double>? =
+        repository.obtenerCoordenadasAvistamiento(id)
+    fun confirmarAlertaPerdida(id: Long) = repository.confirmarAlertaPerdida(id)
+    fun actualizarRevisionAvistamiento(id: Long, estado: String) =
+        repository.actualizarRevisionAvistamiento(id, estado)
+    fun vincularAvistamiento(id: Long, publicacionId: Long) =
+        repository.vincularAvistamiento(id, publicacionId)
 
     fun obtenerAlbergues(): List<Albergue> = repository.obtenerAlbergues()
 
@@ -70,8 +110,7 @@ class DatabaseHelper(context: Context) {
     ): Long = repository.insertarDenuncia(motivo, descripcion, foto, latitud, longitud)
 
     fun obtenerDenuncias(): List<Denuncia> = repository.obtenerDenuncias()
-
-    fun seedIfNeeded() = repository.seedIfNeeded()
+    fun contarDenuncias(): Long = repository.contarDenuncias()
 
     fun observarPublicaciones(
         onChanged: (List<Publicacion>) -> Unit,

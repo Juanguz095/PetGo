@@ -40,13 +40,17 @@ class CrearDenunciaActivity : AppCompatActivity() {
 
     private val picker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
-            fotoUri = uri.toString(); imgFoto.setImageBitmap(
-                decodificarImagen(
-                    this,
-                    uri.toString(),
-                    4
-                )
-            ); tvHint.visibility = View.GONE
+            val imagen = decodificarImagen(this, uri.toString(), 4)
+            if (imagen == null) {
+                fotoUri = null
+                imgFoto.setImageDrawable(null)
+                tvHint.visibility = View.VISIBLE
+                Toast.makeText(this, "No se pudo leer esa imagen. Puedes enviar la denuncia sin foto.", Toast.LENGTH_LONG).show()
+            } else {
+                fotoUri = uri.toString()
+                imgFoto.setImageBitmap(imagen)
+                tvHint.visibility = View.GONE
+            }
         }
     }
 

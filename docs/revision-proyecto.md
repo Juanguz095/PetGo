@@ -27,7 +27,7 @@ Las reglas anteriores permitían lectura y escritura sin autenticación. Las reg
 
 ## Validación reproducible
 
-Resultado final del 16 de octubre de 2026: compilación correcta, 10 pruebas unitarias aprobadas, 3 pruebas de interfaz y 4 de integración Android aprobadas en emulador, y 22 comprobaciones de reglas aprobadas. Lint: 0 errores y 395 advertencias pendientes.
+La ejecucion registrada el 16 de octubre de 2026 (compilacion correcta, 10 pruebas unitarias, 3 de interfaz, 4 de integracion Android y 22 comprobaciones de reglas) corresponde a una revision anterior. Las pruebas de integracion y reglas se actualizaron despues para coincidir con las firmas y validaciones actuales; esa revision aun debe ejecutarse de nuevo antes de considerar vigente el resultado anterior. Lint: la revision anterior reporto 0 errores y 395 advertencias.
 
 ```powershell
 ./gradlew.bat testDebugUnitTest assembleDebug assembleDebugAndroidTest lintDebug

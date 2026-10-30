@@ -33,12 +33,12 @@
         <item name="android:fontFamily">@font/poppins</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/tinta</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="TextAppearance.PetGo.Titulo" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:fontFamily">@font/poppins</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/tinta</item>
     </style>

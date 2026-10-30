@@ -4,8 +4,8 @@
     android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/crema" android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar"
-        android:layout_marginTop="12dp"
-        android:layout_width="0dp" android:layout_height="52dp" android:background="@color/crema"
+        android:layout_marginTop="4dp"
+        android:layout_width="0dp" android:layout_height="48dp" android:background="@color/crema"
         app:elevation="0dp" app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_back_cabecera" app:title="Detalle"
@@ -17,9 +17,9 @@
         app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@id/toolbar">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="vertical" android:padding="20dp">
+            android:orientation="vertical" android:padding="16dp">
 
-            <FrameLayout android:layout_width="match_parent" android:layout_height="200dp">
+            <FrameLayout android:layout_width="match_parent" android:layout_height="180dp">
                 <com.google.android.material.imageview.ShapeableImageView android:id="@+id/img_foto" android:layout_width="match_parent"
                     android:layout_height="match_parent" android:background="@drawable/bg_card_image"
                     android:scaleType="centerCrop"
@@ -29,12 +29,12 @@
                     android:contentDescription="Foto de la mascota" />
                 <TextView android:id="@+id/tv_placeholder" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_gravity="center"
-                    android:text="🚨" android:textSize="60sp" />
+                    android:text="🚨" android:textSize="48sp" />
             </FrameLayout>
 
             <TextView android:id="@+id/tv_motivo" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:layout_marginTop="16dp"
-                android:textColor="@color/colorRed" android:textSize="20sp" android:textStyle="bold" />
+                android:textColor="@color/colorRed" android:textSize="18sp" android:textStyle="bold" />
             <TextView android:id="@+id/tv_descripcion" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:layout_marginTop="8dp"
                 android:textColor="@color/texto_suave" android:textSize="14sp" />

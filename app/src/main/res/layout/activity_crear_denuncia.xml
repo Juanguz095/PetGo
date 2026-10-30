@@ -4,9 +4,9 @@
     android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/crema" android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar" android:layout_marginTop="12dp"
+        android:id="@+id/toolbar" android:layout_marginTop="4dp"
         android:layout_width="0dp"
-        android:layout_height="52dp" android:background="@color/crema"
+        android:layout_height="48dp" android:background="@color/crema"
         app:elevation="0dp" app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_back_cabecera" app:title="Denunciar"
@@ -83,6 +83,9 @@
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" android:text="Foto (opcional)" android:textColor="@color/tinta"
                 android:textSize="13sp" android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="4dp" android:text="La denuncia se guarda aunque no agregues una imagen."
+                android:textColor="@color/texto_suave" android:textSize="12sp" />
             <FrameLayout android:id="@+id/contenedor_foto" android:layout_width="96dp"
                 android:layout_height="96dp" android:layout_marginTop="8dp"
                 android:background="@drawable/bg_card_image" android:clickable="true">

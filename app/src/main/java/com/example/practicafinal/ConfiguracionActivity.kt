@@ -1,4 +1,4 @@
-package com.example.practicafinal
+﻿package com.example.practicafinal
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,7 +13,6 @@ class ConfiguracionActivity : AppCompatActivity() {
         setContentView(R.layout.activity_configuracion)
 
         findViewById<MaterialToolbar>(R.id.toolbar).setNavigationOnClickListener { finish() }
-
         findViewById<LinearLayout>(R.id.opcion_perfil).setOnClickListener {
             startActivity(Intent(this, PerfilActivity::class.java))
         }

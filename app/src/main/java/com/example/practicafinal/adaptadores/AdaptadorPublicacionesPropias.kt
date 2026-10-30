@@ -17,7 +17,11 @@ class AdaptadorPublicacionesPropias(
     private val onResolver: (Publicacion) -> Unit,
     private val onAdoptar: ((Publicacion) -> Unit)? = null,
     private val onQuitarFavorito: ((Publicacion) -> Unit)? = null,
-    private val onAbrir: ((Publicacion) -> Unit)? = null
+    private val onAbrir: ((Publicacion) -> Unit)? = null,
+    private val onEditar: ((Publicacion) -> Unit)? = null,
+    private val onEliminar: ((Publicacion) -> Unit)? = null,
+    private val onConfirmar: ((Publicacion) -> Unit)? = null,
+    private val onVerAvistamientos: ((Publicacion) -> Unit)? = null
 ) : RecyclerView.Adapter<AdaptadorPublicacionesPropias.PubViewHolder>() {
     class PubViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imgFoto: ImageView = view.findViewById(R.id.img_foto)
@@ -26,7 +30,12 @@ class AdaptadorPublicacionesPropias(
         val tvTipo: TextView = view.findViewById(R.id.tv_tipo)
         val tvFecha: TextView = view.findViewById(R.id.tv_fecha)
         val tvEstado: TextView = view.findViewById(R.id.tv_estado)
+        val tvAntigua: TextView = view.findViewById(R.id.tv_antigua)
         val btnResolver: com.google.android.material.button.MaterialButton = view.findViewById(R.id.btn_resolver)
+        val btnEditar: com.google.android.material.button.MaterialButton = view.findViewById(R.id.btn_editar)
+        val btnEliminar: com.google.android.material.button.MaterialButton = view.findViewById(R.id.btn_eliminar)
+        val btnVerAvistamientos: com.google.android.material.button.MaterialButton =
+            view.findViewById(R.id.btn_ver_avistamientos_mios)
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PubViewHolder =
         PubViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_mi_publicacion, parent, false))
@@ -46,9 +55,24 @@ class AdaptadorPublicacionesPropias(
             else -> "En adopcion"
         }
         holder.tvFecha.text = fechaRelativa(p.fechaCreacion)
+        val ultimaRevision = p.ultimaConfirmacion ?: p.fechaCreacion
+        val necesitaRevision = p.estado == "Activa" && ultimaRevision > 0L &&
+            System.currentTimeMillis() - ultimaRevision >= 14L * 24 * 60 * 60 * 1000
+        holder.tvAntigua.visibility = if (necesitaRevision) View.VISIBLE else View.GONE
+        holder.tvAntigua.text = if (p.tipo == "Perdida" && onConfirmar != null) {
+            "¿Sigue perdida? Toca aquí para confirmar"
+        } else "Revisa si esta publicación sigue activa"
+        holder.tvAntigua.isClickable = necesitaRevision && p.tipo == "Perdida" && onConfirmar != null
+        holder.tvAntigua.setOnClickListener {
+            if (necesitaRevision && p.tipo == "Perdida") onConfirmar?.invoke(p)
+        }
+        holder.btnVerAvistamientos.visibility =
+            if (p.tipo == "Perdida" && onVerAvistamientos != null) View.VISIBLE else View.GONE
+        holder.btnVerAvistamientos.setOnClickListener { onVerAvistamientos?.invoke(p) }
         val resuelta = p.estado == "Resuelta" || p.estado == "Adoptada"
         holder.tvEstado.text = when {
             p.estado == "Adoptada" -> "Adoptada"
+            p.estado == "Resuelta" && p.tipo == "Perdida" -> "Encontrada"
             p.estado == "Resuelta" -> "Resuelta"
             else -> "Activa"
         }
@@ -65,10 +89,17 @@ class AdaptadorPublicacionesPropias(
         } else if (p.tipo == "Adopcion" && onAdoptar != null) {
             holder.btnResolver.text = "Marcar adoptada"
             holder.btnResolver.setOnClickListener { onAdoptar(p) }
+        } else if (p.tipo == "Perdida") {
+            holder.btnResolver.text = "Marcar como encontrada"
+            holder.btnResolver.setOnClickListener { onResolver(p) }
         } else {
             holder.btnResolver.text = "Marcar resuelta"
             holder.btnResolver.setOnClickListener { onResolver(p) }
         }
+        holder.btnEditar.visibility = if (!resuelta && onEditar != null) View.VISIBLE else View.GONE
+        holder.btnEliminar.visibility = if (!resuelta && onEliminar != null) View.VISIBLE else View.GONE
+        holder.btnEditar.setOnClickListener { onEditar?.invoke(p) }
+        holder.btnEliminar.setOnClickListener { onEliminar?.invoke(p) }
     }
     override fun getItemCount(): Int = items.size
 }

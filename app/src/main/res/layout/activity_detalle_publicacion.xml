@@ -8,9 +8,9 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:layout_width="0dp"
-        android:layout_height="52dp"
+        android:layout_height="48dp"
         android:background="@color/crema"
         app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,11 +35,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="16dp">
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="220dp">
+                android:layout_height="180dp">
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/img_foto"
@@ -57,7 +57,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:textSize="60sp" />
+                    android:textSize="48sp" />
 
                 <TextView
                     android:id="@+id/tv_estado"
@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:textColor="@color/tinta"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -101,6 +101,27 @@
                 android:textSize="14sp" />
 
             <TextView
+                android:id="@+id/tv_detalles_mascota"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_chip"
+                android:padding="10dp"
+                android:textColor="@color/tinta"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_resumen_actividad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_brutal_blanco"
+                android:padding="10dp"
+                android:textColor="@color/texto_suave"
+                android:textSize="12sp" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -112,10 +133,14 @@
             <TextView
                 android:id="@+id/tv_ubicacion"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_chip"
+                android:gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
                 android:textColor="@color/azul_enlace"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -125,6 +150,41 @@
                 android:layout_marginTop="8dp"
                 android:textColor="@color/texto_suave"
                 android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_fecha_perdida"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/tinta"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_recompensa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/verde_petgo"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_historial_avistamientos"
+                style="@style/Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="10dp"
+                android:text="Ver historial de avistamientos"
+                android:textAllCaps="false"
+                android:textColor="@color/tinta"
+                android:textSize="12sp"
+                android:visibility="gone"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="1dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_avistamiento"
@@ -141,7 +201,27 @@
                 android:stateListAnimator="@null"
                 android:textAllCaps="false"
                 android:textStyle="bold"
-                app:backgroundTint="@color/white"
+                app:backgroundTint="@color/amarillo"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_contactar"
+                style="@style/Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:text="Contactar por WhatsApp"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:visibility="gone"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:stateListAnimator="@null"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                app:backgroundTint="@color/verde_petgo"
                 app:cornerRadius="11dp"
                 app:strokeColor="@color/tinta"
                 app:strokeWidth="2dp" />

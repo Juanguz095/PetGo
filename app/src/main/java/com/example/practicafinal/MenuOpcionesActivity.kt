@@ -3,6 +3,7 @@ package com.example.practicafinal
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
 class MenuOpcionesActivity : AppCompatActivity() {
@@ -15,7 +16,14 @@ class MenuOpcionesActivity : AppCompatActivity() {
             .setNavigationOnClickListener { finish() }
 
         findViewById<View>(R.id.item_perdidas).setOnClickListener {
-            startActivity(Intent(this, MascotasPerdidasActivity::class.java))
+            AlertDialog.Builder(this)
+                .setTitle("Mascotas de la comunidad")
+                .setItems(arrayOf("Mascotas perdidas", "Mascotas encontradas")) { _, which ->
+                    val tipo = if (which == 1) "Encontrada" else "Perdida"
+                    startActivity(Intent(this, MascotasPerdidasActivity::class.java)
+                        .putExtra(MascotasPerdidasActivity.EXTRA_TIPO_LISTADO, tipo))
+                }
+                .show()
         }
 
         findViewById<View>(R.id.item_adopciones).setOnClickListener {

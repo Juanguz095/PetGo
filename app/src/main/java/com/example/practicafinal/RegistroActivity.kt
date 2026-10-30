@@ -10,6 +10,8 @@ import com.example.practicafinal.util.ejecutarSeguro
 import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.practicafinal.controlador.ControladorUsuarios
+import com.example.practicafinal.modelo.ResultadoRegistro
+import com.example.practicafinal.modelo.Usuario
 import com.example.practicafinal.session.FavoritosManager
 import com.example.practicafinal.session.SesionManager
 import java.util.concurrent.Executors
@@ -23,6 +25,9 @@ class RegistroActivity : AppCompatActivity() {
     private lateinit var etConfirmar: EditText
     private lateinit var etCiudad: EditText
     private lateinit var tvError: TextView
+    private lateinit var btnRegistrar: com.google.android.material.button.MaterialButton
+    private lateinit var tvIrLogin: TextView
+    private var perfilPendiente = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,11 +43,16 @@ class RegistroActivity : AppCompatActivity() {
         etCiudad = findViewById(R.id.et_ciudad)
         tvError = findViewById(R.id.tv_error)
 
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar)
-            .setOnClickListener { registrar() }
+        btnRegistrar = findViewById(R.id.btn_registrar)
+        btnRegistrar.setOnClickListener { if (perfilPendiente) reintentarPerfil() else registrar() }
 
-        findViewById<android.widget.TextView>(R.id.tv_ir_login)
-            .setOnClickListener { finish() }
+        tvIrLogin = findViewById(R.id.tv_ir_login)
+        tvIrLogin.setOnClickListener { finish() }
+
+        SesionManager.obtenerRegistroPendiente(this)?.let {
+            mostrarPerfilPendiente(it.usuario)
+            mostrarError(getString(R.string.registration_profile_pending))
+        }
     }
 
     private fun registrar() {
@@ -57,28 +67,71 @@ class RegistroActivity : AppCompatActivity() {
             mostrarError(error); return
         }
 
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = false
+        btnRegistrar.isEnabled = false
         ejecutarSeguro(executor) {
             try {
-                val id = ControladorUsuarios.registrar(this, nombre, correo, contrasena, ciudad)
+                val resultado = ControladorUsuarios.registrar(this, nombre, correo, contrasena, ciudad)
                 actualizarUi {
-                    findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = true
-                    if (id != null) {
-                        SesionManager.guardarSesion(this, id)
-                        FavoritosManager.sincronizar(this)
-                        Toast.makeText(this, "¡Cuenta creada!", Toast.LENGTH_SHORT).show()
-                        irAlMapa()
-                    } else {
-                        mostrarError("No se pudo crear la cuenta")
+                    btnRegistrar.isEnabled = true
+                    when (resultado) {
+                        is ResultadoRegistro.Completo -> completarRegistro()
+                        is ResultadoRegistro.PerfilPendiente -> {
+                            mostrarPerfilPendiente(resultado.usuario)
+                            mostrarError(getString(R.string.registration_profile_pending))
+                        }
                     }
                 }
             } catch (e: Exception) {
                 actualizarUi {
-                    findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_registrar).isEnabled = true
+                    btnRegistrar.isEnabled = true
                     mostrarError(traducirErrorFirebase(e))
                 }
             }
         }
+    }
+
+    private fun mostrarPerfilPendiente(usuario: Usuario) {
+        perfilPendiente = true
+        etNombre.setText(usuario.nombre)
+        etCorreo.setText(usuario.correo)
+        etCiudad.setText(usuario.ciudad)
+        etNombre.isEnabled = false
+        etCorreo.isEnabled = false
+        etCiudad.isEnabled = false
+        etContrasena.text.clear()
+        etConfirmar.text.clear()
+        etContrasena.visibility = View.GONE
+        etConfirmar.visibility = View.GONE
+        findViewById<View>(R.id.label_contrasena).visibility = View.GONE
+        findViewById<View>(R.id.label_confirmar).visibility = View.GONE
+        btnRegistrar.text = getString(R.string.retry_profile_save)
+        tvIrLogin.visibility = View.GONE
+    }
+
+    private fun reintentarPerfil() {
+        btnRegistrar.isEnabled = false
+        ejecutarSeguro(executor) {
+            try {
+                val usuario = ControladorUsuarios.reintentarGuardarPerfilPendiente(this)
+                actualizarUi {
+                    btnRegistrar.isEnabled = true
+                    if (usuario != null) completarRegistro()
+                    else mostrarError(getString(R.string.registration_profile_retry_failed))
+                }
+            } catch (error: Exception) {
+                android.util.Log.e("PetGo", "No se pudo reintentar el perfil", error)
+                actualizarUi {
+                    btnRegistrar.isEnabled = true
+                    mostrarError(getString(R.string.registration_profile_retry_failed))
+                }
+            }
+        }
+    }
+
+    private fun completarRegistro() {
+        FavoritosManager.sincronizar(this)
+        Toast.makeText(this, getString(R.string.account_ready), Toast.LENGTH_SHORT).show()
+        irAlMapa()
     }
 
     private fun traducirErrorFirebase(e: Exception): String =

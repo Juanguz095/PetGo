@@ -78,6 +78,34 @@
             android:textSize="11sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/tv_antigua"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Revisa si esta publicación sigue activa"
+            android:textColor="@color/colorRed"
+            android:textSize="11sp"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_ver_avistamientos_mios"
+            style="@style/Widget.PetGo.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginTop="7dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:stateListAnimator="@null"
+            android:text="Ver avistamientos"
+            android:textAllCaps="false"
+            android:textColor="@color/tinta"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:cornerRadius="11dp"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="1dp" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_resolver"
             style="@style/Widget.PetGo.Button.Outlined"
@@ -94,6 +122,42 @@
             android:textStyle="bold"
             app:cornerRadius="11dp"
             app:strokeColor="@color/tinta"
+            app:strokeWidth="2dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_editar"
+            style="@style/Widget.PetGo.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginTop="6dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:stateListAnimator="@null"
+            android:text="Editar publicación"
+            android:textAllCaps="false"
+            android:textColor="@color/petgo_button_text"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:cornerRadius="11dp"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="2dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_eliminar"
+            style="@style/Widget.PetGo.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginTop="6dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:stateListAnimator="@null"
+            android:text="Retirar publicación"
+            android:textAllCaps="false"
+            android:textColor="@color/colorRed"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:cornerRadius="11dp"
+            app:strokeColor="@color/colorRed"
             app:strokeWidth="2dp" />
     </LinearLayout>
 </LinearLayout>

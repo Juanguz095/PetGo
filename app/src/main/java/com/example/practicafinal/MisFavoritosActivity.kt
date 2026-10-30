@@ -36,9 +36,16 @@ class MisFavoritosActivity : AppCompatActivity() {
                 tvVacio.visibility = if (pubs.isEmpty()) View.VISIBLE else View.GONE
                 rv.adapter = AdaptadorPublicacionesPropias(
                     pubs, onResolver = {}, onQuitarFavorito = { publicacion ->
-                        FavoritosManager.toggle(this, publicacion.id)
-                        Toast.makeText(this, "Quitado de favoritos", Toast.LENGTH_SHORT).show()
-                        cargar()
+                        FavoritosManager.toggle(this, publicacion.id) { result ->
+                            actualizarUi {
+                                if (result.isSuccess) {
+                                    Toast.makeText(this, "Quitado de favoritos", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(this, R.string.favorite_sync_failed, Toast.LENGTH_LONG).show()
+                                }
+                                cargar()
+                            }
+                        }
                     },
                     mostrarBotonResolver = false,
                     onAbrir = { publicacion ->

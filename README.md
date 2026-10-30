@@ -99,7 +99,7 @@ app/src/main/java/com/example/practicafinal/
 ## Limitaciones conocidas
 
 - Las operaciones compartidas requieren conexión con Firebase; los favoritos también tienen una copia local por cuenta.
-- Las fotos se guardan comprimidas dentro del documento de Firestore. Storage está reservado para una futura migración; sus reglas ya limitan las cargas por propietario.
+- Las fotos nuevas se comprimen (máximo 80 KiB) y se guardan dentro del documento de Firestore. La app no usa Firebase Storage en la configuración gratuita.
 - No hay notificaciones push entre dispositivos. Los avisos al dueño aparecen en la sección de notificaciones de la app.
 - Proyecto académico: práctica final.
 

@@ -8,7 +8,9 @@ data class Avistamiento(
     val longitud: Double,
     val descripcion: String,
     val foto: String?,
-    val fecha: Long
+    val fecha: Long,
+    val especie: String? = null,
+    val estadoRevision: String = "Pendiente"
 ) {
     fun toFirestoreMap(firebaseUid: String? = null): Map<String, Any> = buildMap {
         put("publicacionId", publicacionId.toString())
@@ -19,5 +21,7 @@ data class Avistamiento(
         put("descripcion", descripcion)
         foto?.let { put("foto", it) }
         put("fecha", fecha)
+        especie?.takeIf { it.isNotBlank() }?.let { put("especie", it) }
+        put("estadoRevision", estadoRevision)
     }
 }

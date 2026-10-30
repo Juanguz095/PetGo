@@ -1,11 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingTop="10dp"
     android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/img_avistamiento"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/bg_card_image"
+        android:contentDescription="Foto del avistamiento"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
 
     <View
         android:layout_width="11dp"
@@ -29,15 +43,49 @@
 
         <TextView
             android:id="@+id/tv_desc"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+            android:maxLines="3"
             android:textColor="@color/texto_suave"
             android:textSize="12sp" />
-    </LinearLayout>
 
-    <View
-        android:layout_width="2dp"
-        android:layout_height="36dp"
-        android:background="@color/tinta" />
+        <TextView
+            android:id="@+id/tv_revision"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:textColor="@color/ambar_estado"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_mapa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Ver punto en el mapa →"
+            android:textColor="@color/azul_enlace"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_revision_avistamiento"
+            style="Widget.PetGo.Button.Outlined"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:layout_marginTop="5dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="Revisar"
+            android:textAllCaps="false"
+            android:textColor="@color/tinta"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:cornerRadius="9dp"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="1dp" />
+    </LinearLayout>
 </LinearLayout>

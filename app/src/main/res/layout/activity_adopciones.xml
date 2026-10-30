@@ -11,8 +11,8 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
         android:background="@color/crema"
         android:elevation="0dp"
         app:contentInsetStart="8dp"
@@ -98,7 +98,7 @@
                     <TextView
                         android:id="@+id/chip_todos"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="48dp"
                         android:layout_marginEnd="9dp"
                         android:background="@drawable/bg_chip_selected"
                         android:gravity="center"
@@ -113,7 +113,7 @@
                     <TextView
                         android:id="@+id/chip_perros"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="48dp"
                         android:layout_marginEnd="9dp"
                         android:background="@drawable/bg_chip"
                         android:gravity="center"
@@ -128,7 +128,7 @@
                     <TextView
                         android:id="@+id/chip_gatos"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="48dp"
                         android:background="@drawable/bg_chip"
                         android:gravity="center"
                         android:paddingStart="18dp"
@@ -214,7 +214,7 @@
                     <TextView
                         android:id="@+id/chip_orden_recientes"
                         android:layout_width="wrap_content"
-                        android:layout_height="34dp"
+                        android:layout_height="48dp"
                         android:background="@drawable/bg_chip_selected"
                         android:gravity="center"
                         android:paddingStart="16dp"
@@ -228,7 +228,7 @@
                     <TextView
                         android:id="@+id/chip_orden_cercanos"
                         android:layout_width="wrap_content"
-                        android:layout_height="34dp"
+                        android:layout_height="48dp"
                         android:layout_marginStart="9dp"
                         android:background="@drawable/bg_chip"
                         android:gravity="center"
@@ -243,7 +243,7 @@
                     <TextView
                         android:id="@+id/chip_orden_nombre"
                         android:layout_width="wrap_content"
-                        android:layout_height="34dp"
+                        android:layout_height="48dp"
                         android:layout_marginStart="9dp"
                         android:background="@drawable/bg_chip"
                         android:gravity="center"
@@ -258,6 +258,19 @@
             </HorizontalScrollView>
 
             <TextView
+                android:id="@+id/btn_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_chip"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="Radio: todas"
+                android:textColor="@color/tinta"
+                android:textSize="12sp" />
+
+            <TextView
                 android:id="@+id/tv_vacio"
                 style="@style/Widget.PetGo.EmptyState"
                 android:layout_width="match_parent"
@@ -269,11 +282,24 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_animales"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="360dp"
                 android:layout_marginTop="14dp"
                 android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
+                android:nestedScrollingEnabled="true"
                 android:paddingEnd="5dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cargar_mas"
+                style="@style/Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="8dp"
+                android:text="Cargar más"
+                android:textAllCaps="false"
+                android:visibility="gone"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
 
             <View
                 android:layout_width="match_parent"

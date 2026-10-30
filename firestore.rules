@@ -8,37 +8,250 @@ service cloud.firestore {
     function owner(data) {
       return signedIn() && data.usuarioId == request.auth.uid;
     }
+    function validWhatsapp(data) {
+      return !('contactoWhatsapp' in data)
+        || (data.contactoWhatsapp is string
+          && data.contactoWhatsapp.matches('^(51)?[0-9]{9}$'));
+    }
+    function validSighting(data) {
+      return data.keys().hasOnly([
+          'publicacionId', 'usuarioId', 'usuarioLegacyId', 'latitud',
+          'longitud', 'descripcion', 'foto', 'fecha', 'especie', 'estadoRevision'
+        ])
+        && data.keys().hasAll([
+          'publicacionId', 'usuarioId', 'usuarioLegacyId', 'latitud',
+          'longitud', 'descripcion', 'fecha'
+        ])
+        && data.publicacionId is string
+        && data.publicacionId.size() > 0
+        && data.usuarioId is string
+        && data.usuarioLegacyId is number
+        && data.latitud is number
+        && data.latitud >= -90
+        && data.latitud <= 90
+        && data.longitud is number
+        && data.longitud >= -180
+        && data.longitud <= 180
+        && data.descripcion is string
+        && data.descripcion.size() <= 1000
+        && data.fecha is number
+        && (!('estadoRevision' in data) || data.estadoRevision == 'Pendiente')
+        && (!('especie' in data) || (data.especie is string && data.especie in ['Perro', 'Gato']))
+        && (!('foto' in data) || (data.foto is string && data.foto.size() <= 1000000));
+    }
+    function puedeVerUbicacionPrivadaAvistamiento(avistamientoId) {
+      let avistamiento = get(
+        /databases/$(database)/documents/avistamientos/$(avistamientoId)
+      ).data;
+      return signedIn() && (
+        avistamiento.usuarioId == request.auth.uid
+        || (avistamiento.publicacionId != '0'
+          && get(/databases/$(database)/documents/publicaciones/$(avistamiento.publicacionId)).data.usuarioId == request.auth.uid)
+      );
+    }
+    function notificationHasMatchingSighting(data) {
+      let sighting = getAfter(
+        /databases/$(database)/documents/avistamientos/$(data.avistamientoId)
+      ).data;
+      let publication = get(
+        /databases/$(database)/documents/publicaciones/$(data.publicacionId)
+      ).data;
+      return !exists(
+          /databases/$(database)/documents/avistamientos/$(data.avistamientoId)
+        )
+        && sighting.usuarioId == request.auth.uid
+        && sighting.publicacionId == data.publicacionId
+        && publication.usuarioId == data.usuarioDestinoId
+        && publication.tipo == 'Perdida'
+        && publication.estado == 'Activa';
+    }
 
     match /usuarios/{uid} {
       allow read, create, update, delete: if signedIn() && request.auth.uid == uid;
       match /favoritos/{id} {
         allow read, write: if signedIn() && request.auth.uid == uid;
       }
+      match /preferencias/{id} {
+        allow read: if signedIn() && request.auth.uid == uid && id == 'notificaciones';
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && id == 'notificaciones'
+          && request.resource.data.keys().hasOnly(['habilitadas', 'version', 'actualizado'])
+          && request.resource.data.habilitadas is bool
+          && request.resource.data.version is string;
+        allow delete: if signedIn() && request.auth.uid == uid && id == 'notificaciones';
+      }
+      match /dispositivos/{id} {
+        allow read: if signedIn() && request.auth.uid == uid;
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['token', 'plataforma', 'preferenciaVersion', 'actualizado'])
+          && request.resource.data.token is string
+          && request.resource.data.token.size() > 0
+          && request.resource.data.plataforma == 'android'
+          && request.resource.data.preferenciaVersion is string;
+        allow delete: if signedIn() && request.auth.uid == uid;
+      }
+      match /ubicaciones_publicaciones/{id} {
+        allow read, delete: if signedIn() && request.auth.uid == uid;
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['latitud', 'longitud'])
+          && request.resource.data.keys().hasAll(['latitud', 'longitud'])
+          && request.resource.data.latitud is number
+          && request.resource.data.latitud >= -90
+          && request.resource.data.latitud <= 90
+          && request.resource.data.longitud is number
+          && request.resource.data.longitud >= -180
+          && request.resource.data.longitud <= 180;
+      }
     }
     match /publicaciones/{id} {
       allow read: if signedIn();
       allow create: if owner(request.resource.data)
-        && request.resource.data.estado == 'Activa';
+        && request.resource.data.keys().hasOnly([
+          'usuarioId', 'usuarioLegacyId', 'tipo', 'nombre', 'descripcion',
+          'foto', 'ultimoLugar', 'especie', 'latitud', 'longitud',
+          'fechaCreacion', 'estado', 'contactoWhatsapp', 'fechaPerdida',
+          'recompensa', 'ultimaConfirmacion', 'color', 'tamano', 'senasParticulares'
+        ])
+        && request.resource.data.estado == 'Activa'
+        && request.resource.data.tipo in ['Perdida', 'Encontrada', 'Adopcion']
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 80
+        && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() > 0
+        && request.resource.data.descripcion.size() <= 1000
+        && request.resource.data.latitud is number
+        && request.resource.data.latitud >= -90
+        && request.resource.data.latitud <= 90
+        && request.resource.data.longitud is number
+        && request.resource.data.longitud >= -180
+        && request.resource.data.longitud <= 180
+        && request.resource.data.fechaCreacion is number
+        && (!('fechaPerdida' in request.resource.data)
+          || request.resource.data.fechaPerdida is number)
+        && (!('recompensa' in request.resource.data)
+          || (request.resource.data.recompensa is string
+            && request.resource.data.recompensa.size() <= 120))
+        && (!('ultimaConfirmacion' in request.resource.data)
+          || request.resource.data.ultimaConfirmacion is number)
+        && (!('color' in request.resource.data)
+          || (request.resource.data.color is string && request.resource.data.color.size() <= 60))
+        && (!('tamano' in request.resource.data)
+          || (request.resource.data.tamano is string && request.resource.data.tamano.size() <= 40))
+        && (!('senasParticulares' in request.resource.data)
+          || (request.resource.data.senasParticulares is string && request.resource.data.senasParticulares.size() <= 180))
+        && validWhatsapp(request.resource.data)
+        && (!('foto' in request.resource.data) || request.resource.data.foto is string)
+        && (!('ultimoLugar' in request.resource.data) || request.resource.data.ultimoLugar is string)
+        && (!('especie' in request.resource.data) || request.resource.data.especie is string);
       allow update: if owner(resource.data)
-        && request.resource.data.usuarioId == resource.data.usuarioId;
+        && request.resource.data.usuarioId == resource.data.usuarioId
+        && (
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'tipo', 'nombre', 'descripcion', 'foto', 'ultimoLugar', 'especie',
+            'latitud', 'longitud', 'contactoWhatsapp', 'fechaPerdida', 'recompensa',
+            'ultimaConfirmacion', 'color', 'tamano', 'senasParticulares'
+          ])
+            && resource.data.estado == 'Activa'
+            && request.resource.data.estado == 'Activa'
+            && request.resource.data.tipo in ['Perdida', 'Encontrada', 'Adopcion']
+            && request.resource.data.nombre is string
+            && request.resource.data.nombre.size() > 0
+            && request.resource.data.nombre.size() <= 80
+            && request.resource.data.descripcion is string
+            && request.resource.data.descripcion.size() > 0
+            && request.resource.data.descripcion.size() <= 1000
+            && request.resource.data.latitud is number
+            && request.resource.data.latitud >= -90
+            && request.resource.data.latitud <= 90
+            && request.resource.data.longitud is number
+            && request.resource.data.longitud >= -180
+            && request.resource.data.longitud <= 180
+            && (!('fechaPerdida' in request.resource.data)
+              || request.resource.data.fechaPerdida is number)
+            && (!('ultimaConfirmacion' in request.resource.data)
+              || request.resource.data.ultimaConfirmacion is number)
+            && (!('color' in request.resource.data)
+              || (request.resource.data.color is string && request.resource.data.color.size() <= 60))
+            && (!('tamano' in request.resource.data)
+              || (request.resource.data.tamano is string && request.resource.data.tamano.size() <= 40))
+            && (!('senasParticulares' in request.resource.data)
+              || (request.resource.data.senasParticulares is string && request.resource.data.senasParticulares.size() <= 180))
+            && (!('recompensa' in request.resource.data)
+              || (request.resource.data.recompensa is string
+                && request.resource.data.recompensa.size() <= 120))
+            && validWhatsapp(request.resource.data)
+            && (!('foto' in request.resource.data) || request.resource.data.foto is string)
+            && (!('ultimoLugar' in request.resource.data) || request.resource.data.ultimoLugar is string)
+            && (!('especie' in request.resource.data) || request.resource.data.especie is string))
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado'])
+            && resource.data.estado == 'Activa'
+            && request.resource.data.estado in ['Resuelta', 'Adoptada', 'Eliminada']
+            && (request.resource.data.estado != 'Adoptada' || resource.data.tipo == 'Adopcion'))
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ultimaConfirmacion'])
+            && resource.data.tipo == 'Perdida'
+            && resource.data.estado == 'Activa'
+            && request.resource.data.ultimaConfirmacion is number)
+        );
       allow delete: if owner(resource.data);
     }
     match /avistamientos/{id} {
       allow read: if signedIn();
       allow create: if owner(request.resource.data)
-        && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.tipo == 'Perdida'
-        && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.estado == 'Activa';
+        && validSighting(request.resource.data)
+        && (request.resource.data.publicacionId == '0'
+          || (get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.tipo == 'Perdida'
+            && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.estado == 'Activa'));
       allow update: if owner(resource.data)
         && request.resource.data.usuarioId == resource.data.usuarioId
-        && request.resource.data.publicacionId == resource.data.publicacionId;
+        && request.resource.data.publicacionId == resource.data.publicacionId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['latitud', 'longitud'])
+        && request.resource.data.latitud is number
+        && request.resource.data.latitud >= -90
+        && request.resource.data.latitud <= 90
+        && request.resource.data.longitud is number
+        && request.resource.data.longitud >= -180
+        && request.resource.data.longitud <= 180
+        || (signedIn()
+          && resource.data.publicacionId != '0'
+          && request.resource.data.usuarioId == resource.data.usuarioId
+          && request.resource.data.publicacionId == resource.data.publicacionId
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estadoRevision'])
+          && request.resource.data.estadoRevision in ['Pendiente', 'Coincide', 'No coincide', 'Duplicado']
+          && get(/databases/$(database)/documents/publicaciones/$(resource.data.publicacionId)).data.usuarioId == request.auth.uid)
+        || (signedIn()
+          && resource.data.publicacionId == '0'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['publicacionId', 'estadoRevision'])
+          && request.resource.data.publicacionId is string
+          && request.resource.data.estadoRevision == 'Pendiente'
+          && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.usuarioId == request.auth.uid
+          && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.tipo == 'Perdida'
+          && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.estado == 'Activa'
+          && (!('especie' in resource.data)
+            || !('especie' in get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data)
+            || resource.data.especie == get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.especie));
       allow delete: if owner(resource.data);
+      match /ubicacion_privada/{locationId} {
+        allow read: if locationId == 'coordenadas'
+          && puedeVerUbicacionPrivadaAvistamiento(id);
+        allow create, update: if locationId == 'coordenadas'
+          && owner(getAfter(/databases/$(database)/documents/avistamientos/$(id)).data)
+          && request.resource.data.keys().hasOnly(['latitud', 'longitud'])
+          && request.resource.data.keys().hasAll(['latitud', 'longitud'])
+          && request.resource.data.latitud is number
+          && request.resource.data.latitud >= -90
+          && request.resource.data.latitud <= 90
+          && request.resource.data.longitud is number
+          && request.resource.data.longitud >= -180
+          && request.resource.data.longitud <= 180;
+        allow delete: if locationId == 'coordenadas'
+          && owner(get(/databases/$(database)/documents/avistamientos/$(id)).data);
+      }
     }
     match /albergues/{id} {
       allow read: if signedIn();
-      allow create: if owner(request.resource.data);
-      allow update: if owner(resource.data)
-        && request.resource.data.usuarioId == resource.data.usuarioId;
-      allow delete: if owner(resource.data);
+      // Los albergues se gestionan externamente, no desde clientes de la app.
+      allow write: if false;
     }
     match /denuncias/{id} {
       allow read, delete: if owner(resource.data);
@@ -51,10 +264,33 @@ service cloud.firestore {
     match /notificaciones/{id} {
       allow read, delete: if signedIn() && resource.data.usuarioDestinoId == request.auth.uid;
       allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          'id', 'usuarioDestinoId', 'usuarioOrigenId', 'tipo', 'publicacionId',
+          'avistamientoId', 'mensaje', 'latitud', 'longitud', 'fecha', 'leida'
+        ])
+        && request.resource.data.keys().hasAll([
+          'id', 'usuarioDestinoId', 'usuarioOrigenId', 'tipo', 'publicacionId',
+          'avistamientoId', 'mensaje', 'latitud', 'longitud', 'fecha', 'leida'
+        ])
         && request.resource.data.usuarioOrigenId == request.auth.uid
         && request.resource.data.tipo == 'avistamiento'
         && request.resource.data.leida == false
-        && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.usuarioId == request.resource.data.usuarioDestinoId;
+        && request.resource.data.id == id
+        && request.resource.data.avistamientoId == id
+        && request.resource.data.usuarioDestinoId is string
+        && request.resource.data.usuarioDestinoId != request.auth.uid
+        && request.resource.data.publicacionId is string
+        && request.resource.data.avistamientoId is string
+        && request.resource.data.mensaje is string
+        && request.resource.data.mensaje.size() <= 200
+        && request.resource.data.latitud is number
+        && request.resource.data.latitud >= -90
+        && request.resource.data.latitud <= 90
+        && request.resource.data.longitud is number
+        && request.resource.data.longitud >= -180
+        && request.resource.data.longitud <= 180
+        && request.resource.data.fecha is number
+        && notificationHasMatchingSighting(request.resource.data);
       allow update: if signedIn() && resource.data.usuarioDestinoId == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['leida'])
         && request.resource.data.leida is bool;

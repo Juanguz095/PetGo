@@ -25,6 +25,13 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         
+        if (SesionManager.hayRegistroPendiente(this)) {
+            startActivity(Intent(this, RegistroActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            finish()
+            return
+        }
         if (SesionManager.tieneSesion(this)) {
             irAlMapa()
             return

@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="🐾  Perdidas — se busca a la mascota"
+            android:text="Perdidas — busca a su familia"
             android:textColor="@color/tinta"
             android:textSize="14sp" />
     </LinearLayout>
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="🐶  Encontradas — busca a su dueño"
+            android:text="Encontradas — busca a su familia"
             android:textColor="@color/tinta"
             android:textSize="14sp" />
     </LinearLayout>
@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="🐱  Adopciones — busca un hogar"
+            android:text="Adopciones — busca hogar"
             android:textColor="@color/tinta"
             android:textSize="14sp" />
     </LinearLayout>
@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="👀  Avistamientos — alguien la vio aquí"
+            android:text="Avistamientos — vista aquí"
             android:textColor="@color/tinta"
             android:textSize="14sp" />
     </LinearLayout>
@@ -113,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="✓  Resueltas — caso cerrado"
+            android:text="Resueltas — caso cerrado"
             android:textColor="@color/tinta"
             android:textSize="14sp" />
     </LinearLayout>
@@ -135,7 +135,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="🏠  Albergues — refugios de mascotas"
+            android:text="Albergues — refugios cercanos"
             android:textColor="@color/tinta"
             android:textSize="14sp" />
     </LinearLayout>

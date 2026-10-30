@@ -9,9 +9,9 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="48dp"
         android:background="@color/crema"
         android:elevation="0dp"
         app:contentInsetStartWithNavigation="6dp"

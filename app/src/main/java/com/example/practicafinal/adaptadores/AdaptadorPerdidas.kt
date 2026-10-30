@@ -28,6 +28,7 @@ class AdaptadorPerdidas(
         val tvNombre: TextView = view.findViewById(R.id.tv_nombre)
         val tvEspecie: TextView = view.findViewById(R.id.tv_especie)
         val tvUltimoLugar: TextView = view.findViewById(R.id.tv_ultimo_lugar)
+        val tvRecompensa: TextView? = view.findViewById(R.id.tv_recompensa)
         val tvFecha: TextView = view.findViewById(R.id.tv_fecha)
         val tvEstado: TextView = view.findViewById(R.id.tv_estado)
         val tvAvist: TextView = view.findViewById(R.id.tv_avist)
@@ -57,24 +58,46 @@ class AdaptadorPerdidas(
         val p = items[position]
         if (!p.foto.isNullOrBlank()) {
             com.example.practicafinal.util.cargarImagen(holder.imgFoto, p.foto)
+            holder.imgFoto.contentDescription = "Foto de ${p.nombre}"
             holder.tvPlaceholder.visibility = View.GONE
         } else {
             com.example.practicafinal.util.cargarImagen(holder.imgFoto, null)
-            holder.tvPlaceholder.visibility = View.GONE
+            holder.imgFoto.contentDescription = "Sin foto de ${p.nombre}"
+            holder.tvPlaceholder.text = when {
+                p.especie.equals("Perro", ignoreCase = true) -> "🐶"
+                p.especie.equals("Gato", ignoreCase = true) -> "🐱"
+                else -> "🐾"
+            }
+            holder.tvPlaceholder.visibility = View.VISIBLE
         }
+        holder.tvPlaceholder.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         holder.tvNombre.text = p.nombre
         holder.tvEspecie.text = p.especie.orEmpty()
         holder.tvEspecie.visibility = if (p.especie.isNullOrBlank()) View.GONE else View.VISIBLE
         holder.tvEspecieBadge?.text = p.especie?.uppercase() ?: ""
         holder.tvEspecieBadge?.visibility =
             if (p.especie.isNullOrBlank()) View.GONE else View.VISIBLE
-        holder.tvUltimoLugar.text =
+        holder.tvUltimoLugar.text = if (p.tipo == "Encontrada") {
+            p.ultimoLugar?.let { "📍 Encontrada en: $it" } ?: "📍 Ubicación en el mapa"
+        } else {
             p.ultimoLugar?.let { "📍 Última vez: " + it } ?: "📍 Sin ubicación de referencia"
-        holder.tvFecha.text = com.example.practicafinal.util.fechaRelativa(p.fechaCreacion)
+        }
+        holder.tvFecha.text = if (p.tipo == "Perdida" && p.fechaPerdida != null) {
+            "Última vez vista ${com.example.practicafinal.util.fechaRelativa(p.fechaPerdida)}"
+        } else "Alerta publicada ${com.example.practicafinal.util.fechaRelativa(p.fechaCreacion)}"
+        holder.tvRecompensa?.apply {
+            text = "🎁 Recompensa: ${p.recompensa.orEmpty()}"
+            visibility = if (p.tipo == "Perdida" && !p.recompensa.isNullOrBlank()) View.VISIBLE else View.GONE
+        }
+        val avistamientos = avistPorPublicacion[p.id].orEmpty()
+        val count = avistamientos.size
         val resuelta = p.estado == "Resuelta" || p.estado == "Adoptada"
         holder.tvEstado.text = when {
             p.estado == "Adoptada" -> "Adoptada"
+            p.estado == "Resuelta" && p.tipo == "Perdida" -> "Encontrada"
             p.estado == "Resuelta" -> "Resuelta"
+            p.tipo == "Perdida" && count > 0 -> "Avistamientos · $count"
+            p.tipo == "Perdida" -> "En búsqueda"
             else -> "Activa"
         }
         holder.tvEstado.setTextColor(
@@ -83,19 +106,25 @@ class AdaptadorPerdidas(
                 when {
                     p.estado == "Adoptada" -> R.color.azul_enlace
                     p.estado == "Resuelta" -> R.color.texto_suave
+                    p.tipo == "Perdida" && count > 0 -> R.color.ambar_estado
                     else -> R.color.verde_petgo
                 }
             )
         )
-        holder.btnVi?.visibility = if (resuelta) View.GONE else View.VISIBLE
+        holder.btnVi?.visibility = if (p.tipo == "Perdida" && !resuelta) View.VISIBLE else View.GONE
         holder.btnVi?.setOnClickListener { onSighting(p) }
         holder.btnVerMapa?.setOnClickListener { onVerMapa(p) }
         holder.btnDetalles?.setOnClickListener { onDetalles(p) }
 
-        val count = avistPorPublicacion[p.id]?.size ?: 0
         holder.tvAvist.visibility = if (count > 0) View.VISIBLE else View.GONE
-        holder.tvAvist.text =
-            "👀 " + count + " avistamiento" + if (count > 1) "s" else ""
+        if (count > 0) {
+            val ultimo = avistamientos.maxByOrNull { it.fecha }
+            val plural = if (count == 1) "avistamiento" else "avistamientos"
+            val hora = ultimo?.let { com.example.practicafinal.util.fechaRelativa(it.fecha) }.orEmpty()
+            holder.tvAvist.text = "👀 $count $plural · último $hora"
+            holder.tvAvist.contentDescription =
+                "$count $plural. Toca para ver los reportes y sus ubicaciones."
+        }
         holder.tvAvist.setOnClickListener(
             if (count > 0) View.OnClickListener { onVerAvistamientos(p) } else null
         )

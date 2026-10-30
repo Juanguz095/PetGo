@@ -7,6 +7,7 @@ import android.widget.TextView
 import com.example.practicafinal.util.ejecutarSeguro
 import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
+import com.example.practicafinal.db.DatabaseHelper
 import com.example.practicafinal.controlador.ControladorDenuncias
 import com.example.practicafinal.controlador.ControladorPublicaciones
 import com.example.practicafinal.controlador.ControladorUsuarios
@@ -26,11 +27,21 @@ class PerfilActivity : AppCompatActivity() {
             .setNavigationOnClickListener { finish() }
 
         findViewById<View>(R.id.row_cerrar_sesion).setOnClickListener {
-            SesionManager.cerrarSesion(this)
-            startActivity(Intent(this, LoginActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            })
-            finish()
+            it.isEnabled = false
+            ejecutarSeguro(executor) {
+                try {
+                    DatabaseHelper(this).quitarDispositivoPushActual()
+                } catch (error: Exception) {
+                    android.util.Log.w("PetGo", "No se pudo limpiar el token de notificaciones al cerrar sesión", error)
+                }
+                actualizarUi {
+                    SesionManager.cerrarSesion(this)
+                    startActivity(Intent(this, LoginActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    })
+                    finish()
+                }
+            }
         }
 
         
@@ -60,8 +71,9 @@ class PerfilActivity : AppCompatActivity() {
             val usuarioId = SesionManager.obtenerUsuarioId(this)
             val usuario = usuarioId?.let { ControladorUsuarios.obtenerPorId(this, it) }
             val publicaciones = if (usuarioId != null)
-                ControladorPublicaciones.obtenerPropias(this).size else 0
-            val denuncias = ControladorDenuncias.obtenerDenuncias(this).size
+                ControladorPublicaciones.contarPropias(this) else 0L
+            val denuncias = if (usuarioId != null)
+                ControladorDenuncias.contarDenuncias(this) else 0L
             val favoritos = FavoritosManager.contar(this)
             actualizarUi {
                 usuario?.let {

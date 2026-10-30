@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.doAfterTextChanged
 import com.example.practicafinal.util.ejecutarSeguro
 import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +17,9 @@ import com.example.practicafinal.controlador.ControladorPublicaciones
 import com.example.practicafinal.controlador.ControladorDenuncias
 import com.example.practicafinal.session.SesionManager
 import com.example.practicafinal.util.decodificarImagen
+import com.example.practicafinal.util.BorradoresLocales
+import com.example.practicafinal.util.MonitorConectividad
+import org.json.JSONObject
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.XYTileSource
@@ -23,6 +28,10 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import java.util.concurrent.Executors
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class CrearPublicacionActivity : AppCompatActivity() {
 
@@ -30,6 +39,7 @@ class CrearPublicacionActivity : AppCompatActivity() {
         const val EXTRA_LAT = "extra_lat"
         const val EXTRA_LNG = "extra_lng"
         const val EXTRA_TIPO = "extra_tipo"
+        const val EXTRA_EDIT_ID = "extra_edit_publicacion_id"
     }
 
     private val executor = Executors.newSingleThreadExecutor()
@@ -43,7 +53,13 @@ class CrearPublicacionActivity : AppCompatActivity() {
     private lateinit var etNombre: EditText
     private lateinit var etUltimoLugar: EditText
     private lateinit var etDescripcion: EditText
+    private lateinit var etContactoWhatsapp: EditText
+    private lateinit var etRecompensa: EditText
+    private lateinit var etColor: EditText
+    private lateinit var etTamano: EditText
+    private lateinit var etSenas: EditText
     private lateinit var tvError: TextView
+    private lateinit var tvEstadoRed: TextView
     private lateinit var chipPerdida: View
     private lateinit var chipEncontrada: View
     private lateinit var chipAdopcion: View
@@ -57,17 +73,35 @@ class CrearPublicacionActivity : AppCompatActivity() {
     private lateinit var sectionEspecie: View
     private lateinit var sectionUltimoLugar: View
     private lateinit var sectionMotivosDenuncia: View
+    private lateinit var sectionContacto: View
+    private lateinit var sectionDatosPerdida: View
+    private lateinit var sectionIdentificativos: View
     private lateinit var etMotivoCustom: EditText
+    private var editandoId: Long? = null
     private var motivoDenuncia = "Maltrato"
     private var esOtroMotivo = false
+    private var fechaPerdidaSeleccionada: Long = System.currentTimeMillis()
+    private lateinit var monitorConectividad: MonitorConectividad
+    private var formularioListo = false
+    private var borradorActivo = false
 
     private val pickerGaleria = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
         if (uri != null) {
-            fotoUri = uri.toString()
-            imgFoto.setImageBitmap(decodificarImagen(this, uri.toString(), 4))
-            tvFotoHint.visibility = View.GONE
+            val imagen = decodificarImagen(this, uri.toString(), 4)
+            if (imagen == null) {
+                fotoUri = null
+                imgFoto.setImageDrawable(null)
+                tvFotoHint.visibility = View.VISIBLE
+                Toast.makeText(this, "No se pudo leer esa imagen. Puedes publicar sin foto.", Toast.LENGTH_LONG).show()
+            } else {
+                fotoUri = uri.toString()
+                imgFoto.setImageBitmap(imagen)
+                tvFotoHint.visibility = View.GONE
+                borradorActivo = true
+                guardarBorrador()
+            }
         }
     }
 
@@ -88,7 +122,13 @@ class CrearPublicacionActivity : AppCompatActivity() {
         etNombre = findViewById(R.id.et_nombre)
         etUltimoLugar = findViewById(R.id.et_ultimo_lugar)
         etDescripcion = findViewById(R.id.et_descripcion)
+        etContactoWhatsapp = findViewById(R.id.et_contacto_whatsapp)
+        etRecompensa = findViewById(R.id.et_recompensa)
+        etColor = findViewById(R.id.et_color_mascota)
+        etTamano = findViewById(R.id.et_tamano_mascota)
+        etSenas = findViewById(R.id.et_senas_mascota)
         tvError = findViewById(R.id.tv_error)
+        tvEstadoRed = findViewById(R.id.tv_estado_red)
         chipPerdida = findViewById(R.id.chip_perdida)
         chipEncontrada = findViewById(R.id.chip_encontrada)
         chipAdopcion = findViewById(R.id.chip_adopcion)
@@ -102,11 +142,17 @@ class CrearPublicacionActivity : AppCompatActivity() {
         sectionEspecie = findViewById(R.id.section_especie)
         sectionUltimoLugar = findViewById(R.id.section_ultimo_lugar)
         sectionMotivosDenuncia = findViewById(R.id.section_motivos_denuncia)
+        sectionContacto = findViewById(R.id.section_contacto)
+        sectionDatosPerdida = findViewById(R.id.section_datos_perdida)
+        sectionIdentificativos = findViewById(R.id.section_identificativos)
         etMotivoCustom = findViewById(R.id.et_motivo_custom)
 
         
         findViewById<View>(R.id.contenedor_foto).setOnClickListener {
             pickerGaleria.launch("image/*")
+        }
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_fecha_perdida).setOnClickListener {
+            elegirFechaPerdida()
         }
 
         chipPerdida.setOnClickListener { seleccionarTipo("Perdida") }
@@ -133,6 +179,10 @@ class CrearPublicacionActivity : AppCompatActivity() {
                 }
                 etMotivoCustom.visibility = if (esOtroMotivo) View.VISIBLE else View.GONE
                 if (esOtroMotivo) etMotivoCustom.requestFocus()
+                if (formularioListo) {
+                    borradorActivo = true
+                    guardarBorrador()
+                }
             }
         }
 
@@ -140,10 +190,23 @@ class CrearPublicacionActivity : AppCompatActivity() {
 
         
         val tipoInicial = intent.getStringExtra(EXTRA_TIPO)
-        if (tipoInicial != null) seleccionarTipo(tipoInicial)
+        seleccionarTipo(tipoInicial ?: tipoSeleccionado)
 
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar)
             .setOnClickListener { publicar() }
+
+        editandoId = intent.getLongExtra(EXTRA_EDIT_ID, -1L).takeIf { it > 0L }
+        monitorConectividad = MonitorConectividad(this) { conectado ->
+            tvEstadoRed.visibility = if (conectado) View.GONE else View.VISIBLE
+            tvEstadoRed.announceForAccessibility(if (conectado) "Conexión restablecida" else "Sin conexión a internet")
+        }
+        if (editandoId != null) {
+            cargarEdicion(editandoId!!)
+        } else {
+            formularioListo = true
+            instalarAutoGuardado()
+            ofrecerBorrador()
+        }
     }
 
     private fun configurarMapa() {
@@ -188,6 +251,8 @@ class CrearPublicacionActivity : AppCompatActivity() {
                     puntoSeleccionado = p
                     pinSeleccion.position = p
                     map.invalidate()
+                    borradorActivo = true
+                    guardarBorrador()
                     return true
                 }
 
@@ -260,10 +325,46 @@ class CrearPublicacionActivity : AppCompatActivity() {
                 sectionMotivosDenuncia.visibility = View.GONE
             }
         }
+        sectionContacto.visibility = if (tipo == "Denuncia") View.GONE else View.VISIBLE
+        sectionDatosPerdida.visibility = if (tipo == "Perdida") View.VISIBLE else View.GONE
+        sectionIdentificativos.visibility = if (tipo == "Denuncia") View.GONE else View.VISIBLE
+        if (formularioListo) {
+            borradorActivo = true
+            guardarBorrador()
+        }
+    }
+
+    private fun elegirFechaPerdida() {
+        val calendario = Calendar.getInstance().apply { timeInMillis = fechaPerdidaSeleccionada }
+        android.app.DatePickerDialog(
+            this,
+            { _, year, month, day ->
+                calendario.set(Calendar.YEAR, year)
+                calendario.set(Calendar.MONTH, month)
+                calendario.set(Calendar.DAY_OF_MONTH, day)
+                android.app.TimePickerDialog(this, { _, hour, minute ->
+                    calendario.set(Calendar.HOUR_OF_DAY, hour)
+                    calendario.set(Calendar.MINUTE, minute)
+                    calendario.set(Calendar.SECOND, 0)
+                    calendario.set(Calendar.MILLISECOND, 0)
+                    val elegido = calendario.timeInMillis
+                    if (elegido > System.currentTimeMillis()) {
+                        Toast.makeText(this, "La fecha no puede estar en el futuro", Toast.LENGTH_LONG).show()
+                        return@TimePickerDialog
+                    }
+                    fechaPerdidaSeleccionada = elegido
+                    findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_fecha_perdida).text =
+                        "Última vez: ${SimpleDateFormat("dd/MM/yyyy, HH:mm", Locale.forLanguageTag("es-PE")).format(Date(elegido))}"
+                    borradorActivo = true
+                    guardarBorrador()
+                }, calendario.get(Calendar.HOUR_OF_DAY), calendario.get(Calendar.MINUTE), true).show()
+            }, calendario.get(Calendar.YEAR), calendario.get(Calendar.MONTH), calendario.get(Calendar.DAY_OF_MONTH)
+        ).apply { datePicker.maxDate = System.currentTimeMillis() }.show()
     }
 
     private fun seleccionarEspecie(especie: String) {
         especieSeleccionada = especie
+        if (formularioListo) borradorActivo = true
         listOf(chipPerro to "Perro", chipGato to "Gato").forEach { (chip, e) ->
             val activo = e == especie
             chip.background = if (activo) {
@@ -278,6 +379,51 @@ class CrearPublicacionActivity : AppCompatActivity() {
         }
     }
 
+    private fun cargarEdicion(id: Long) {
+        findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar).title = "Editar publicación"
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar).text = "Guardar cambios"
+        findViewById<View>(R.id.chip_denuncia).visibility = View.GONE
+        ejecutarSeguro(executor) {
+            val publicacion = ControladorPublicaciones.obtenerPorId(this, id)
+            val coordenadasExactas = runCatching {
+                ControladorPublicaciones.obtenerCoordenadasPublicacion(this, id)
+            }.getOrNull()
+            actualizarUi {
+                if (publicacion == null || publicacion.estado != "Activa") {
+                    Toast.makeText(this, "La publicación ya no se puede editar", Toast.LENGTH_LONG).show()
+                    finish()
+                    return@actualizarUi
+                }
+                seleccionarTipo(publicacion.tipo)
+                etNombre.setText(publicacion.nombre)
+                etDescripcion.setText(publicacion.descripcion)
+                etUltimoLugar.setText(publicacion.ultimoLugar.orEmpty())
+                etContactoWhatsapp.setText(publicacion.contactoWhatsapp.orEmpty().let {
+                    if (it.startsWith("51") && it.length == 11) it.drop(2) else it
+                })
+                etRecompensa.setText(publicacion.recompensa.orEmpty())
+                etColor.setText(publicacion.color.orEmpty())
+                etTamano.setText(publicacion.tamano.orEmpty())
+                etSenas.setText(publicacion.senasParticulares.orEmpty())
+                fechaPerdidaSeleccionada = publicacion.fechaPerdida ?: publicacion.fechaCreacion
+                findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_fecha_perdida).text =
+                    "Última vez: ${SimpleDateFormat("dd/MM/yyyy, HH:mm", Locale.forLanguageTag("es-PE")).format(Date(fechaPerdidaSeleccionada))}"
+                publicacion.especie?.let(::seleccionarEspecie)
+                fotoUri = publicacion.foto
+                if (!publicacion.foto.isNullOrBlank()) {
+                    com.example.practicafinal.util.cargarImagen(imgFoto, publicacion.foto)
+                    tvFotoHint.visibility = View.GONE
+                }
+                val punto = coordenadasExactas?.let { GeoPoint(it.first, it.second) }
+                    ?: GeoPoint(publicacion.latitud, publicacion.longitud)
+                puntoSeleccionado = punto
+                pinSeleccion.position = punto
+                map.controller.setCenter(punto)
+                map.invalidate()
+            }
+        }
+    }
+
     private fun publicar() {
         val nombre = etNombre.text.toString().trim()
         val descripcion = etDescripcion.text.toString().trim()
@@ -286,6 +432,21 @@ class CrearPublicacionActivity : AppCompatActivity() {
         val foto = fotoUri
         val ultimoLugar = etUltimoLugar.text.toString().trim().ifEmpty { null }
         val punto = puntoSeleccionado
+        val contactoEscrito = etContactoWhatsapp.text.toString().filter(Char::isDigit)
+        if (contactoEscrito.isNotEmpty() && !(contactoEscrito.length == 9 || (contactoEscrito.length == 11 && contactoEscrito.startsWith("51")))) {
+            mostrarError("Ingresa un celular de 9 dígitos o con prefijo 51")
+            return
+        }
+        val contactoWhatsapp = when {
+            contactoEscrito.length == 9 -> "51$contactoEscrito"
+            contactoEscrito.isNotEmpty() -> contactoEscrito
+            else -> null
+        }
+        val fechaPerdida = fechaPerdidaSeleccionada.takeIf { tipo == "Perdida" }
+        val recompensa = etRecompensa.text.toString().trim().takeIf { tipo == "Perdida" && it.isNotEmpty() }
+        val color = etColor.text.toString().trim().ifEmpty { null }
+        val tamano = etTamano.text.toString().trim().ifEmpty { null }
+        val senas = etSenas.text.toString().trim().ifEmpty { null }
 
         if (tipoSeleccionado == "Denuncia") {
             if (descripcion.isBlank()) {
@@ -302,8 +463,12 @@ class CrearPublicacionActivity : AppCompatActivity() {
                 return
             }
             val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar)
+            guardarBorrador()
+            if (!monitorConectividad.hayInternet()) {
+                mostrarError("Sin conexión. El borrador queda guardado en este teléfono; vuelve a intentarlo cuando tengas internet.")
+                return
+            }
             button.isEnabled = false
-            val tieneFoto = !fotoUri.isNullOrBlank()
             ejecutarSeguro(executor) {
                 try {
                     ControladorDenuncias.insertarDenuncia(
@@ -311,8 +476,9 @@ class CrearPublicacionActivity : AppCompatActivity() {
                         foto, punto.latitude, punto.longitude
                     )
                     actualizarUi {
-                        val msg = if (tieneFoto) "Denuncia enviada (foto subida)" else "Denuncia enviada"
-                        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                        borradorActivo = false
+                        BorradoresLocales.eliminar(this, "publicacion")
+                        Toast.makeText(this, "Denuncia enviada", Toast.LENGTH_SHORT).show()
                         finish()
                     }
                 } catch (error: Exception) {
@@ -336,17 +502,32 @@ class CrearPublicacionActivity : AppCompatActivity() {
         }
 
         val button = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_publicar)
+        guardarBorrador()
+        if (!monitorConectividad.hayInternet()) {
+            mostrarError("Sin conexión. El borrador queda guardado en este teléfono; vuelve a intentarlo cuando tengas internet.")
+            return
+        }
         button.isEnabled = false
-        val tieneFoto = !fotoUri.isNullOrBlank()
         ejecutarSeguro(executor) {
             try {
                 val usuarioId = SesionManager.obtenerUsuarioId(this)
-                ControladorPublicaciones.publicar(
-                    this, usuarioId, tipo, nombre, descripcion,
-                    foto, ultimoLugar, especie, punto.latitude, punto.longitude
-                )
+                if (editandoId != null) {
+                    ControladorPublicaciones.actualizar(
+                        this, editandoId!!, tipo, nombre, descripcion, foto, ultimoLugar,
+                        especie, punto.latitude, punto.longitude, contactoWhatsapp,
+                        fechaPerdida, recompensa, color, tamano, senas
+                    )
+                } else {
+                    ControladorPublicaciones.publicar(
+                        this, usuarioId, tipo, nombre, descripcion,
+                        foto, ultimoLugar, especie, punto.latitude, punto.longitude, contactoWhatsapp,
+                        fechaPerdida, recompensa, color, tamano, senas
+                    )
+                }
                 actualizarUi {
-                    val msg = if (tieneFoto) "Publicacion creada (foto subida)" else "Publicacion creada"
+                    borradorActivo = false
+                    BorradoresLocales.eliminar(this, "publicacion")
+                    val msg = if (editandoId != null) "Publicación actualizada" else "Publicación creada"
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                     finish()
                 }
@@ -361,16 +542,119 @@ class CrearPublicacionActivity : AppCompatActivity() {
     private fun mostrarError(mensaje: String) {
         tvError.text = mensaje
         tvError.visibility = View.VISIBLE
+        tvError.announceForAccessibility(mensaje)
+        findViewById<android.widget.ScrollView>(R.id.scroll_formulario).post {
+            findViewById<android.widget.ScrollView>(R.id.scroll_formulario)
+                .smoothScrollTo(0, tvError.top)
+        }
+    }
+
+    private fun instalarAutoGuardado() {
+        listOf(etNombre, etUltimoLugar, etDescripcion, etContactoWhatsapp, etRecompensa,
+            etColor, etTamano, etSenas, etMotivoCustom).forEach { campo ->
+            campo.doAfterTextChanged {
+                borradorActivo = true
+                guardarBorrador()
+            }
+        }
+    }
+
+    private fun ofrecerBorrador() {
+        val datos = BorradoresLocales.obtener(this, "publicacion") ?: return
+        AlertDialog.Builder(this)
+            .setTitle("Tienes un borrador")
+            .setMessage("¿Quieres continuar donde lo dejaste?")
+            .setPositiveButton("Continuar") { _, _ -> restaurarBorrador(datos) }
+            .setNegativeButton("Empezar de nuevo") { _, _ -> BorradoresLocales.eliminar(this, "publicacion") }
+            .setCancelable(false)
+            .show()
+            .also { com.example.practicafinal.util.Dialogos.aplicar(this, it) }
+    }
+
+    private fun guardarBorrador() {
+        if (!formularioListo || !borradorActivo || editandoId != null) return
+        val punto = puntoSeleccionado
+        val datos = JSONObject()
+            .put("tipo", tipoSeleccionado)
+            .put("especie", especieSeleccionada)
+            .put("nombre", etNombre.text.toString())
+            .put("descripcion", etDescripcion.text.toString())
+            .put("ultimoLugar", etUltimoLugar.text.toString())
+            .put("contacto", etContactoWhatsapp.text.toString())
+            .put("recompensa", etRecompensa.text.toString())
+            .put("color", etColor.text.toString())
+            .put("tamano", etTamano.text.toString())
+            .put("senas", etSenas.text.toString())
+            .put("motivo", motivoDenuncia)
+            .put("otroMotivo", esOtroMotivo)
+            .put("motivoCustom", etMotivoCustom.text.toString())
+            .put("fecha", fechaPerdidaSeleccionada)
+            .put("lat", punto?.latitude ?: JSONObject.NULL)
+            .put("lng", punto?.longitude ?: JSONObject.NULL)
+            .put("foto", fotoUri ?: "")
+        BorradoresLocales.guardar(this, "publicacion", datos)
+    }
+
+    private fun restaurarBorrador(datos: JSONObject) {
+        formularioListo = false
+        seleccionarTipo(datos.optString("tipo", tipoSeleccionado))
+        seleccionarEspecie(datos.optString("especie", "Perro"))
+        etNombre.setText(datos.optString("nombre"))
+        etDescripcion.setText(datos.optString("descripcion"))
+        etUltimoLugar.setText(datos.optString("ultimoLugar"))
+        etContactoWhatsapp.setText(datos.optString("contacto"))
+        etRecompensa.setText(datos.optString("recompensa"))
+        etColor.setText(datos.optString("color"))
+        etTamano.setText(datos.optString("tamano"))
+        etSenas.setText(datos.optString("senas"))
+        motivoDenuncia = datos.optString("motivo", "Maltrato")
+        esOtroMotivo = datos.optBoolean("otroMotivo", false)
+        etMotivoCustom.setText(datos.optString("motivoCustom"))
+        etMotivoCustom.visibility = if (esOtroMotivo) View.VISIBLE else View.GONE
+        fechaPerdidaSeleccionada = datos.optLong("fecha", System.currentTimeMillis())
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_fecha_perdida).text =
+            "Última vez: ${SimpleDateFormat("dd/MM/yyyy, HH:mm", Locale.forLanguageTag("es-PE")).format(Date(fechaPerdidaSeleccionada))}"
+        val lat = datos.optDouble("lat", Double.NaN)
+        val lng = datos.optDouble("lng", Double.NaN)
+        if (lat.isFinite() && lng.isFinite()) {
+            val punto = GeoPoint(lat, lng)
+            puntoSeleccionado = punto
+            pinSeleccion.position = punto
+            map.controller.setCenter(punto)
+        }
+        fotoUri = datos.optString("foto").takeIf(String::isNotBlank)
+        if (!fotoUri.isNullOrBlank()) {
+            val bitmap = decodificarImagen(this, fotoUri!!, 4)
+            if (bitmap != null) {
+                imgFoto.setImageBitmap(bitmap)
+                tvFotoHint.visibility = View.GONE
+            } else {
+                fotoUri = null
+                tvFotoHint.visibility = View.VISIBLE
+                Toast.makeText(this, "El acceso a la foto anterior venció; selecciónala otra vez.", Toast.LENGTH_LONG).show()
+            }
+        }
+        map.invalidate()
+        formularioListo = true
+        borradorActivo = true
+        guardarBorrador()
     }
 
     override fun onResume() {
         super.onResume()
+        if (::monitorConectividad.isInitialized) monitorConectividad.iniciar()
         if (::map.isInitialized) map.onResume()
     }
 
     override fun onPause() {
+        guardarBorrador()
         super.onPause()
         if (::map.isInitialized) map.onPause()
+    }
+
+    override fun onStop() {
+        if (::monitorConectividad.isInitialized) monitorConectividad.detener()
+        super.onStop()
     }
 
     override fun onDestroy() {

@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.practicafinal.db.FirebaseRepository
+import com.example.practicafinal.modelo.ResultadoRegistro
 import com.example.practicafinal.session.FavoritosManager
 import com.example.practicafinal.session.SesionManager
 import com.google.firebase.auth.FirebaseAuth
@@ -40,7 +41,7 @@ class FirebaseFlujoTest {
     @Test fun sesionYFavoritosSeAislanEntreDosCuentas() {
         val emailA = "a-${UUID.randomUUID()}@example.com"
         val emailB = "b-${UUID.randomUUID()}@example.com"
-        val idA = repository.registrar("Ana", emailA, "prueba123", ciudad = "Lima")
+        val idA = registrar("Ana", emailA)
         assertTrue(SesionManager.tieneSesion(context))
         assertEquals(idA, repository.obtenerPorId(idA)?.id)
         assertTrue(FavoritosManager.toggle(context, 123L))
@@ -49,7 +50,7 @@ class FirebaseFlujoTest {
 
         SesionManager.cerrarSesion(context)
         assertFalse(SesionManager.tieneSesion(context))
-        repository.registrar("Bruno", emailB, "prueba123", ciudad = "Lima")
+        registrar("Bruno", emailB)
         assertTrue(FavoritosManager.obtenerIds(context).isEmpty())
 
         repository.validarLogin(emailA, "prueba123")
@@ -60,10 +61,10 @@ class FirebaseFlujoTest {
     @Test fun avistamientoNotificaAlDuenoYActualizaSuPropioRegistro() {
         val emailA = "owner-${UUID.randomUUID()}@example.com"
         val emailB = "observer-${UUID.randomUUID()}@example.com"
-        val owner = repository.registrar("Dueño", emailA, "prueba123", ciudad = "Lima")
+        val owner = registrar("Dueño", emailA)
         val publication = repository.insertarPublicacion(owner, "Perdida", "Luna", "Collar rojo",
             null, "Parque", "Perro", -12.0, -77.0)
-        repository.registrar("Observador", emailB, "prueba123", ciudad = "Lima")
+        registrar("Observador", emailB)
         assertTrue(repository.obtenerPropias().isEmpty())
         try {
             repository.marcarResuelta(publication)
@@ -84,28 +85,48 @@ class FirebaseFlujoTest {
         assertEquals(0, repository.contarNoLeidas())
     }
 
-    @Test fun fotoSeGuardaEnUnFormatoLegibleSinPersistirUnaUriPrivada() {
-        val id = repository.registrar("Fotos", "foto-${UUID.randomUUID()}@example.com", "prueba123", ciudad = "Lima")
+    @Test fun fotosDePublicacionAvistamientoYDenunciaSeGuardanEnFirestore() {
+        val id = registrar("Fotos", "foto-${UUID.randomUUID()}@example.com")
         val file = java.io.File(context.cacheDir, "test-photo.jpg")
         val bitmap = android.graphics.Bitmap.createBitmap(64, 64, android.graphics.Bitmap.Config.ARGB_8888)
         bitmap.eraseColor(android.graphics.Color.GREEN)
         file.outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, it) }
         bitmap.recycle()
         try {
+            val fotoLocal = android.net.Uri.fromFile(file).toString()
             val publication = repository.insertarPublicacion(id, "Adopcion", "Michi", "Busca hogar",
-                android.net.Uri.fromFile(file).toString(), null, "Gato", -12.0, -77.0)
-            val photo = repository.obtenerPorIdPublicacion(publication)!!.foto!!
-            assertTrue(photo.startsWith("data:image/jpeg;base64,"))
-            val bytes = android.util.Base64.decode(photo.substringAfter("base64,"), android.util.Base64.NO_WRAP)
-            val decoded = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            assertNotNull(decoded)
-            decoded?.recycle()
+                fotoLocal, null, "Gato", -12.0, -77.0)
+            assertInlinePhoto(repository.obtenerPorIdPublicacion(publication)?.foto)
+
+            val sighting = repository.insertarAvistamiento(null, id, -12.1, -77.1,
+                "La vi en el parque", fotoLocal)
+            assertInlinePhoto(repository.obtenerAvistamientos().first { it.id == sighting }.foto)
+
+            val report = repository.insertarDenuncia("Maltrato", "Reporte de prueba", fotoLocal, -12.2, -77.2)
+            assertInlinePhoto(repository.obtenerDenuncias().first { it.id == report }.foto)
         } finally { file.delete() }
+    }
+
+    @Test fun siLaFotoNoSePuedeLeerLaPublicacionSeGuardaSinFoto() {
+        val id = registrar("Sin foto", "sin-foto-${UUID.randomUUID()}@example.com")
+        val publication = repository.insertarPublicacion(id, "Perdida", "Luna", "Collar rojo",
+            "content://imagen-inexistente/foto", "Parque", "Perro", -12.0, -77.0)
+        assertNull(repository.obtenerPorIdPublicacion(publication)?.foto)
+    }
+
+    private fun assertInlinePhoto(photo: String?) {
+        assertNotNull(photo)
+        assertTrue(photo!!.startsWith("data:image/jpeg;base64,"))
+        val bytes = android.util.Base64.decode(photo.substringAfter("base64,"), android.util.Base64.NO_WRAP)
+        assertTrue(bytes.size <= 80 * 1024)
+        val decoded = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        assertNotNull(decoded)
+        decoded?.recycle()
     }
 
     @Test fun unaContrasenaIncorrectaNoSeConfundeConUnCorreoInvalido() {
         val email = "invalid-${UUID.randomUUID()}@example.com"
-        repository.registrar("Acceso", email, "prueba123", ciudad = "Lima")
+        registrar("Acceso", email)
         SesionManager.cerrarSesion(context)
         try {
             repository.validarLogin(email, "otraClave123")
@@ -119,6 +140,13 @@ class FirebaseFlujoTest {
         val latch = CountDownLatch(1)
         FavoritosManager.sincronizar(context) { latch.countDown() }
         assertTrue("La sincronización no terminó", latch.await(20, TimeUnit.SECONDS))
+    }
+
+    private fun registrar(nombre: String, correo: String): Long = when (
+        val resultado = repository.registrar(nombre, correo, "prueba123", ciudad = "Lima")
+    ) {
+        is ResultadoRegistro.Completo -> resultado.usuario.id
+        is ResultadoRegistro.PerfilPendiente -> throw resultado.error
     }
 
     companion object {

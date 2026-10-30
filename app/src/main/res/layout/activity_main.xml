@@ -17,99 +17,132 @@
 
     <TextView
         android:id="@+id/tv_pista_publicar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="12dp"
         android:background="@drawable/bg_chip_map"
         android:elevation="2dp"
         android:paddingStart="10dp"
         android:paddingTop="4dp"
-        android:text="Mantén presionado el mapa para publicar"
+        android:paddingEnd="14dp"
+        android:paddingBottom="8dp"
+        android:text="Mantén pulsado para publicar"
         android:textColor="@color/texto_suave"
         android:textSize="11sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="0dp"
-        android:layout_marginEnd="12dp"
         app:layout_constraintEnd_toStartOf="@id/controls_recenter"
-        android:paddingEnd="14dp"
-        android:paddingBottom="8dp" />
-
-
-    <TextView
-        android:id="@+id/btn_leyenda"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/bg_chip_map"
-        android:elevation="2dp"
-        android:paddingStart="12dp"
-        android:paddingTop="5dp"
-        android:text="📖  Leyenda"
-        android:textColor="@color/tinta"
-        android:textSize="11sp"
-        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_pista_publicar"
-        android:minHeight="48dp"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingBottom="9dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?attr/selectableItemBackground" />
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_toggle_controles_mapa"
+        style="@style/Widget.PetGo.Button.Outlined"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="Mostrar controles del mapa"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:minWidth="0dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:text="Opciones del mapa"
+        android:textSize="12sp"
+        app:icon="@drawable/ic_menu_grid"
+        app:iconGravity="textStart"
+        app:iconSize="18dp"
+        app:iconPadding="6dp"
+        app:iconTint="@color/tinta"
+        app:layout_constraintEnd_toStartOf="@id/controls_recenter"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_pista_publicar" />
 
-    <TextView
-        android:id="@+id/btn_cercanas"
+    <LinearLayout
+        android:id="@+id/panel_controles_mapa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="6dp"
-        android:background="@drawable/bg_chip_map"
+        android:background="@drawable/bg_card_lista"
         android:elevation="2dp"
-        android:paddingStart="12dp"
-        android:paddingTop="5dp"
-        android:text="Alertas cerca"
-        android:textColor="@color/tinta"
-        android:textSize="11sp"
-        android:textStyle="bold"
+        android:orientation="vertical"
+        android:padding="4dp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_leyenda"
-        android:minHeight="48dp"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingBottom="9dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?attr/selectableItemBackground" />
+        app:layout_constraintTop_toBottomOf="@id/btn_toggle_controles_mapa">
 
+        <TextView
+            android:id="@+id/btn_leyenda"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minWidth="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="12dp"
+            android:text="📖  Leyenda"
+            android:textColor="@color/tinta"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/btn_notificaciones"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/bg_chip_map"
-        android:elevation="2dp"
-        android:paddingStart="12dp"
-        android:paddingTop="5dp"
-        android:text="🔔  Notificaciones"
-        android:textColor="@color/tinta"
-        android:textSize="11sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_cercanas"
-        android:minHeight="48dp"
-        android:gravity="center_vertical"
-        android:paddingEnd="16dp"
-        android:paddingBottom="9dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?attr/selectableItemBackground" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/bg_divider" />
+
+        <TextView
+            android:id="@+id/btn_cercanas"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minWidth="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="12dp"
+            android:text="Alertas cerca"
+            android:textColor="@color/tinta"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <View
+            android:id="@+id/divisor_alertas_mapa"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/bg_divider"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/btn_notificaciones"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minWidth="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="12dp"
+            android:text="🔔  Notificaciones"
+            android:textColor="@color/tinta"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 
     <FrameLayout
@@ -117,19 +150,19 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="61dp"
+        android:layout_width="53dp"
         android:background="@drawable/bg_sombra"
         android:paddingEnd="5dp"
-        android:layout_height="61dp"
+        android:layout_height="53dp"
         android:paddingBottom="5dp"
         android:id="@+id/controls_recenter">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fab_recenter"
             style="@style/Widget.PetGo.Button.Icon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:contentDescription="Recentrar"
-            app:icon="@drawable/ic_recenter" />
+                app:icon="@drawable/ic_my_location" />
     </FrameLayout>
 
 
@@ -141,10 +174,10 @@
         android:background="@drawable/bg_panel_top"
         android:elevation="10dp"
         android:orientation="vertical"
-        android:paddingStart="18dp"
-        android:paddingTop="14dp"
-        android:paddingEnd="18dp"
-        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -174,7 +207,7 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/panel_foto"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="100dp"
             android:layout_marginTop="4dp"
             android:background="@drawable/bg_card_image"
             android:scaleType="centerCrop"
@@ -202,8 +235,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/tinta"
-            android:textSize="17sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
@@ -211,6 +246,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/texto_suave"
             android:textSize="12sp" />
 
@@ -221,7 +258,7 @@
             android:layout_marginTop="6dp"
             android:textColor="@color/texto_suave"
             android:textSize="13sp"
-            android:maxLines="3"
+            android:maxLines="2"
             android:ellipsize="end" />
 
         <TextView
@@ -229,6 +266,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/texto_suave"
             android:textSize="12sp" />
 
@@ -237,13 +276,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textSize="12sp"
             android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
@@ -325,7 +366,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:contentDescription="Acercar"
-                app:icon="@drawable/ic_fab_menu" />
+                app:icon="@drawable/ic_zoom_in" />
         </FrameLayout>
 
         <FrameLayout
@@ -341,7 +382,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:contentDescription="Alejar"
-                app:icon="@drawable/ic_menos" />
+                app:icon="@drawable/ic_zoom_out" />
         </FrameLayout>
     </LinearLayout>
 
@@ -351,16 +392,16 @@
         android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_width="61dp"
+        android:layout_width="53dp"
         android:background="@drawable/bg_sombra"
         android:paddingEnd="5dp"
-        android:layout_height="61dp"
+        android:layout_height="53dp"
         android:paddingBottom="5dp">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fab_perfil"
             style="@style/Widget.PetGo.Button.Icon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:contentDescription="Perfil"
             app:icon="@drawable/ic_perfil" />
     </FrameLayout>
@@ -371,18 +412,18 @@
         android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="61dp"
+        android:layout_width="53dp"
         android:background="@drawable/bg_sombra"
         android:paddingEnd="5dp"
-        android:layout_height="61dp"
+        android:layout_height="53dp"
         android:paddingBottom="5dp">
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fab_menu"
             style="@style/Widget.PetGo.Button.Icon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:contentDescription="Menú de opciones"
-            app:icon="@drawable/ic_fab_menu"
+            app:icon="@drawable/ic_menu_grid"
             app:backgroundTint="@color/petgo_button_background" />
     </FrameLayout>
 

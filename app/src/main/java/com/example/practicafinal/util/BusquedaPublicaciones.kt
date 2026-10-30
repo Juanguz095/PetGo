@@ -16,7 +16,10 @@ fun filtrarPublicaciones(
     val palabras = normalizarBusqueda(consulta).split("\\s+".toRegex()).filter { it.isNotEmpty() }
     return publicaciones.filter { p ->
         val contenido = normalizarBusqueda(
-            listOfNotNull(p.nombre, p.descripcion, p.especie, p.ultimoLugar).joinToString(" ")
+            listOfNotNull(
+                p.nombre, p.descripcion, p.especie, p.ultimoLugar,
+                p.color, p.tamano, p.senasParticulares
+            ).joinToString(" ")
         )
         (especie == null || p.especie.equals(especie, ignoreCase = true)) &&
             palabras.all { contenido.contains(it) }

@@ -3,6 +3,8 @@
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicLong
 
 object FavoritosManager {
 
@@ -10,12 +12,21 @@ object FavoritosManager {
     private const val KEY_FAVS = "ids_favoritos"
     private const val SUBCOLECCION = "favoritos"
     private const val REVISION = "revision_local"
+    private val operationVersions = ConcurrentHashMap<String, AtomicLong>()
 
     fun esFavorito(context: Context, publicacionId: Long): Boolean =
         localIds(context).contains(publicacionId.toString())
 
-    fun toggle(context: Context, publicacionId: Long): Boolean {
-        val uid = SesionManager.currentFirebaseUid(context) ?: return false
+    fun toggle(
+        context: Context,
+        publicacionId: Long,
+        onComplete: (Result<Boolean>) -> Unit = {}
+    ): Boolean {
+        val uid = SesionManager.currentFirebaseUid(context)
+        if (uid == null) {
+            onComplete(Result.failure(IllegalStateException("Inicia sesión para guardar favoritos")))
+            return false
+        }
         val set = localIds(context).toMutableSet()
         val key = publicacionId.toString()
         val agregado = if (set.contains(key)) {
@@ -26,14 +37,24 @@ object FavoritosManager {
             true
         }
         saveLocal(context, set)
-        run {
-            val ref = FirebaseFirestore.getInstance().collection("usuarios")
-                .document(uid).collection(SUBCOLECCION).document(key)
-            if (agregado) {
-                ref.set(mapOf("publicacionId" to key, "fecha" to System.currentTimeMillis()))
-            } else {
-                ref.delete()
+        val operationKey = "$uid:$key"
+        val operationVersion = operationVersions.getOrPut(operationKey) { AtomicLong() }.incrementAndGet()
+        val ref = FirebaseFirestore.getInstance().collection("usuarios")
+            .document(uid).collection(SUBCOLECCION).document(key)
+        val task = if (agregado) {
+            ref.set(mapOf("publicacionId" to key, "fecha" to System.currentTimeMillis()))
+        } else {
+            ref.delete()
+        }
+        task.addOnSuccessListener {
+            onComplete(Result.success(agregado))
+        }.addOnFailureListener { error ->
+            if (operationVersions[operationKey]?.get() == operationVersion) {
+                val actual = localIds(context).toMutableSet()
+                if (agregado) actual.remove(key) else actual.add(key)
+                saveLocal(context, actual)
             }
+            onComplete(Result.failure(error))
         }
         return agregado
     }

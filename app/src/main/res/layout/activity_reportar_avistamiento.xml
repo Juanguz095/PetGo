@@ -11,9 +11,9 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:layout_width="0dp"
-        android:layout_height="52dp"
+        android:layout_height="48dp"
         android:background="@color/crema"
         app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +38,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tv_estado_red"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_chip"
+                android:padding="10dp"
+                android:text="Sin conexión: el reporte se conserva como borrador en este teléfono."
+                android:textColor="@color/tinta"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="El reporte se guarda en este teléfono hasta que lo envíes. No persigas al animal ni te acerques al tráfico."
+                android:textColor="@color/texto_suave"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tv_mascota"
@@ -48,7 +68,37 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_alerta_relacionada"
+                style="Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="8dp"
+                android:text="Vincular con una alerta perdida (opcional)"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="1dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_especie_avistamiento"
+                style="Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="6dp"
+                android:text="Especie: Perro"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                android:visibility="gone"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="1dp" />
+
             <TextView
+                android:id="@+id/tv_ayuda_ubicacion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -59,7 +109,7 @@
             <org.osmdroid.views.MapView
                 android:id="@+id/mapa_avistamiento"
                 android:layout_width="match_parent"
-                android:layout_height="260dp"
+                android:layout_height="220dp"
                 android:layout_marginTop="12dp"
                 android:background="@color/bg_divider" />
 
@@ -67,10 +117,43 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="📍 Toca el mapa para elegir el lugar del avistamiento"
+                android:text="Toca el punto donde la viste. Tu ubicación exacta solo la verán tú y el responsable de la alerta."
                 android:textColor="@color/texto_suave"
                 android:textSize="12sp" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_chip"
+                android:padding="12dp"
+                android:text="Por seguridad, no persigas al animal ni te acerques al tráfico. El mapa mostrará una zona aproximada; solo quien reporta y el dueño verán el punto exacto. La foto y los detalles serán visibles para usuarios de PetGo con sesión. La foto es opcional y el reporte se guarda aunque no pueda procesarse. Si no encuentras la alerta, puedes dejarlo sin vincular; el dueño podrá asociarlo después."
+                android:textColor="@color/tinta"
+                android:textSize="12sp" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="¿Cuándo la viste?"
+                android:textColor="@color/tinta"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_hora_avistamiento"
+                style="Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="8dp"
+                android:text="La vi: ahora"
+                android:textAllCaps="false"
+                android:textColor="@color/tinta"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="1dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -128,9 +211,10 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_brutal_blanco"
                 android:gravity="top|start"
-                android:hint="Ej. Lo vi cruzando la avenida con collar rojo"
+                android:hint="Color, collar, dirección o si todavía está allí"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine"
+                android:maxLength="1000"
                 android:paddingStart="14dp"
                 android:paddingTop="14dp"
                 android:paddingEnd="19dp"

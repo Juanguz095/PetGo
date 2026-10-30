@@ -21,4 +21,6 @@ object ControladorDenuncias {
 
     fun obtenerDenuncias(context: Context): List<Denuncia> =
         DatabaseHelper(context).obtenerDenuncias()
+
+    fun contarDenuncias(context: Context): Long = DatabaseHelper(context).contarDenuncias()
 }

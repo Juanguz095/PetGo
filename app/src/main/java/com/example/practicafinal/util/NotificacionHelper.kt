@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.practicafinal.MainActivity
+import com.example.practicafinal.DetallePublicacionActivity
 import com.example.practicafinal.R
 
 object NotificacionHelper {
@@ -36,46 +37,48 @@ object NotificacionHelper {
         }
     }
 
-    fun notificarAvistamiento(
+    fun mostrarPush(
         context: Context,
         notificationId: Int,
-        nombreMascota: String,
-        descripcionAvist: String,
+        titulo: String,
+        mensaje: String,
         publicacionId: Long,
-        latAvist: Double,
-        lngAvist: Double
+        latitud: Double? = null,
+        longitud: Double? = null,
+        tipo: String = "avistamiento"
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    context, Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) return
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) return
 
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("mostrar_alerta", publicacionId)
+        val destino = if (tipo == "caso_resuelto") DetallePublicacionActivity::class.java
+            else MainActivity::class.java
+        val intent = Intent(context, destino).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            if (tipo == "caso_resuelto") {
+                putExtra(DetallePublicacionActivity.EXTRA_PUBLICACION_ID, publicacionId)
+            } else if (latitud != null && longitud != null) {
+                putExtra("centrar_lat", latitud)
+                putExtra("centrar_lng", longitud)
+            } else {
+                putExtra("mostrar_alerta", publicacionId)
+            }
         }
         val pendingIntent = PendingIntent.getActivity(
-            context, notificationId, intent,
+            context,
+            notificationId,
+            intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
-        val texto = if (descripcionAvist.isNotEmpty()) {
-            "Vieron a $nombreMascota: $descripcionAvist"
-        } else {
-            "Alguien reportó haber visto a $nombreMascota"
-        }
-
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_pin_rojo)
-            .setContentTitle("Avistamiento de $nombreMascota")
-            .setContentText(texto)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(texto))
+            .setContentTitle(titulo)
+            .setContentText(mensaje)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(mensaje))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .setVibrate(longArrayOf(0, 300, 200, 300))
             .build()
 
         NotificationManagerCompat.from(context).notify(notificationId, notification)

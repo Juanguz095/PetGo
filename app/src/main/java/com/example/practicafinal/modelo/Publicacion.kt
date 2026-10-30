@@ -12,7 +12,14 @@ data class Publicacion(
     val latitud: Double,
     val longitud: Double,
     val fechaCreacion: Long,
-    val estado: String
+    val estado: String,
+    val contactoWhatsapp: String? = null,
+    val fechaPerdida: Long? = null,
+    val recompensa: String? = null,
+    val ultimaConfirmacion: Long? = null,
+    val color: String? = null,
+    val tamano: String? = null,
+    val senasParticulares: String? = null
 ) {
     fun toFirestoreMap(firebaseUid: String? = null): Map<String, Any> = buildMap {
         firebaseUid?.let { put("usuarioId", it) }
@@ -27,5 +34,12 @@ data class Publicacion(
         put("longitud", longitud)
         put("fechaCreacion", fechaCreacion)
         put("estado", estado)
+        contactoWhatsapp?.takeIf { it.isNotBlank() }?.let { put("contactoWhatsapp", it) }
+        fechaPerdida?.let { put("fechaPerdida", it) }
+        recompensa?.takeIf { it.isNotBlank() }?.let { put("recompensa", it) }
+        ultimaConfirmacion?.let { put("ultimaConfirmacion", it) }
+        color?.trim()?.takeIf { it.isNotEmpty() }?.let { put("color", it) }
+        tamano?.trim()?.takeIf { it.isNotEmpty() }?.let { put("tamano", it) }
+        senasParticulares?.trim()?.takeIf { it.isNotEmpty() }?.let { put("senasParticulares", it) }
     }
 }

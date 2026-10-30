@@ -89,13 +89,24 @@ class DetalleAdopcionActivity : AppCompatActivity() {
         val btnFav = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_favorito)
         actualizarBotonFavorito(btnFav)
         btnFav.setOnClickListener {
-            FavoritosManager.toggle(this, publicacionId)
+            btnFav.isEnabled = false
+            FavoritosManager.toggle(this, publicacionId) { result ->
+                actualizarUi {
+                    btnFav.isEnabled = true
+                    actualizarBotonFavorito(btnFav)
+                    if (result.isFailure) {
+                        Toast.makeText(this, R.string.favorite_sync_failed, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
             actualizarBotonFavorito(btnFav)
         }
 
         
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_whatsapp)
-            .setOnClickListener { contactarWhatsApp(p) }
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_whatsapp).apply {
+            visibility = if (p.contactoWhatsapp.isNullOrBlank()) View.GONE else View.VISIBLE
+            setOnClickListener { contactarWhatsApp(p) }
+        }
     }
 
     private fun actualizarBotonFavorito(btn: com.google.android.material.button.MaterialButton) {
@@ -104,10 +115,14 @@ class DetalleAdopcionActivity : AppCompatActivity() {
     }
 
     private fun contactarWhatsApp(p: Publicacion) {
+        val telefono = p.contactoWhatsapp?.filter(Char::isDigit).orEmpty()
+        if (telefono.isBlank()) return
+        val latitudAproximada = kotlin.math.round(p.latitud * 1000.0) / 1000.0
+        val longitudAproximada = kotlin.math.round(p.longitud * 1000.0) / 1000.0
         val texto =
-            "${p.nombre} · En adopción\n${p.descripcion}\n📍 https://maps.google.com/?q=${p.latitud},${p.longitud}"
+            "${p.nombre} · En adopción\n${p.descripcion}\n📍 https://maps.google.com/?q=$latitudAproximada,$longitudAproximada"
         try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/?text=${Uri.encode(texto)}")))
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$telefono?text=${Uri.encode(texto)}")))
         } catch (_: Exception) {
             Toast.makeText(this, "WhatsApp no instalado", Toast.LENGTH_SHORT).show()
         }

@@ -37,11 +37,19 @@ class AdaptadorAdopciones(
 
         if (!p.foto.isNullOrBlank()) {
             com.example.practicafinal.util.cargarImagen(holder.imgFoto, p.foto)
+            holder.imgFoto.contentDescription = "Foto de ${p.nombre}"
             holder.tvPlaceholder.visibility = View.GONE
         } else {
             com.example.practicafinal.util.cargarImagen(holder.imgFoto, null)
+            holder.imgFoto.contentDescription = "Sin foto de ${p.nombre}"
+            holder.tvPlaceholder.text = when {
+                p.especie.equals("Perro", ignoreCase = true) -> "🐶"
+                p.especie.equals("Gato", ignoreCase = true) -> "🐱"
+                else -> "🐾"
+            }
             holder.tvPlaceholder.visibility = View.VISIBLE
         }
+        holder.tvPlaceholder.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
         val especie = p.especie?.take(20).orEmpty()
         holder.tvEspecieChip.text = especie

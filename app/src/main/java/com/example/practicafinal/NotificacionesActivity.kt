@@ -58,9 +58,22 @@ class NotificacionesActivity : AppCompatActivity() {
                             ejecutarSeguro(executor) {
                                 DatabaseHelper(this).marcarNotificacionLeida(notif["id"] as String)
                             }
-                            val intent = Intent(this, MainActivity::class.java)
-                            intent.putExtra("mostrar_alerta", pubId)
-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            val tipo = notif["tipo"] as? String
+                            val destino = if (tipo == "caso_resuelto") {
+                                DetallePublicacionActivity::class.java
+                            } else MainActivity::class.java
+                            val intent = Intent(this, destino)
+                            val lat = (notif["latitud"] as? Number)?.toDouble()
+                            val lng = (notif["longitud"] as? Number)?.toDouble()
+                            if (tipo == "caso_resuelto") {
+                                intent.putExtra(DetallePublicacionActivity.EXTRA_PUBLICACION_ID, pubId)
+                            } else if (tipo == "avistamiento" && lat != null && lng != null) {
+                                intent.putExtra("centrar_lat", lat)
+                                intent.putExtra("centrar_lng", lng)
+                            } else {
+                                intent.putExtra("mostrar_alerta", pubId)
+                            }
+                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                             startActivity(intent)
                         }
                     }
@@ -105,6 +118,7 @@ class NotificacionesActivity : AppCompatActivity() {
             val tipo = notif["tipo"] as? String ?: ""
             holder.tvTipo.text = when (tipo) {
                 "avistamiento" -> "Avistamiento de mascota"
+                "caso_resuelto" -> "Mascota encontrada"
                 else -> tipo
             }
             val fecha = notif["fecha"] as? Long ?: 0L

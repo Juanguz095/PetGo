@@ -3,11 +3,9 @@
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent
-import android.content.pm.PackageManager;
 import android.location.Location
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build
 import android.os.Bundle
 import android.view.View;
 import android.widget.TextView;
@@ -62,12 +60,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pnlEst: TextView;
     private lateinit var pnlFoto: android.widget.ImageView
     private lateinit var pnlBotonesTipo: android.widget.LinearLayout
+    private lateinit var pnlCompartir: MaterialButton
     private lateinit var pnlBtnIzq: MaterialButton
     private lateinit var pnlBtnDer: MaterialButton
-    private var pubActual: Publicacion? = null
+    private var textoCompartirActual: String? = null
     private var marcBusqAvist: MutableList<Polygon> = mutableListOf()
     private lateinit var btnCercanas: TextView
     private lateinit var btnNotificaciones: TextView
+    private lateinit var dividerAlertasMapa: View
+    private lateinit var panelControlesMapa: View
+    private lateinit var btnToggleControlesMapa: MaterialButton
     private var pendienteMostrarAlerta: Long? = null
     private val firebaseListeners = mutableListOf<ListenerRegistration>()
     private var listenersAttached = false
@@ -82,10 +84,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val permisoNotif = registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ -> }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (SesionManager.hayRegistroPendiente(this)) {
+            startActivity(Intent(this, RegistroActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+            finish()
+            return
+        }
         if (!SesionManager.tieneSesion(this)) {
             startActivity(Intent(this, LoginActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -128,11 +135,12 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.panel_estado)
         pnlFoto = findViewById(R.id.panel_foto)
         pnlBotonesTipo = findViewById(R.id.panel_botones_tipo)
+        pnlCompartir = findViewById(R.id.panel_compartir)
         pnlBtnIzq = findViewById(R.id.panel_btn_izq)
         pnlBtnDer = findViewById(R.id.panel_btn_der)
         pnl.findViewById<TextView>(R.id.panel_cerrar)
-            .setOnClickListener { ocultarPanel() }; pnl.findViewById<MaterialButton>(R.id.panel_compartir)
-            .setOnClickListener { compartir() }
+            .setOnClickListener { ocultarPanel() }
+        pnlCompartir.setOnClickListener { compartir() }
         findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_menu).setOnClickListener {
             startActivity(
                 Intent(this, MenuOpcionesActivity::class.java)
@@ -151,7 +159,18 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_zoom_in).setOnClickListener { map.controller.zoomIn() }
         findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_zoom_out).setOnClickListener { map.controller.zoomOut() }
-        btnCercanas = findViewById(R.id.btn_cercanas); btnCercanas.setOnClickListener { dialogoCercanas() }
+        btnCercanas = findViewById(R.id.btn_cercanas)
+        dividerAlertasMapa = findViewById(R.id.divisor_alertas_mapa)
+        btnCercanas.setOnClickListener { dialogoCercanas() }
+        panelControlesMapa = findViewById(R.id.panel_controles_mapa)
+        btnToggleControlesMapa = findViewById(R.id.btn_toggle_controles_mapa)
+        btnToggleControlesMapa.setOnClickListener {
+            val mostrar = panelControlesMapa.visibility != View.VISIBLE
+            panelControlesMapa.visibility = if (mostrar) View.VISIBLE else View.GONE
+            btnToggleControlesMapa.text = if (mostrar) "Ocultar controles" else "Opciones del mapa"
+            btnToggleControlesMapa.contentDescription =
+                if (mostrar) "Ocultar controles del mapa" else "Mostrar controles del mapa"
+        }
         btnNotificaciones = findViewById(R.id.btn_notificaciones)
         btnNotificaciones.setOnClickListener {
             startActivity(Intent(this, NotificacionesActivity::class.java))
@@ -163,26 +182,55 @@ class MainActivity : AppCompatActivity() {
             map.controller.setZoom(19.5); centrarArriba(GeoPoint(clat, clng))
         }
         val alertaId = intent.getLongExtra("mostrar_alerta", -1L)
-        if (alertaId != -1L) pendienteMostrarAlerta = alertaId
-        if (tienePermiso()) centrarUsuario() else permiso.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                permisoNotif.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
+        pendienteMostrarAlerta = alertaId.takeIf { it != -1L }
+        if (pendienteMostrarAlerta != null) {
+            mostrarAlertaPendiente()
         }
+        val tieneDestino = (!clat.isNaN() && !clng.isNaN()) || pendienteMostrarAlerta != null
+        if (!tieneDestino) {
+            if (tienePermiso()) centrarUsuario() else permiso.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+        }
+
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent);
+        setIntent(intent)
         val lat = intent.getDoubleExtra("centrar_lat", Double.NaN);
-        val lng = intent.getDoubleExtra("centrar_lng", Double.NaN); if (!lat.isNaN() && !lng.isNaN()) {
+        val lng = intent.getDoubleExtra("centrar_lng", Double.NaN)
+        val alertaId = intent.getLongExtra("mostrar_alerta", -1L)
+        if ((!lat.isNaN() && !lng.isNaN()) || alertaId != -1L) {
+            cancelarUbicacion()
+        }
+        if (!lat.isNaN() && !lng.isNaN()) {
             map.controller.setZoom(19.5); centrarArriba(GeoPoint(lat, lng))
         }
-        val alertaId = intent.getLongExtra("mostrar_alerta", -1L)
-        if (alertaId != -1L) pendienteMostrarAlerta = alertaId
+        pendienteMostrarAlerta = alertaId.takeIf { it != -1L }
+        if (pendienteMostrarAlerta != null) {
+            mostrarAlertaPendiente()
+        }
+    }
+
+    private fun mostrarAlertaPendiente() {
+        val id = pendienteMostrarAlerta ?: return
+        val publicacion = publicacionesActuales.firstOrNull { it.id == id }
+        if (publicacion != null) {
+            pendienteMostrarAlerta = null
+            centrarArriba(GeoPoint(publicacion.latitud, publicacion.longitud))
+            showPanel(publicacion)
+            return
+        }
+
+        ejecutarSeguro(exec) {
+            val encontrada = ControladorPublicaciones.obtenerPorId(this, id)
+            actualizarUi {
+                if (pendienteMostrarAlerta == id && encontrada != null) {
+                    pendienteMostrarAlerta = null
+                    centrarArriba(GeoPoint(encontrada.latitud, encontrada.longitud))
+                    showPanel(encontrada)
+                }
+            }
+        }
     }
 
     private fun centrarArriba(p: GeoPoint) {
@@ -303,7 +351,8 @@ class MainActivity : AppCompatActivity() {
             actualizarUi {
                 if (listenersAttached) return@actualizarUi
                 listenersAttached = true
-                val errorHandler: (Exception) -> Unit = {
+                val errorHandler: (Exception) -> Unit = { error ->
+                    android.util.Log.e("PetGo", "Error sincronizando los datos del mapa", error)
                     actualizarUi {
                         Toast.makeText(this, "Error de sincronización o red", Toast.LENGTH_SHORT).show()
                     }
@@ -374,7 +423,7 @@ class MainActivity : AppCompatActivity() {
             )
         }; marcAlb.clear(); marcDenuncias.forEach { map.overlays.remove(it) }; marcDenuncias.clear()
         marcBusqAvist.forEach { map.overlays.remove(it) }; marcBusqAvist.clear()
-        val activas = l.filter { it.estado != "Resuelta" && it.estado != "Adoptada" && !it.foto.isNullOrBlank() }
+        val activas = l.filter { it.estado == "Activa" }
         for (pub in activas) {
             val m = Marker(map); m.position = GeoPoint(pub.latitud, pub.longitud); m.icon =
                 ContextCompat.getDrawable(this, ico(pub)); m.setAnchor(
@@ -388,17 +437,38 @@ class MainActivity : AppCompatActivity() {
                 }; true
             }; map.overlays.add(m); marcPub.add(m)
         }
-        for (av in a) {
+        val alertasPerdidasActivas = l.filter { it.tipo == "Perdida" && it.estado == "Activa" }
+            .map { it.id }.toSet()
+        val avistamientosVisibles = a.filter { avistamiento ->
+            avistamiento.estadoRevision !in setOf("No coincide", "Duplicado") &&
+                (avistamiento.publicacionId == 0L || avistamiento.publicacionId in alertasPerdidasActivas)
+        }
+        for (av in avistamientosVisibles) {
             val m = Marker(map); m.position = GeoPoint(av.latitud, av.longitud); m.icon =
                 ContextCompat.getDrawable(this, R.drawable.ic_pin_amarillo); m.setAnchor(
                 Marker.ANCHOR_CENTER,
                 Marker.ANCHOR_BOTTOM
             ); m.relatedObject = av; m.setOnMarkerClickListener { mk, _ ->
                 (mk.relatedObject as? Avistamiento)?.let {
-                    centrarArriba(mk.position); showPanelAvist(
-                    it,
-                    n[it.publicacionId] ?: "la mascota"
-                )
+                    val relacionada = l.firstOrNull { publicacion -> publicacion.id == it.publicacionId }
+                    val esPropietario = relacionada?.usuarioId == SesionManager.obtenerUsuarioId(this)
+                    if (esPropietario && it.publicacionId > 0L) {
+                        ejecutarSeguro(exec) {
+                            val ubicacionExacta = runCatching {
+                                ControladorPublicaciones.obtenerCoordenadasAvistamiento(this, it.id)
+                            }.getOrNull()
+                            val reporte = if (ubicacionExacta != null) {
+                                it.copy(latitud = ubicacionExacta.first, longitud = ubicacionExacta.second)
+                            } else it
+                            actualizarUi {
+                                centrarArriba(GeoPoint(reporte.latitud, reporte.longitud))
+                                showPanelAvist(reporte, n[it.publicacionId] ?: "la mascota")
+                            }
+                        }
+                    } else {
+                        centrarArriba(mk.position)
+                        showPanelAvist(it, n[it.publicacionId] ?: "la mascota")
+                    }
                 }; true
             }; map.overlays.add(m); marcAvist.add(m)
         }
@@ -425,31 +495,125 @@ class MainActivity : AppCompatActivity() {
             }; map.overlays.add(m); marcDenuncias.add(m)
         }
 
-        dibujarBusquedaColaborativa(l, a)
+        dibujarBusquedaColaborativa(l, avistamientosVisibles)
 
         map.invalidate(); actualizarBtnCercanas(l)
         pendienteMostrarAlerta?.let { id ->
-            pendienteMostrarAlerta = null
-            l.find { it.id == id }?.let { showPanel(it) }
+            l.find { it.id == id }?.let {
+                pendienteMostrarAlerta = null
+                centrarArriba(GeoPoint(it.latitud, it.longitud))
+                showPanel(it)
+            }
         }
     }
 
     private fun mostrarAlbergue(al: Albergue) {
-        pnlEmoji.text = "ALBERGUE"
-        pnlEmoji.setTextColor(ContextCompat.getColor(this, R.color.colorSecondary))
-        pnlEmoji.textSize = 14f
-        pnlTit.text = al.nombre
-        pnlTipo.text = "Albergue"
-        pnlDesc.text = al.descripcion
-        pnlUbi.text = al.direccion
-        pnlEst.text = ""
-        if (!al.foto.isNullOrBlank()) {
-            com.example.practicafinal.util.cargarImagen(pnlFoto, al.foto)
+        val telefono = al.telefono.filter(Char::isDigit).takeIf(String::isNotBlank)
+        val direccion = valorInformativo(al.direccion)
+        val texto = buildList {
+            add(al.nombre)
+            direccion?.let(::add)
+            telefono?.let { add("Teléfono: $it") }
+            add("https://maps.google.com/?q=${al.latitud},${al.longitud}")
+        }.joinToString("\n")
+        prepararPanel(
+            etiqueta = "ALBERGUE",
+            colorEtiqueta = R.color.colorSecondary,
+            titulo = al.nombre,
+            subtitulo = direccion,
+            descripcion = al.descripcion,
+            latitud = al.latitud,
+            longitud = al.longitud,
+            estado = telefono?.let { "Teléfono: $it" },
+            colorEstado = R.color.texto_suave,
+            foto = al.foto,
+            textoCompartir = texto
+        )
+        configurarAcciones(
+            izquierda = telefono?.let { numero -> "Llamar" to { llamar(numero) } },
+            derecha = "Cómo llegar" to { abrirRuta(al.latitud, al.longitud) }
+        )
+        mostrarPanelAnimado()
+    }
+
+    private fun prepararPanel(
+        etiqueta: String,
+        colorEtiqueta: Int,
+        titulo: String,
+        subtitulo: String?,
+        descripcion: String?,
+        latitud: Double,
+        longitud: Double,
+        estado: String?,
+        colorEstado: Int,
+        foto: String?,
+        textoCompartir: String?
+    ) {
+        pnlEmoji.visibility = View.VISIBLE
+        pnlEmoji.text = etiqueta
+        pnlEmoji.setTextColor(ContextCompat.getColor(this, colorEtiqueta))
+        pnlTit.text = titulo
+        pnlTipo.text = subtitulo.orEmpty()
+        pnlTipo.visibility = if (subtitulo.isNullOrBlank()) View.GONE else View.VISIBLE
+        pnlDesc.text = descripcion?.trim()?.takeIf(String::isNotEmpty)
+            ?: "Sin detalles adicionales."
+        val distanciaMetros = userLoc?.distanceToAsDouble(GeoPoint(latitud, longitud))
+        pnlUbi.text = distanciaMetros?.let { metros ->
+            if (metros < 1000) "A ${metros.toInt()} m de ti"
+            else "A ${String.format(Locale.forLanguageTag("es-PE"), "%.1f", metros / 1000.0)} km de ti"
+        } ?: "Ubicación marcada en el mapa"
+        pnlEst.text = estado.orEmpty()
+        pnlEst.visibility = if (estado.isNullOrBlank()) View.GONE else View.VISIBLE
+        pnlEst.setTextColor(ContextCompat.getColor(this, colorEstado))
+        pnlFoto.setImageDrawable(null)
+        if (!foto.isNullOrBlank()) {
+            com.example.practicafinal.util.cargarImagen(pnlFoto, foto)
             pnlFoto.visibility = View.VISIBLE
         } else {
             pnlFoto.visibility = View.GONE
         }
-        pnlBotonesTipo.visibility = View.GONE
+        textoCompartirActual = textoCompartir?.takeIf(String::isNotBlank)
+        val mostrarCompartir = textoCompartirActual != null
+        pnlCompartir.visibility = if (mostrarCompartir) View.VISIBLE else View.GONE
+        (pnlCompartir.parent as? View)?.visibility = if (mostrarCompartir) View.VISIBLE else View.GONE
+        configurarAcciones(null, null)
+    }
+
+    private fun valorInformativo(valor: String?): String? = valor?.trim()?.takeIf {
+        it.isNotEmpty() && !it.equals("desconocido", ignoreCase = true) &&
+            !it.equals("desconocida", ignoreCase = true) && !it.equals("null", ignoreCase = true) &&
+            !it.equals("no disponible", ignoreCase = true)
+    }
+
+    private fun configurarAcciones(
+        izquierda: Pair<String, () -> Unit>?,
+        derecha: Pair<String, () -> Unit>?
+    ) {
+        fun configurarBoton(boton: MaterialButton, accion: Pair<String, () -> Unit>?) {
+            if (accion == null) {
+                boton.visibility = View.GONE
+                boton.setOnClickListener(null)
+                return
+            }
+            boton.text = accion.first
+            boton.contentDescription = accion.first
+            boton.setStrokeColorResource(when (accion.first) {
+                "Contactar", "Llamar" -> R.color.colorSuccess
+                "Avisar que la vi" -> R.color.colorRed
+                "Ver detalles", "Ver alerta" -> R.color.colorSecondary
+                else -> R.color.tinta
+            })
+            boton.visibility = View.VISIBLE
+            boton.setOnClickListener { accion.second.invoke() }
+        }
+
+        configurarBoton(pnlBtnIzq, izquierda)
+        configurarBoton(pnlBtnDer, derecha)
+        pnlBotonesTipo.visibility =
+            if (izquierda == null && derecha == null) View.GONE else View.VISIBLE
+    }
+
+    private fun mostrarPanelAnimado() {
         pnl.visibility = View.VISIBLE
         pnl.alpha = 0f
         pnl.post {
@@ -460,58 +624,92 @@ class MainActivity : AppCompatActivity() {
 
     private fun actualizarBtnCercanas(l: List<Publicacion>) {
         val u = userLoc; if (u == null) {
-            btnCercanas.visibility = View.GONE; return
+            btnCercanas.visibility = View.GONE
+            dividerAlertasMapa.visibility = View.GONE
+            return
         };
-        val c = l.filter { it.estado != "Resuelta" && it.estado != "Adoptada" }.size; if (c > 0) {
-            btnCercanas.visibility = View.VISIBLE; btnCercanas.text = "Alertas cerca ($c)"
-        } else btnCercanas.visibility = View.GONE
+        val c = l.count { it.estado == "Activa" }; if (c > 0) {
+            btnCercanas.visibility = View.VISIBLE
+            dividerAlertasMapa.visibility = View.VISIBLE
+            btnCercanas.text = "Alertas ($c)"
+            btnCercanas.contentDescription = "Alertas activas: $c"
+        } else {
+            btnCercanas.visibility = View.GONE
+            dividerAlertasMapa.visibility = View.GONE
+        }
     }
 
     private fun dialogoCercanas() {
-        val u = userLoc ?: return; ejecutarSeguro(exec) {
-            val pubs =
-                ControladorPublicaciones.obtenerPublicaciones(this).filter { it.estado != "Resuelta" && it.estado != "Adoptada" }; data class I(
-            val p: Publicacion,
-            val km: Double
-        );
-            val items =
-                pubs.map { I(it, GeoPoint(it.latitud, it.longitud).distanceToAsDouble(u) / 1000.0) }.sortedBy { it.km }
-                    .take(20); actualizarUi {
-            if (items.isEmpty()) {
-                Toast.makeText(this, "No hay alertas cercanas", Toast.LENGTH_SHORT).show(); return@actualizarUi
-            };
-            val v = android.view.LayoutInflater.from(this).inflate(R.layout.dialog_cercanas, null);
-            val rv =
-                v.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_dialog_cercanas); rv.layoutManager =
-            LinearLayoutManager(this); rv.adapter = object :
-            androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
-            override fun onCreateViewHolder(pg: android.view.ViewGroup, vt: Int) = object :
-                androidx.recyclerview.widget.RecyclerView.ViewHolder(
-                    android.view.LayoutInflater.from(pg.context).inflate(R.layout.item_alerta_cercana, pg, false)
-                ) {};
-
-            override fun onBindViewHolder(h: androidx.recyclerview.widget.RecyclerView.ViewHolder, pos: Int) {
-                val d = items[pos]; h.itemView.findViewById<View>(R.id.dot).background = when (d.p.tipo) {
-                    "Perdida" -> ContextCompat.getDrawable(
-                        this@MainActivity,
-                        R.drawable.bg_dot_rojo
-                    ); "Encontrada" -> ContextCompat.getDrawable(
-                        this@MainActivity,
-                        R.drawable.bg_dot_verde
-                    ); else -> ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_dot_naranja)
-                }; (h.itemView.findViewById<TextView>(R.id.tv_info)).text =
-                    "${d.p.nombre} . ${String.format(Locale("es"), "%.1f km", d.km)} - ${
-                        when (d.p.tipo) {
-                            "Perdida" -> "Perdida"; "Encontrada" -> "Encontrada"; else -> "Adopcion"
-                        }
-                    }"; h.itemView.setOnClickListener { centrarArriba(GeoPoint(d.p.latitud, d.p.longitud)) }
-            };
-            override fun getItemCount() = items.size
-        }; androidx.appcompat.app.AlertDialog.Builder(this).setTitle("Alertas cercanas").setView(v)
-            .setPositiveButton("Cerrar", null).show()
+        if (userLoc == null) return
+        val radios = arrayOf("Hasta 5 km", "Hasta 10 km", "Hasta 25 km", "Cualquier distancia")
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Buscar alertas dentro de")
+            .setItems(radios) { _, which ->
+                val radioKm = when (which) {
+                    0 -> 5.0
+                    1 -> 10.0
+                    2 -> 25.0
+                    else -> null
+                }
+                mostrarAlertasCercanas(radioKm)
+            }
+            .show()
             .also { com.example.practicafinal.util.Dialogos.aplicar(this, it) }
+    }
+
+    private fun mostrarAlertasCercanas(radioKm: Double?) {
+        val origen = userLoc ?: return
+        data class AlertaCercana(val publicacion: Publicacion, val kilometros: Double)
+        val items = publicacionesActuales
+            .filter { it.estado == "Activa" }
+            .map { AlertaCercana(it, GeoPoint(it.latitud, it.longitud).distanceToAsDouble(origen) / 1000.0) }
+            .filter { radioKm == null || it.kilometros <= radioKm }
+            .sortedBy { it.kilometros }
+            .take(20)
+        if (items.isEmpty()) {
+            Toast.makeText(this, "No hay alertas dentro de ese radio", Toast.LENGTH_SHORT).show()
+            return
         }
+        val v = android.view.LayoutInflater.from(this).inflate(R.layout.dialog_cercanas, null)
+        val rv = v.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_dialog_cercanas)
+        rv.layoutManager = LinearLayoutManager(this)
+        val titulo = if (radioKm == null) "Alertas cercanas · cualquier distancia"
+        else "Alertas dentro de ${radioKm.toInt()} km"
+        val dialogo = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(titulo)
+            .setView(v)
+            .setPositiveButton("Cerrar", null)
+            .create()
+        rv.adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+            override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int) = object :
+                androidx.recyclerview.widget.RecyclerView.ViewHolder(
+                    android.view.LayoutInflater.from(parent.context).inflate(R.layout.item_alerta_cercana, parent, false)
+                ) {}
+
+            override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+                val alerta = items[position]
+                val publicacion = alerta.publicacion
+                holder.itemView.findViewById<View>(R.id.dot).background = ContextCompat.getDrawable(
+                    this@MainActivity,
+                    when (publicacion.tipo) {
+                        "Perdida" -> R.drawable.bg_dot_rojo
+                        "Encontrada" -> R.drawable.bg_dot_verde
+                        else -> R.drawable.bg_dot_naranja
+                    }
+                )
+                holder.itemView.findViewById<TextView>(R.id.tv_info).text =
+                    "${publicacion.nombre} · ${String.format(Locale.forLanguageTag("es-PE"), "%.1f km", alerta.kilometros)} · ${publicacion.tipo}"
+                holder.itemView.setOnClickListener {
+                    dialogo.dismiss()
+                    centrarArriba(GeoPoint(publicacion.latitud, publicacion.longitud))
+                    showPanel(publicacion)
+                }
+            }
+
+            override fun getItemCount() = items.size
         }
+        dialogo.show()
+        com.example.practicafinal.util.Dialogos.aplicar(this, dialogo)
     }
 
     private fun ico(p: Publicacion) = when {
@@ -524,197 +722,268 @@ class MainActivity : AppCompatActivity() {
     private fun dibujarBusquedaColaborativa(publicaciones: List<Publicacion>, avistamientos: List<Avistamiento>) {
         val perdidasActivas = publicaciones.filter { it.tipo == "Perdida" && it.estado == "Activa" }
         for (pub in perdidasActivas) {
-            val avistDePub = avistamientos.filter { it.publicacionId == pub.id }
-            if (avistDePub.size < 2) continue
-
-            val puntos = mutableListOf(GeoPoint(pub.latitud, pub.longitud))
-            puntos.addAll(avistDePub.map { GeoPoint(it.latitud, it.longitud) })
-            puntos.add(GeoPoint(pub.latitud, pub.longitud))
-
+            val avistDePub = avistamientos
+                .filter { it.publicacionId == pub.id && it.estadoRevision !in setOf("No coincide", "Duplicado") }
+                .sortedBy { it.fecha }
+            if (avistDePub.isEmpty()) continue
+            val puntos = listOf(GeoPoint(pub.latitud, pub.longitud)) +
+                avistDePub.map { GeoPoint(it.latitud, it.longitud) }
             val ahora = System.currentTimeMillis()
-            for (av in avistDePub) {
-                val horasPasadas = (ahora - av.fecha) / (1000.0 * 60 * 60)
+            for (indice in 0 until puntos.lastIndex) {
+                val fecha = avistDePub.getOrNull(indice)?.fecha ?: ahora
+                val horasPasadas = (ahora - fecha) / (1000.0 * 60 * 60)
                 val opacidad = if (horasPasadas < 24) 0x60FFA000 else if (horasPasadas < 72) 0x40FFA000 else 0x20FFA000
-
                 val linea = Polygon()
-                linea.points = listOf(
-                    GeoPoint(pub.latitud, pub.longitud),
-                    GeoPoint(av.latitud, av.longitud)
-                )
+                linea.points = listOf(puntos[indice], puntos[indice + 1])
                 linea.fillColor = 0x00000000
                 linea.strokeColor = opacidad
                 linea.strokeWidth = 3f
                 map.overlays.add(linea)
                 marcBusqAvist.add(linea)
             }
-
-            val poligono = Polygon()
-            poligono.points = puntos
-            poligono.fillColor = 0x18FFA000
-            poligono.strokeColor = 0x60FFA000
-            poligono.strokeWidth = 2f
-            map.overlays.add(poligono)
-            marcBusqAvist.add(poligono)
         }
     }
 
     private fun tl(t: String) = when (t) {
-        "Perdida" -> "Mascota perdida"; "Encontrada" -> "Mascota encontrada"; else -> "En adopcion"
+        "Perdida" -> "Mascota perdida"
+        "Encontrada" -> "Mascota encontrada"
+        else -> "En adopción"
     }
 
     private fun showPanel(pub: Publicacion) {
-        pubActual = pub
-        pnlEmoji.text = when (pub.tipo) {
-            "Perdida" -> "PERDIDA"; "Encontrada" -> "ENCONTRADA"; else -> "ADOPCION"
+        val especie = valorInformativo(pub.especie)
+        val ultimaZona = valorInformativo(pub.ultimoLugar)
+        val subtitulo = buildList {
+            especie?.let(::add)
+            if (pub.tipo == "Perdida") ultimaZona?.let { add("Última zona: $it") }
+        }.joinToString(" · ").takeIf(String::isNotEmpty)
+        val numeroAvistamientos = avistamientosActuales.count {
+            it.publicacionId == pub.id && it.estadoRevision !in setOf("No coincide", "Duplicado")
         }
-        pnlEmoji.setTextColor(ContextCompat.getColor(this, when (pub.tipo) {
-            "Perdida" -> R.color.colorRed; "Encontrada" -> R.color.colorSuccess; else -> R.color.colorSecondary
-        }))
-        pnlEmoji.textSize = 14f
-        pnlTit.text = pub.nombre
-        pnlTipo.text = if (pub.tipo == "Perdida" && pub.ultimoLugar != null) "Mascota perdida . Ultima vez: ${pub.ultimoLugar}" else tl(pub.tipo)
-        pnlDesc.text = pub.descripcion
-        val d = GeoPoint(pub.latitud, pub.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }
-        pnlUbi.text = if (d != null) "A %.1f km de ti".format(d) else "Lima, Peru"
-        val r = pub.estado == "Resuelta"
-        val a = pub.estado == "Adoptada"
-        pnlEst.text = when {
-            r -> "Resuelta . ${fechaRelativa(pub.fechaCreacion)}"
-            a -> "Adoptada . ${fechaRelativa(pub.fechaCreacion)}"
-            else -> "Activa . ${fechaRelativa(pub.fechaCreacion)}"
+        val textoEstado = when {
+            pub.estado == "Resuelta" && pub.tipo == "Perdida" -> "Encontrada"
+            pub.estado == "Resuelta" -> "Resuelta"
+            pub.estado == "Adoptada" -> "Adoptada"
+            pub.tipo == "Perdida" && numeroAvistamientos > 0 -> "En búsqueda · $numeroAvistamientos avistamientos"
+            pub.tipo == "Perdida" -> "En búsqueda"
+            pub.tipo == "Encontrada" -> "Busca a su familia"
+            else -> "Disponible"
         }
-        pnlEst.setTextColor(ContextCompat.getColor(this, when {
-            r -> R.color.texto_suave
-            a -> R.color.colorSecondary
-            else -> R.color.verde_estado
-        }))
+        val fechaPublicacion = pub.fechaCreacion.takeIf { it > 0L }?.let(::fechaRelativa)
+        val fechaPerdida = pub.fechaPerdida?.let(::fechaRelativa)
+        val estado = buildString {
+            append(textoEstado)
+            fechaPerdida?.let { append(" · vista por última vez $it") }
+            if (fechaPerdida == null) fechaPublicacion?.let { append(" · publicada $it") }
+        }
+        val colorEstado = when (pub.estado) {
+            "Resuelta" -> R.color.texto_suave
+            "Adoptada" -> R.color.colorSecondary
+            else -> if (pub.tipo == "Perdida") R.color.colorRed else R.color.verde_estado
+        }
+        val textoCompartir = buildString {
+            appendLine("${pub.nombre} · ${tl(pub.tipo)}")
+            especie?.let { appendLine("Especie: $it") }
+            ultimaZona?.let { appendLine("Última zona: $it") }
+            appendLine("Estado: $estado")
+            pub.descripcion.takeIf(String::isNotBlank)?.let { appendLine(it) }
+            pub.recompensa?.takeIf(String::isNotBlank)?.let { appendLine("Recompensa ofrecida: $it") }
+            val latitudAproximada = kotlin.math.round(pub.latitud * 1000.0) / 1000.0
+            val longitudAproximada = kotlin.math.round(pub.longitud * 1000.0) / 1000.0
+            append("https://maps.google.com/?q=$latitudAproximada,$longitudAproximada")
+        }
+        prepararPanel(
+            etiqueta = when (pub.tipo) {
+                "Perdida" -> "PERDIDA"
+                "Encontrada" -> "ENCONTRADA"
+                else -> "ADOPCIÓN"
+            },
+            colorEtiqueta = when (pub.tipo) {
+                "Perdida" -> R.color.colorRed
+                "Encontrada" -> R.color.colorSuccess
+                else -> R.color.colorSecondary
+            },
+            titulo = pub.nombre,
+            subtitulo = subtitulo,
+            descripcion = buildString {
+                append(pub.descripcion)
+                pub.recompensa?.takeIf(String::isNotBlank)?.let { append("\n\nRecompensa ofrecida: $it") }
+            },
+            latitud = pub.latitud,
+            longitud = pub.longitud,
+            estado = estado,
+            colorEstado = colorEstado,
+            foto = pub.foto,
+            textoCompartir = textoCompartir
+        )
 
-        if (!pub.foto.isNullOrBlank()) {
-            com.example.practicafinal.util.cargarImagen(pnlFoto, pub.foto)
-            pnlFoto.visibility = View.VISIBLE
-        } else {
-            pnlFoto.setImageResource(android.R.drawable.ic_menu_gallery)
-            pnlFoto.visibility = View.VISIBLE
-        }
-
-        pnlBotonesTipo.visibility = View.VISIBLE
-        pnlBtnDer.visibility = View.GONE
+        val accionDetalle: () -> Unit = { abrirDetalles(pub) }
+        val contactoDisponible = pub.contactoWhatsapp?.any(Char::isDigit) == true && pub.estado != "Adoptada"
+        val accionContactar = if (contactoDisponible) {
+            "Contactar" to { contactarPublicacion(pub) }
+        } else null
 
         when (pub.tipo) {
-            "Perdida", "Encontrada" -> {
-                pnlBtnIzq.text = "Ver detalles"
-                pnlBtnIzq.isEnabled = !r
-                pnlBtnIzq.setStrokeColorResource(R.color.colorSecondary)
-                pnlBtnIzq.setOnClickListener {
-                    startActivity(Intent(this, DetallePublicacionActivity::class.java).apply {
-                        putExtra(DetallePublicacionActivity.EXTRA_PUBLICACION_ID, pub.id)
-                    })
-                }
+            "Perdida" -> {
+                val accionAvistamiento = if (pub.estado == "Activa") {
+                    "Avisar que la vi" to { abrirFormularioAvistamiento(pub) }
+                } else null
+                configurarAcciones(accionAvistamiento, "Ver detalles" to accionDetalle)
             }
-            "Adopcion" -> {
-                pnlBtnIzq.text = "WhatsApp"
-                pnlBtnIzq.setStrokeColorResource(R.color.colorSuccess)
-                pnlBtnIzq.isEnabled = true
-                pnlBtnIzq.setOnClickListener { enviarWA() }
-
-                pnlBtnDer.text = "Mas detalles"
-                pnlBtnDer.setStrokeColorResource(R.color.colorSecondary)
-                pnlBtnDer.visibility = View.VISIBLE
-                pnlBtnDer.isEnabled = !a
-                pnlBtnDer.setOnClickListener {
-                    startActivity(Intent(this, DetalleAdopcionActivity::class.java).apply {
-                        putExtra(DetalleAdopcionActivity.EXTRA_PUBLICACION_ID, pub.id)
-                    })
-                }
-            }
+            "Encontrada" -> configurarAcciones(
+                accionContactar,
+                "Ver detalles" to accionDetalle
+            )
+            else -> configurarAcciones(
+                accionContactar,
+                "Ver detalles" to accionDetalle
+            )
         }
-
-        if (r || a) {
-            pnlBotonesTipo.visibility = View.GONE
-        }
-
-        pnl.visibility = View.VISIBLE
-        pnl.alpha = 0f
-        pnl.post {
-            pnl.translationY = pnl.height.toFloat()
-            pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
-        }
+        mostrarPanelAnimado()
     }
 
     private fun showPanelAvist(a: Avistamiento, nom: String) {
-        pubActual = null
-        pnlEmoji.text = "AVISTAMIENTO"
-        pnlEmoji.setTextColor(ContextCompat.getColor(this, R.color.ambar_estado))
-        pnlEmoji.textSize = 14f
-        pnlTit.text = "Vieron a $nom"
-        pnlTipo.text = "Reportado por la comunidad"
-        pnlDesc.text = a.descripcion.ifEmpty { "Alguien reporto haber visto a esta mascota aqui." }
-        val d = GeoPoint(a.latitud, a.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }
-        pnlUbi.text = if (d != null) "A %.1f km de ti".format(d) else "Lima, Peru"
-        pnlEst.text = "Avistamiento . ${fechaRelativa(a.fecha)}"
-        pnlEst.setTextColor(ContextCompat.getColor(this, R.color.ambar_estado))
-        if (!a.foto.isNullOrBlank()) {
-            com.example.practicafinal.util.cargarImagen(pnlFoto, a.foto)
-            pnlFoto.visibility = View.VISIBLE
-        } else {
-            pnlFoto.visibility = View.GONE
+        val relacionada = publicacionesActuales.firstOrNull { it.id == a.publicacionId }
+        val nombreMascota = valorInformativo(relacionada?.nombre)
+            ?: a.especie?.let { "una mascota: $it" }
+            ?: nom
+        val descripcion = a.descripcion.trim().ifBlank { "El reporte no incluye detalles adicionales." }
+        val fechaAvistamiento = a.fecha.takeIf { it > 0L }?.let(::fechaRelativa)
+        val textoCompartir = buildString {
+            appendLine("Avistamiento de $nombreMascota")
+            appendLine(fechaAvistamiento?.let { "Reportado $it" } ?: "Fecha no disponible")
+            appendLine(descripcion)
+            append("https://maps.google.com/?q=${a.latitud},${a.longitud}")
         }
-        pnlBotonesTipo.visibility = View.GONE
-        pnl.visibility = View.VISIBLE
-        pnl.alpha = 0f
-        pnl.post {
-            pnl.translationY = pnl.height.toFloat()
-            pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
+        prepararPanel(
+            etiqueta = "AVISTAMIENTO",
+            colorEtiqueta = R.color.ambar_estado,
+            titulo = when {
+                relacionada != null -> "Vieron a $nombreMascota"
+                a.publicacionId > 0L -> "Avistamiento de una alerta cerrada"
+                else -> "Avistamiento sin alerta vinculada"
+            },
+            subtitulo = valorInformativo(relacionada?.especie ?: a.especie)
+                ?: "Avistamiento reportado por la comunidad",
+            descripcion = descripcion,
+            latitud = a.latitud,
+            longitud = a.longitud,
+            estado = buildString {
+                append(when (a.estadoRevision) {
+                    "Coincide" -> "Coincide con la alerta"
+                    "No coincide" -> "No coincide con la alerta"
+                    "Duplicado" -> "Reporte duplicado"
+                    else -> if (a.publicacionId == 0L) "Sin alerta relacionada" else "Pendiente de revisión"
+                })
+                fechaAvistamiento?.let { append(" · Visto $it") }
+            },
+            colorEstado = R.color.ambar_estado,
+            foto = a.foto,
+            textoCompartir = textoCompartir
+        )
+        val accionVerAlerta = a.publicacionId.takeIf { it > 0L }?.let { id ->
+            "Ver alerta" to {
+                startActivity(Intent(this, DetallePublicacionActivity::class.java).apply {
+                    putExtra(DetallePublicacionActivity.EXTRA_PUBLICACION_ID, id)
+                })
+            }
         }
+        configurarAcciones(
+            accionVerAlerta,
+            "Cómo llegar" to { abrirRuta(a.latitud, a.longitud) }
+        )
+        mostrarPanelAnimado()
     }
 
     private fun mostrarDenuncia(d: Denuncia) {
-        pubActual = null
-        pnlEmoji.text = ""
-        pnlEmoji.visibility = View.GONE
-        pnlTit.text = d.motivo
-        pnlTipo.text = "Denuncia anonima"
-        pnlDesc.text = d.descripcion.ifEmpty { "Reporte enviado por la comunidad." }
-        val d2 = GeoPoint(d.latitud, d.longitud).let { userLoc?.distanceToAsDouble(it)?.div(1000.0) }
-        pnlUbi.text = if (d2 != null) "A %.1f km de ti".format(d2) else "Lima, Peru"
-        pnlEst.text = "Reportado . ${fechaRelativa(d.fecha)}"
-        pnlEst.setTextColor(ContextCompat.getColor(this, R.color.colorRed))
-        if (!d.foto.isNullOrBlank()) {
-            com.example.practicafinal.util.cargarImagen(pnlFoto, d.foto)
-            pnlFoto.visibility = View.VISIBLE
-        } else {
-            pnlFoto.visibility = View.GONE
-        }
-        pnlBotonesTipo.visibility = View.GONE
-        pnl.visibility = View.VISIBLE
-        pnl.alpha = 0f
-        pnl.post {
-            pnl.translationY = pnl.height.toFloat()
-            pnl.animate().translationY(0f).alpha(1f).setDuration(250).start()
-        }
+        prepararPanel(
+            etiqueta = "REPORTE ANÓNIMO",
+            colorEtiqueta = R.color.colorRed,
+            titulo = d.motivo,
+            subtitulo = "Reporte de la comunidad",
+            descripcion = d.descripcion,
+            latitud = d.latitud,
+            longitud = d.longitud,
+            estado = "Reportado ${fechaRelativa(d.fecha)}",
+            colorEstado = R.color.colorRed,
+            foto = d.foto,
+            textoCompartir = null
+        )
+        mostrarPanelAnimado()
     }
 
     private fun ocultarPanel() {
         pnl.animate().translationY(pnl.height.toFloat()).alpha(0f).setDuration(200)
-            .withEndAction { pnl.visibility = View.GONE }.start(); pubActual =
-            null; circBusq?.let { map.overlays.remove(it) }; circBusq = null; map.invalidate()
+            .withEndAction { pnl.visibility = View.GONE }.start()
+        textoCompartirActual = null
+        circBusq?.let { map.overlays.remove(it) }
+        circBusq = null
+        map.invalidate()
     }
 
-    private fun txt(pub: Publicacion) =
-        "${pub.nombre} . ${tl(pub.tipo)}\n${pub.descripcion}\nEstado: ${pub.estado} . ${fechaRelativa(pub.fechaCreacion)}\nhttps://maps.google.com/?q=${pub.latitud},${pub.longitud}"
+    private fun abrirDetalles(pub: Publicacion) {
+        if (pub.tipo == "Adopcion") {
+            startActivity(Intent(this, DetalleAdopcionActivity::class.java).apply {
+                putExtra(DetalleAdopcionActivity.EXTRA_PUBLICACION_ID, pub.id)
+            })
+        } else {
+            startActivity(Intent(this, DetallePublicacionActivity::class.java).apply {
+                putExtra(DetallePublicacionActivity.EXTRA_PUBLICACION_ID, pub.id)
+            })
+        }
+    }
 
-    private fun enviarWA() {
-        val p = pubActual ?: return; try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/?text=${Uri.encode(txt(p))}")))
+    private fun abrirFormularioAvistamiento(pub: Publicacion) {
+        startActivity(Intent(this, ReportarAvistamientoActivity::class.java).apply {
+            putExtra(ReportarAvistamientoActivity.EXTRA_PUBLICACION_ID, pub.id)
+            putExtra(ReportarAvistamientoActivity.EXTRA_NOMBRE, pub.nombre)
+            putExtra(ReportarAvistamientoActivity.EXTRA_ULTIMA_LATITUD, pub.latitud)
+            putExtra(ReportarAvistamientoActivity.EXTRA_ULTIMA_LONGITUD, pub.longitud)
+        })
+    }
+
+    private fun contactarPublicacion(pub: Publicacion) {
+        val telefono = pub.contactoWhatsapp?.filter(Char::isDigit).orEmpty()
+        if (telefono.isBlank()) {
+            Toast.makeText(this, "Esta alerta no tiene un número de contacto", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val texto = "Hola, te contacto por ${pub.nombre} (${tl(pub.tipo)})."
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(
+                "https://wa.me/$telefono?text=${Uri.encode(texto)}"
+            )))
         } catch (_: Exception) {
-            Toast.makeText(this, "WhatsApp no instalado", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "No se pudo abrir WhatsApp", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun llamar(telefono: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", telefono, null)))
+        } catch (_: Exception) {
+            Toast.makeText(this, "No se pudo abrir el marcador", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun abrirRuta(latitud: Double, longitud: Double) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$latitud,$longitud")))
+        } catch (_: Exception) {
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("geo:$latitud,$longitud?q=$latitud,$longitud")))
+            } catch (_: Exception) {
+                Toast.makeText(this, "No hay una aplicación de mapas disponible", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun compartir() {
-        val p = pubActual ?: return; startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"; putExtra(Intent.EXTRA_TEXT, txt(p))
-        }, "Compartir alerta"))
+        val texto = textoCompartirActual ?: return
+        startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, texto)
+        }, "Compartir información"))
     }
 
     override fun onResume() {

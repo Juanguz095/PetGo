@@ -16,8 +16,8 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
             android:background="@color/fondo_lista"
             android:elevation="0dp"
             app:contentInsetStart="8dp"
@@ -53,7 +53,7 @@
                 <TextView
                     android:id="@+id/chip_todos"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="9dp"
                     android:background="@drawable/bg_chip_lista_on"
                     android:gravity="center"
@@ -67,7 +67,7 @@
                 <TextView
                     android:id="@+id/chip_perros"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="9dp"
                     android:background="@drawable/bg_chip_lista"
                     android:gravity="center"
@@ -80,7 +80,7 @@
                 <TextView
                     android:id="@+id/chip_gatos"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="48dp"
                     android:background="@drawable/bg_chip_lista"
                     android:gravity="center"
                     android:paddingStart="18dp"
@@ -126,8 +126,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_publicar"
                 style="@style/Widget.PetGo.Button.Icon"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_marginStart="8dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
@@ -140,6 +140,69 @@
                 android:contentDescription="@string/publish_lost_pet" />
         </LinearLayout>
 
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:overScrollMode="never"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <TextView
+                    android:id="@+id/btn_radio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bg_chip_lista"
+                    android:clickable="true"
+                    android:contentDescription="Filtrar mascotas por distancia"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:text="Distancia: todas"
+                    android:textColor="@color/tinta"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_fecha_filtro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bg_chip_lista"
+                    android:clickable="true"
+                    android:contentDescription="Filtrar por actividad reciente"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:text="Fecha: todas"
+                    android:textColor="@color/tinta"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btn_orden"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_chip_lista"
+                    android:clickable="true"
+                    android:contentDescription="Ordenar alertas"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:text="Orden: actividad"
+                    android:textColor="@color/tinta"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_perdidas"
             android:layout_width="match_parent"
@@ -151,6 +214,21 @@
             android:paddingEnd="11dp"
             android:paddingBottom="24dp"
             android:scrollbars="vertical" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cargar_mas"
+            style="@style/Widget.PetGo.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="Cargar más"
+            android:textAllCaps="false"
+            android:visibility="gone"
+            app:cornerRadius="11dp"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="2dp" />
     </LinearLayout>
 
     <TextView
