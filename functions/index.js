@@ -11,7 +11,7 @@ exports.enviarPushAvistamiento = onDocumentCreated(
   "notificaciones/{notificationId}",
   async (event) => {
     const notification = event.data?.data();
-    if (!notification || !["avistamiento", "caso_resuelto"].includes(notification.tipo)) return;
+    if (!notification || !["avistamiento", "caso_resuelto", "alerta_cercana"].includes(notification.tipo)) return;
 
     const userId = notification.usuarioDestinoId;
     const publicationId = notification.publicacionId;
@@ -46,7 +46,9 @@ exports.enviarPushAvistamiento = onDocumentCreated(
 
     const title = notification.tipo === "caso_resuelto"
       ? "Mascota encontrada"
-      : "Nuevo avistamiento";
+      : notification.tipo === "alerta_cercana"
+        ? "Mascota perdida cerca"
+        : "Nuevo avistamiento";
     const body =
       typeof notification.mensaje === "string" && notification.mensaje.length > 0
         ? notification.mensaje
@@ -172,5 +174,64 @@ exports.notificarAvistamientoVinculado = onDocumentUpdated(
       fecha: Date.now(),
       leida: false,
     });
+  }
+);
+
+function distanciaKm(lat1, lng1, lat2, lng2) {
+  const rad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * rad;
+  const dLng = (lng2 - lng1) * rad;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+exports.notificarPerdidaCercana = onDocumentCreated(
+  "publicaciones/{publicationId}",
+  async (event) => {
+    const pub = event.data?.data();
+    if (!pub || pub.tipo !== "Perdida" || pub.estado !== "Activa") return;
+
+    const latitud = pub.latitud;
+    const longitud = pub.longitud;
+    if (typeof latitud !== "number" || typeof longitud !== "number") return;
+
+    const ownerId = pub.usuarioId;
+    const snapshot = await db.collection("usuarios")
+      .where("alertaCercanaHabilitada", "==", true)
+      .get();
+
+    const petName = pub.nombre || "Una mascota";
+    for (const doc of snapshot.docs) {
+      const userId = doc.id;
+      if (typeof ownerId === "string" && userId === ownerId) continue;
+
+      const uLat = doc.get("alertaCercanaLatitud");
+      const uLng = doc.get("alertaCercanaLongitud");
+      if (typeof uLat !== "number" || typeof uLng !== "number") continue;
+
+      const radio = typeof doc.get("alertaCercanaRadioKm") === "number"
+        ? doc.get("alertaCercanaRadioKm")
+        : 10;
+
+      const distancia = distanciaKm(latitud, longitud, uLat, uLng);
+      if (distancia > radio) continue;
+
+      const notificationId = `${event.params.publicationId}_cercana_${userId}`;
+      const kmTexto = distancia < 1 ? "a menos de 1 km" : `a unos ${Math.round(distancia)} km`;
+      await db.collection("notificaciones").doc(notificationId).set({
+        id: notificationId,
+        usuarioDestinoId: userId,
+        usuarioOrigenId: typeof ownerId === "string" ? ownerId : "",
+        tipo: "alerta_cercana",
+        publicacionId: event.params.publicationId,
+        avistamientoId: "",
+        mensaje: `${petName} se perdió ${kmTexto} de tu zona.`,
+        latitud,
+        longitud,
+        fecha: Date.now(),
+        leida: false,
+      });
+    }
   }
 );

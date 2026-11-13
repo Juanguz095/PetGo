@@ -533,6 +533,71 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/section_adopcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Información para adoptantes (opcional)"
+                    android:textColor="@color/tinta"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_edad_adopcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/bg_brutal_blanco"
+                    android:hint="Edad aproximada (ej. 2 años, cachorro)"
+                    android:importantForAutofill="no"
+                    android:inputType="textCapSentences"
+                    android:maxLength="40"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textColor="@color/tinta"
+                    android:textColorHint="@color/texto_suave"
+                    android:textSize="13sp" />
+
+                <EditText
+                    android:id="@+id/et_caracter_adopcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/bg_brutal_blanco"
+                    android:hint="Carácter (ej. cariñoso, tranquilo, juguetón)"
+                    android:importantForAutofill="no"
+                    android:inputType="textCapSentences"
+                    android:maxLength="80"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textColor="@color/tinta"
+                    android:textColorHint="@color/texto_suave"
+                    android:textSize="13sp" />
+
+                <EditText
+                    android:id="@+id/et_cuidados_adopcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_marginTop="7dp"
+                    android:background="@drawable/bg_brutal_blanco"
+                    android:gravity="top|start"
+                    android:hint="Cuidados importantes (vacunas, alimentación, paseos)"
+                    android:importantForAutofill="no"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLength="180"
+                    android:padding="12dp"
+                    android:textColor="@color/tinta"
+                    android:textColorHint="@color/texto_suave"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/section_ultimo_lugar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -629,6 +694,7 @@
 
 
             <TextView
+                android:id="@+id/label_ubicacion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -645,6 +711,7 @@
                 android:background="@color/bg_divider" />
 
             <TextView
+                android:id="@+id/hint_ubicacion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"

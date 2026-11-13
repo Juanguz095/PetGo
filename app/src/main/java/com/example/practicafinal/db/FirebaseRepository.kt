@@ -12,6 +12,7 @@ import com.example.practicafinal.modelo.Avistamiento
 import com.example.practicafinal.modelo.Denuncia
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.modelo.ResultadoRegistro
+import com.example.practicafinal.modelo.PreferenciasAlerta
 import com.example.practicafinal.modelo.Usuario
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -20,6 +21,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import java.util.UUID
@@ -145,6 +147,29 @@ class FirebaseRepository(private val context: Context) {
         }
     }
 
+    fun guardarPreferenciaAlerta(pref: PreferenciasAlerta, latitud: Double?, longitud: Double?) {
+        val uid = currentUid()
+        val datos = hashMapOf<String, Any>(
+            "alertaCercanaHabilitada" to pref.habilitadas,
+            "alertaCercanaRadioKm" to pref.radioKm,
+            "alertaCercanaActualizado" to System.currentTimeMillis()
+        )
+        if (latitud != null && longitud != null) {
+            datos["alertaCercanaLatitud"] = latitud
+            datos["alertaCercanaLongitud"] = longitud
+        }
+        await(db.collection(USERS).document(uid).set(datos, SetOptions.merge()))
+    }
+
+    fun obtenerPreferenciaAlerta(): PreferenciasAlerta {
+        val uid = currentUid()
+        val snap = await(db.collection(USERS).document(uid).get())
+        return PreferenciasAlerta(
+            habilitadas = snap.getBoolean("alertaCercanaHabilitada") ?: false,
+            radioKm = (snap.get("alertaCercanaRadioKm") as? Number)?.toInt() ?: 10
+        )
+    }
+
     fun quitarDispositivoPushActual() {
         val uid = currentUid()
         val token = await(FirebaseMessaging.getInstance().token)
@@ -193,7 +218,10 @@ class FirebaseRepository(private val context: Context) {
         recompensa: String? = null,
         color: String? = null,
         tamano: String? = null,
-        senasParticulares: String? = null
+        senasParticulares: String? = null,
+        edadAproximada: String? = null,
+        caracter: String? = null,
+        cuidados: String? = null
     ): Long {
         val uid = currentUid()
         val id = newId()
@@ -217,7 +245,10 @@ class FirebaseRepository(private val context: Context) {
             ultimaConfirmacion = if (tipo == "Perdida") System.currentTimeMillis() else null,
             color = color?.trim()?.ifBlank { null },
             tamano = tamano?.trim()?.ifBlank { null },
-            senasParticulares = senasParticulares?.trim()?.ifBlank { null }
+            senasParticulares = senasParticulares?.trim()?.ifBlank { null },
+            edadAproximada = edadAproximada?.trim()?.ifBlank { null },
+            caracter = caracter?.trim()?.ifBlank { null },
+            cuidados = cuidados?.trim()?.ifBlank { null }
         )
         val publicData = publication.copy(
             latitud = aproximarCoordenada(latitud),
@@ -234,7 +265,8 @@ class FirebaseRepository(private val context: Context) {
         id: Long, tipo: String, nombre: String, descripcion: String, foto: String?,
         ultimoLugar: String?, especie: String?, latitud: Double, longitud: Double,
         contactoWhatsapp: String?, fechaPerdida: Long? = null, recompensa: String? = null,
-        color: String? = null, tamano: String? = null, senasParticulares: String? = null
+        color: String? = null, tamano: String? = null, senasParticulares: String? = null,
+        edadAproximada: String? = null, caracter: String? = null, cuidados: String? = null
     ) {
         val uid = currentUid()
         val ref = db.collection(PUBLICATIONS).document(id.toString())
@@ -265,7 +297,10 @@ class FirebaseRepository(private val context: Context) {
             ultimaConfirmacion = if (tipo == "Perdida") System.currentTimeMillis() else actual.ultimaConfirmacion,
             color = color?.trim()?.ifBlank { null },
             tamano = tamano?.trim()?.ifBlank { null },
-            senasParticulares = senasParticulares?.trim()?.ifBlank { null }
+            senasParticulares = senasParticulares?.trim()?.ifBlank { null },
+            edadAproximada = edadAproximada?.trim()?.ifBlank { null },
+            caracter = caracter?.trim()?.ifBlank { null },
+            cuidados = cuidados?.trim()?.ifBlank { null }
         )
         val publicData = actualizada.copy(
             latitud = aproximarCoordenada(latitud),
@@ -839,7 +874,10 @@ class FirebaseRepository(private val context: Context) {
             (get("ultimaConfirmacion") as? Number)?.toLong(),
             getString("color"),
             getString("tamano"),
-            getString("senasParticulares")
+            getString("senasParticulares"),
+            getString("edadAproximada"),
+            getString("caracter"),
+            getString("cuidados")
         )
     }
 

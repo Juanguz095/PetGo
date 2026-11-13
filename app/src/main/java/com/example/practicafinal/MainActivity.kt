@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity() {
     private var avistamientosActuales: List<Avistamiento> = emptyList()
     private var alberguesActuales: List<Albergue> = emptyList()
     private var denunciasActuales: List<Denuncia> = emptyList()
+    private var filtroTipoMapa: String? = null
 
     private val permiso = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permisos ->
         if (permisos.values.any { it }) centrarUsuario() else {
@@ -175,6 +176,7 @@ class MainActivity : AppCompatActivity() {
         btnNotificaciones.setOnClickListener {
             startActivity(Intent(this, NotificacionesActivity::class.java))
         }
+        configurarFiltrosMapa()
         cargarBD()
         val clat = intent.getDoubleExtra("centrar_lat", Double.NaN);
         val clng = intent.getDoubleExtra("centrar_lng", Double.NaN)
@@ -209,6 +211,45 @@ class MainActivity : AppCompatActivity() {
         if (pendienteMostrarAlerta != null) {
             mostrarAlertaPendiente()
         }
+    }
+
+    private fun configurarFiltrosMapa() {
+        val chips = listOf(
+            R.id.filtro_todas to null,
+            R.id.filtro_perdidas to "Perdida",
+            R.id.filtro_encontradas to "Encontrada",
+            R.id.filtro_adopciones to "Adopcion"
+        )
+        fun pintar() {
+            chips.forEach { (id, tipo) ->
+                val activo = filtroTipoMapa == tipo
+                findViewById<TextView>(id).background = ContextCompat.getDrawable(
+                    this,
+                    if (activo) R.drawable.bg_chip_selected else R.drawable.bg_chip
+                )
+                findViewById<TextView>(id).setTextColor(
+                    ContextCompat.getColor(this, if (activo) R.color.tinta else R.color.texto_suave)
+                )
+            }
+        }
+        chips.forEach { (id, tipo) ->
+            findViewById<TextView>(id).setOnClickListener {
+                filtroTipoMapa = tipo
+                pintar()
+                redibujar()
+            }
+        }
+        pintar()
+    }
+
+    private fun redibujar() {
+        render(
+            publicacionesActuales,
+            avistamientosActuales,
+            alberguesActuales,
+            denunciasActuales,
+            publicacionesActuales.associate { it.id to it.nombre }
+        )
     }
 
     private fun mostrarAlertaPendiente() {
@@ -423,7 +464,7 @@ class MainActivity : AppCompatActivity() {
             )
         }; marcAlb.clear(); marcDenuncias.forEach { map.overlays.remove(it) }; marcDenuncias.clear()
         marcBusqAvist.forEach { map.overlays.remove(it) }; marcBusqAvist.clear()
-        val activas = l.filter { it.estado == "Activa" }
+        val activas = l.filter { it.estado == "Activa" && (filtroTipoMapa == null || it.tipo == filtroTipoMapa) }
         for (pub in activas) {
             val m = Marker(map); m.position = GeoPoint(pub.latitud, pub.longitud); m.icon =
                 ContextCompat.getDrawable(this, ico(pub)); m.setAnchor(
@@ -437,8 +478,10 @@ class MainActivity : AppCompatActivity() {
                 }; true
             }; map.overlays.add(m); marcPub.add(m)
         }
-        val alertasPerdidasActivas = l.filter { it.tipo == "Perdida" && it.estado == "Activa" }
-            .map { it.id }.toSet()
+        val alertasPerdidasActivas = l.filter {
+            it.tipo == "Perdida" && it.estado == "Activa" &&
+                (filtroTipoMapa == null || filtroTipoMapa == "Perdida")
+        }.map { it.id }.toSet()
         val avistamientosVisibles = a.filter { avistamiento ->
             avistamiento.estadoRevision !in setOf("No coincide", "Duplicado") &&
                 (avistamiento.publicacionId == 0L || avistamiento.publicacionId in alertasPerdidasActivas)
@@ -824,12 +867,10 @@ class MainActivity : AppCompatActivity() {
         } else null
 
         when (pub.tipo) {
-            "Perdida" -> {
-                val accionAvistamiento = if (pub.estado == "Activa") {
-                    "Avisar que la vi" to { abrirFormularioAvistamiento(pub) }
-                } else null
-                configurarAcciones(accionAvistamiento, "Ver detalles" to accionDetalle)
-            }
+            "Perdida" -> configurarAcciones(
+                accionContactar,
+                "Ver detalles" to accionDetalle
+            )
             "Encontrada" -> configurarAcciones(
                 accionContactar,
                 "Ver detalles" to accionDetalle
@@ -937,6 +978,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, ReportarAvistamientoActivity::class.java).apply {
             putExtra(ReportarAvistamientoActivity.EXTRA_PUBLICACION_ID, pub.id)
             putExtra(ReportarAvistamientoActivity.EXTRA_NOMBRE, pub.nombre)
+            putExtra(ReportarAvistamientoActivity.EXTRA_ESPECIE, pub.especie)
             putExtra(ReportarAvistamientoActivity.EXTRA_ULTIMA_LATITUD, pub.latitud)
             putExtra(ReportarAvistamientoActivity.EXTRA_ULTIMA_LONGITUD, pub.longitud)
         })

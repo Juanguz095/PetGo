@@ -69,7 +69,15 @@ class DetalleAdopcionActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.tv_nombre).text = p.nombre
-        findViewById<TextView>(R.id.tv_descripcion).text = p.descripcion
+        findViewById<TextView>(R.id.tv_descripcion).text = buildString {
+            append(p.descripcion)
+            val extras = listOfNotNull(
+                p.edadAproximada?.takeIf { it.isNotBlank() }?.let { "Edad aproximada: $it" },
+                p.caracter?.takeIf { it.isNotBlank() }?.let { "Caracter: $it" },
+                p.cuidados?.takeIf { it.isNotBlank() }?.let { "Cuidados: $it" }
+            )
+            if (extras.isNotEmpty()) append(" · " + extras.joinToString(" · "))
+        }
 
         
         findViewById<TextView>(R.id.tv_ubicacion).apply {

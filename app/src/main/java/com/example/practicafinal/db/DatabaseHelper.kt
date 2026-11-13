@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.practicafinal.modelo.Albergue
 import com.example.practicafinal.modelo.Avistamiento
 import com.example.practicafinal.modelo.Denuncia
+import com.example.practicafinal.modelo.PreferenciasAlerta
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.modelo.ResultadoRegistro
 import com.example.practicafinal.modelo.Usuario
@@ -34,6 +35,11 @@ class DatabaseHelper(context: Context) {
     fun actualizarPushHabilitado(habilitadas: Boolean) =
         repository.actualizarPushHabilitado(habilitadas)
 
+    fun guardarPreferenciaAlerta(pref: PreferenciasAlerta, latitud: Double?, longitud: Double?) =
+        repository.guardarPreferenciaAlerta(pref, latitud, longitud)
+
+    fun obtenerPreferenciaAlerta(): PreferenciasAlerta = repository.obtenerPreferenciaAlerta()
+
     fun quitarDispositivoPushActual() = repository.quitarDispositivoPushActual()
 
     fun registrarTokenPushSiHabilitado(token: String) =
@@ -44,20 +50,24 @@ class DatabaseHelper(context: Context) {
         foto: String?, ultimoLugar: String?, especie: String?,
         latitud: Double, longitud: Double, contactoWhatsapp: String? = null,
         fechaPerdida: Long? = null, recompensa: String? = null,
-        color: String? = null, tamano: String? = null, senasParticulares: String? = null
+        color: String? = null, tamano: String? = null, senasParticulares: String? = null,
+        edadAproximada: String? = null, caracter: String? = null, cuidados: String? = null
     ): Long = repository.insertarPublicacion(
         usuarioId, tipo, nombre, descripcion, foto, ultimoLugar, especie, latitud, longitud,
-        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares
+        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares,
+        edadAproximada, caracter, cuidados
     )
 
     fun actualizarPublicacion(
         id: Long, tipo: String, nombre: String, descripcion: String, foto: String?,
         ultimoLugar: String?, especie: String?, latitud: Double, longitud: Double,
         contactoWhatsapp: String?, fechaPerdida: Long? = null, recompensa: String? = null,
-        color: String? = null, tamano: String? = null, senasParticulares: String? = null
+        color: String? = null, tamano: String? = null, senasParticulares: String? = null,
+        edadAproximada: String? = null, caracter: String? = null, cuidados: String? = null
     ) = repository.actualizarPublicacion(
         id, tipo, nombre, descripcion, foto, ultimoLugar, especie, latitud, longitud,
-        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares
+        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares,
+        edadAproximada, caracter, cuidados
     )
 
     fun eliminarPublicacion(id: Long) = repository.eliminarPublicacion(id)

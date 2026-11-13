@@ -21,20 +21,24 @@ object ControladorPublicaciones {
         context: Context, usuarioId: Long?, tipo: String, nombre: String, descripcion: String,
         foto: String?, ultimoLugar: String?, especie: String?, latitud: Double, longitud: Double,
         contactoWhatsapp: String? = null, fechaPerdida: Long? = null, recompensa: String? = null,
-        color: String? = null, tamano: String? = null, senasParticulares: String? = null
+        color: String? = null, tamano: String? = null, senasParticulares: String? = null,
+        edadAproximada: String? = null, caracter: String? = null, cuidados: String? = null
     ): Long = DatabaseHelper(context).insertarPublicacion(
         usuarioId, tipo, nombre, descripcion, foto, ultimoLugar, especie, latitud, longitud,
-        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares
+        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares,
+        edadAproximada, caracter, cuidados
     )
 
     fun actualizar(
         context: Context, id: Long, tipo: String, nombre: String, descripcion: String, foto: String?,
         ultimoLugar: String?, especie: String?, latitud: Double, longitud: Double, contactoWhatsapp: String?,
         fechaPerdida: Long? = null, recompensa: String? = null,
-        color: String? = null, tamano: String? = null, senasParticulares: String? = null
+        color: String? = null, tamano: String? = null, senasParticulares: String? = null,
+        edadAproximada: String? = null, caracter: String? = null, cuidados: String? = null
     ) = DatabaseHelper(context).actualizarPublicacion(
         id, tipo, nombre, descripcion, foto, ultimoLugar, especie, latitud, longitud,
-        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares
+        contactoWhatsapp, fechaPerdida, recompensa, color, tamano, senasParticulares,
+        edadAproximada, caracter, cuidados
     )
 
     fun eliminar(context: Context, id: Long) = DatabaseHelper(context).eliminarPublicacion(id)

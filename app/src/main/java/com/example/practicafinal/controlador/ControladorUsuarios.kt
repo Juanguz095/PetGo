@@ -3,6 +3,7 @@ package com.example.practicafinal.controlador
 import android.content.Context
 import com.example.practicafinal.db.DatabaseHelper
 import com.example.practicafinal.modelo.Usuario
+import com.example.practicafinal.modelo.PreferenciasAlerta
 import com.example.practicafinal.modelo.ResultadoRegistro
 
 
@@ -39,4 +40,10 @@ object ControladorUsuarios {
     fun obtenerPorId(context: Context, id: Long): Usuario? {
         return DatabaseHelper(context).obtenerPorId(id)
     }
+
+    fun guardarPreferenciaAlerta(context: Context, pref: PreferenciasAlerta, latitud: Double?, longitud: Double?) =
+        DatabaseHelper(context).guardarPreferenciaAlerta(pref, latitud, longitud)
+
+    fun obtenerPreferenciaAlerta(context: Context): PreferenciasAlerta =
+        DatabaseHelper(context).obtenerPreferenciaAlerta()
 }

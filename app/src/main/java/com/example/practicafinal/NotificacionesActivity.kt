@@ -119,6 +119,7 @@ class NotificacionesActivity : AppCompatActivity() {
             holder.tvTipo.text = when (tipo) {
                 "avistamiento" -> "Avistamiento de mascota"
                 "caso_resuelto" -> "Mascota encontrada"
+                "alerta_cercana" -> "Mascota perdida cerca"
                 else -> tipo
             }
             val fecha = notif["fecha"] as? Long ?: 0L

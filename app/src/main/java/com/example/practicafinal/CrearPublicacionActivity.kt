@@ -58,6 +58,10 @@ class CrearPublicacionActivity : AppCompatActivity() {
     private lateinit var etColor: EditText
     private lateinit var etTamano: EditText
     private lateinit var etSenas: EditText
+    private lateinit var etEdadAdopcion: EditText
+    private lateinit var etCaracterAdopcion: EditText
+    private lateinit var etCuidadosAdopcion: EditText
+    private lateinit var sectionAdopcion: View
     private lateinit var tvError: TextView
     private lateinit var tvEstadoRed: TextView
     private lateinit var chipPerdida: View
@@ -76,6 +80,8 @@ class CrearPublicacionActivity : AppCompatActivity() {
     private lateinit var sectionContacto: View
     private lateinit var sectionDatosPerdida: View
     private lateinit var sectionIdentificativos: View
+    private lateinit var labelUbicacion: TextView
+    private lateinit var hintUbicacion: TextView
     private lateinit var etMotivoCustom: EditText
     private var editandoId: Long? = null
     private var motivoDenuncia = "Maltrato"
@@ -127,6 +133,10 @@ class CrearPublicacionActivity : AppCompatActivity() {
         etColor = findViewById(R.id.et_color_mascota)
         etTamano = findViewById(R.id.et_tamano_mascota)
         etSenas = findViewById(R.id.et_senas_mascota)
+        etEdadAdopcion = findViewById(R.id.et_edad_adopcion)
+        etCaracterAdopcion = findViewById(R.id.et_caracter_adopcion)
+        etCuidadosAdopcion = findViewById(R.id.et_cuidados_adopcion)
+        sectionAdopcion = findViewById(R.id.section_adopcion)
         tvError = findViewById(R.id.tv_error)
         tvEstadoRed = findViewById(R.id.tv_estado_red)
         chipPerdida = findViewById(R.id.chip_perdida)
@@ -145,6 +155,8 @@ class CrearPublicacionActivity : AppCompatActivity() {
         sectionContacto = findViewById(R.id.section_contacto)
         sectionDatosPerdida = findViewById(R.id.section_datos_perdida)
         sectionIdentificativos = findViewById(R.id.section_identificativos)
+        labelUbicacion = findViewById(R.id.label_ubicacion)
+        hintUbicacion = findViewById(R.id.hint_ubicacion)
         etMotivoCustom = findViewById(R.id.et_motivo_custom)
 
         
@@ -328,6 +340,17 @@ class CrearPublicacionActivity : AppCompatActivity() {
         sectionContacto.visibility = if (tipo == "Denuncia") View.GONE else View.VISIBLE
         sectionDatosPerdida.visibility = if (tipo == "Perdida") View.VISIBLE else View.GONE
         sectionIdentificativos.visibility = if (tipo == "Denuncia") View.GONE else View.VISIBLE
+        sectionAdopcion.visibility = if (tipo == "Adopcion") View.VISIBLE else View.GONE
+        labelUbicacion.text = when (tipo) {
+            "Perdida" -> "¿Dónde la viste por última vez?"
+            "Encontrada" -> "¿Dónde la encontraste?"
+            "Adopcion" -> "Zona aproximada de la mascota"
+            else -> "Ubicación"
+        }
+        hintUbicacion.text = when (tipo) {
+            "Adopcion" -> "📍 Marca la zona donde está o donde se coordinaría el encuentro"
+            else -> "📍 Toca el mapa para elegir la ubicación"
+        }
         if (formularioListo) {
             borradorActivo = true
             guardarBorrador()
@@ -405,6 +428,9 @@ class CrearPublicacionActivity : AppCompatActivity() {
                 etColor.setText(publicacion.color.orEmpty())
                 etTamano.setText(publicacion.tamano.orEmpty())
                 etSenas.setText(publicacion.senasParticulares.orEmpty())
+                etEdadAdopcion.setText(publicacion.edadAproximada.orEmpty())
+                etCaracterAdopcion.setText(publicacion.caracter.orEmpty())
+                etCuidadosAdopcion.setText(publicacion.cuidados.orEmpty())
                 fechaPerdidaSeleccionada = publicacion.fechaPerdida ?: publicacion.fechaCreacion
                 findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_fecha_perdida).text =
                     "Última vez: ${SimpleDateFormat("dd/MM/yyyy, HH:mm", Locale.forLanguageTag("es-PE")).format(Date(fechaPerdidaSeleccionada))}"
@@ -447,6 +473,9 @@ class CrearPublicacionActivity : AppCompatActivity() {
         val color = etColor.text.toString().trim().ifEmpty { null }
         val tamano = etTamano.text.toString().trim().ifEmpty { null }
         val senas = etSenas.text.toString().trim().ifEmpty { null }
+        val edadAproximada = etEdadAdopcion.text.toString().trim().ifEmpty { null }
+        val caracter = etCaracterAdopcion.text.toString().trim().ifEmpty { null }
+        val cuidados = etCuidadosAdopcion.text.toString().trim().ifEmpty { null }
 
         if (tipoSeleccionado == "Denuncia") {
             if (descripcion.isBlank()) {
@@ -515,13 +544,15 @@ class CrearPublicacionActivity : AppCompatActivity() {
                     ControladorPublicaciones.actualizar(
                         this, editandoId!!, tipo, nombre, descripcion, foto, ultimoLugar,
                         especie, punto.latitude, punto.longitude, contactoWhatsapp,
-                        fechaPerdida, recompensa, color, tamano, senas
+                        fechaPerdida, recompensa, color, tamano, senas,
+                        edadAproximada, caracter, cuidados
                     )
                 } else {
                     ControladorPublicaciones.publicar(
                         this, usuarioId, tipo, nombre, descripcion,
                         foto, ultimoLugar, especie, punto.latitude, punto.longitude, contactoWhatsapp,
-                        fechaPerdida, recompensa, color, tamano, senas
+                        fechaPerdida, recompensa, color, tamano, senas,
+                        edadAproximada, caracter, cuidados
                     )
                 }
                 actualizarUi {
@@ -551,7 +582,8 @@ class CrearPublicacionActivity : AppCompatActivity() {
 
     private fun instalarAutoGuardado() {
         listOf(etNombre, etUltimoLugar, etDescripcion, etContactoWhatsapp, etRecompensa,
-            etColor, etTamano, etSenas, etMotivoCustom).forEach { campo ->
+            etColor, etTamano, etSenas, etEdadAdopcion, etCaracterAdopcion, etCuidadosAdopcion,
+            etMotivoCustom).forEach { campo ->
             campo.doAfterTextChanged {
                 borradorActivo = true
                 guardarBorrador()
@@ -585,6 +617,9 @@ class CrearPublicacionActivity : AppCompatActivity() {
             .put("color", etColor.text.toString())
             .put("tamano", etTamano.text.toString())
             .put("senas", etSenas.text.toString())
+            .put("edadAdopcion", etEdadAdopcion.text.toString())
+            .put("caracterAdopcion", etCaracterAdopcion.text.toString())
+            .put("cuidadosAdopcion", etCuidadosAdopcion.text.toString())
             .put("motivo", motivoDenuncia)
             .put("otroMotivo", esOtroMotivo)
             .put("motivoCustom", etMotivoCustom.text.toString())
@@ -607,6 +642,9 @@ class CrearPublicacionActivity : AppCompatActivity() {
         etColor.setText(datos.optString("color"))
         etTamano.setText(datos.optString("tamano"))
         etSenas.setText(datos.optString("senas"))
+        etEdadAdopcion.setText(datos.optString("edadAdopcion"))
+        etCaracterAdopcion.setText(datos.optString("caracterAdopcion"))
+        etCuidadosAdopcion.setText(datos.optString("cuidadosAdopcion"))
         motivoDenuncia = datos.optString("motivo", "Maltrato")
         esOtroMotivo = datos.optBoolean("otroMotivo", false)
         etMotivoCustom.setText(datos.optString("motivoCustom"))
