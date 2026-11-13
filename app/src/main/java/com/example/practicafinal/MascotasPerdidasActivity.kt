@@ -86,6 +86,11 @@ class MascotasPerdidasActivity : AppCompatActivity() {
         userLoc = com.example.practicafinal.util.ultimaUbicacion(this)
             ?.let { GeoPoint(it.latitude, it.longitude) }
         findViewById<TextView>(R.id.btn_radio).setOnClickListener { mostrarMenuRadio() }
+
+        val panelFiltros = findViewById<View>(R.id.panel_filtros)
+        findViewById<View>(R.id.btn_filtro).setOnClickListener {
+            panelFiltros.visibility = if (panelFiltros.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
         findViewById<TextView>(R.id.btn_fecha_filtro).setOnClickListener { mostrarMenuFecha() }
         findViewById<TextView>(R.id.btn_orden).setOnClickListener { mostrarMenuOrden() }
 

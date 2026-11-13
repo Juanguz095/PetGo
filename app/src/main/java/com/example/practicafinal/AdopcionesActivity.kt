@@ -72,6 +72,11 @@ class AdopcionesActivity : AppCompatActivity() {
         btnRadio = findViewById(R.id.btn_radio)
         btnRadio.setOnClickListener { mostrarMenuRadio() }
 
+        val panelFiltros = findViewById<View>(R.id.panel_filtros)
+        findViewById<View>(R.id.btn_filtro).setOnClickListener {
+            panelFiltros.visibility = if (panelFiltros.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
+
         findViewById<View>(R.id.btn_favoritos).setOnClickListener {
             startActivity(Intent(this, MisFavoritosActivity::class.java))
         }
