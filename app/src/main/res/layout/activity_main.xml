@@ -283,10 +283,10 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/panel_foto"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="180dp"
             android:layout_marginTop="0dp"
             android:background="@drawable/bg_card_image"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:visibility="gone"
             android:contentDescription="Foto de la mascota"
             app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.PetGo.Photo"

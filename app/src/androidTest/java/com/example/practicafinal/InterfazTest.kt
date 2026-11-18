@@ -92,6 +92,20 @@ class InterfazTest {
     }
 
     @Test
+    fun fotoDelPanelDelMapaSeMuestraCompleta() {
+        val context =
+            ContextThemeWrapper(ApplicationProvider.getApplicationContext<Context>(), R.style.Theme_PracticaFinal)
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            val view = LayoutInflater.from(context).inflate(R.layout.activity_main, FrameLayout(context), false)
+            val foto = view.findViewById<android.widget.ImageView>(R.id.panel_foto)
+
+            assertEquals(android.widget.ImageView.ScaleType.FIT_CENTER, foto.scaleType)
+            assertTrue(foto.layoutParams.height >= (160 * context.resources.displayMetrics.density).toInt())
+            view.findViewById<org.osmdroid.views.MapView>(R.id.map).onDetach()
+        }
+    }
+
+    @Test
     fun listaAdopcionesNoCortaLasTarjetas() {
         val context =
             ContextThemeWrapper(ApplicationProvider.getApplicationContext<Context>(), R.style.Theme_PracticaFinal)
