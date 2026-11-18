@@ -106,6 +106,21 @@ class InterfazTest {
     }
 
     @Test
+    fun botonesAccionesDelMapaNoPartenSusEtiquetas() {
+        val context =
+            ContextThemeWrapper(ApplicationProvider.getApplicationContext<Context>(), R.style.Theme_PracticaFinal)
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync {
+            val view = LayoutInflater.from(context).inflate(R.layout.activity_main, FrameLayout(context), false)
+            val botones = listOf(R.id.panel_btn_izq, R.id.panel_btn_der, R.id.panel_btn_extra)
+                .map { view.findViewById<MaterialButton>(it) }
+
+            assertTrue(botones.all { it.maxLines == 1 })
+            assertTrue(botones.all { it.ellipsize == android.text.TextUtils.TruncateAt.END })
+            view.findViewById<org.osmdroid.views.MapView>(R.id.map).onDetach()
+        }
+    }
+
+    @Test
     fun listaAdopcionesNoCortaLasTarjetas() {
         val context =
             ContextThemeWrapper(ApplicationProvider.getApplicationContext<Context>(), R.style.Theme_PracticaFinal)
