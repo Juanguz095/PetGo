@@ -47,18 +47,11 @@
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/bg_chip"
                 android:padding="10dp"
-                android:text="Sin conexión: el reporte se conserva como borrador en este teléfono."
+                android:text="Sin conexión. Podrás enviar el avistamiento cuando recuperes internet."
                 android:textColor="@color/tinta"
                 android:textSize="12sp"
                 android:visibility="gone" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="El reporte se guarda en este teléfono hasta que lo envíes. No persigas al animal ni te acerques al tráfico."
-                android:textColor="@color/texto_suave"
-                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tv_mascota"
@@ -113,23 +106,36 @@
                 android:layout_marginTop="12dp"
                 android:background="@color/bg_divider" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Toca el punto donde la viste. Tu ubicación exacta solo la verán tú y el responsable de la alerta."
-                android:textColor="@color/texto_suave"
-                android:textSize="12sp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_info_seguridad"
+                style="@style/Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="10dp"
+                android:text="Información de seguridad"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="11dp"
+                app:icon="@drawable/ic_info_outline"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/azul_enlace"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="1dp" />
 
             <TextView
+                android:id="@+id/tv_info_seguridad"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_chip"
                 android:padding="12dp"
                 android:text="Por seguridad, no persigas al animal ni te acerques al tráfico. El mapa mostrará una zona aproximada; solo quien reporta y el dueño verán el punto exacto. La foto y los detalles serán visibles para usuarios de PetGo con sesión. La foto es opcional y el reporte se guarda aunque no pueda procesarse. Si no encuentras la alerta, puedes dejarlo sin vincular; el dueño podrá asociarlo después."
                 android:textColor="@color/tinta"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:visibility="gone" />
 
 
             <TextView

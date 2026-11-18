@@ -111,15 +111,6 @@
                 android:textSize="13sp"
                 android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/tv_resumen_actividad"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_brutal_blanco"
-                android:padding="10dp"
-                android:textColor="@color/texto_suave"
-                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -130,18 +121,24 @@
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/tv_ubicacion"
-                android:layout_width="wrap_content"
+                style="@style/Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="6dp"
-                android:background="@drawable/bg_chip"
-                android:gravity="center_vertical"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:stateListAnimator="@null"
+                android:text="Ver zona aproximada en el mapa"
+                android:textAllCaps="false"
                 android:textColor="@color/azul_enlace"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
 
             <TextView
                 android:id="@+id/tv_fecha"
@@ -174,7 +171,7 @@
                 android:id="@+id/btn_historial_avistamientos"
                 style="@style/Widget.PetGo.Button.Outlined"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="10dp"
                 android:text="Ver historial de avistamientos"
                 android:textAllCaps="false"
@@ -184,7 +181,7 @@
                 app:backgroundTint="@color/white"
                 app:cornerRadius="11dp"
                 app:strokeColor="@color/tinta"
-                app:strokeWidth="1dp" />
+                app:strokeWidth="2dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_avistamiento"
@@ -244,6 +241,16 @@
                 app:cornerRadius="11dp"
                 app:strokeColor="@color/tinta"
                 app:strokeWidth="2dp" />
+
+            <TextView
+                android:id="@+id/tv_resumen_actividad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_brutal_blanco"
+                android:padding="10dp"
+                android:textColor="@color/texto_suave"
+                android:textSize="12sp" />
 
         </LinearLayout>
     </ScrollView>

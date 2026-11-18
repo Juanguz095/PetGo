@@ -26,3 +26,7 @@ Las publicaciones antiguas que guardan una URL de Firebase Storage pueden mostra
 Las notificaciones dentro de la app se guardan en Firestore y se consultan desde la bandeja de PetGo. El envío automático de avisos push tras nuevos avistamientos o al resolver una alerta depende de `functions/`; Firebase exige Blaze para desplegar Cloud Functions. No ejecutes `firebase deploy --only functions` si quieres mantener el proyecto en Spark.
 
 La app no requiere desplegar Storage ni Functions para crear publicaciones, guardar avistamientos, consultar mapas o revisar notificaciones dentro de PetGo. Authentication y Firestore siguen sujetos a las cuotas incluidas en Spark.
+
+## Moderación de denuncias
+
+La bandeja de moderación aparece únicamente para cuentas con el custom claim `moderator: true`. Asigna ese claim con Firebase Admin SDK desde un entorno confiable; nunca lo guardes en un campo editable por el usuario en Firestore. Las cuentas sin ese claim solo pueden leer sus propios folios. La app permite actualizar los estados `Recibida`, `En revisión`, `Atendida` y `No procede`.

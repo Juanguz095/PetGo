@@ -43,6 +43,8 @@ class DetalleDenunciaActivity : AppCompatActivity() {
                 findViewById<TextView>(R.id.tv_motivo).text = "$icono ${d.motivo}"
                 findViewById<TextView>(R.id.tv_descripcion).text = d.descripcion
                 findViewById<TextView>(R.id.tv_fecha).text = "Reportado ${fechaRelativa(d.fecha)}"
+                findViewById<TextView>(R.id.tv_folio).text = "Folio: PG-${d.id.toString().takeLast(6)}"
+                findViewById<TextView>(R.id.tv_estado).text = "Estado: ${d.estado}"
                 findViewById<TextView>(R.id.tv_ubicacion).setOnClickListener {
                     startActivity(Intent(this, MainActivity::class.java).apply {
                         putExtra("centrar_lat", d.latitud)

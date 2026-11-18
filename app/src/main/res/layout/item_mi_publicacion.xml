@@ -107,6 +107,24 @@
             app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_solicitudes_adopcion"
+            style="@style/Widget.PetGo.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginTop="7dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:stateListAnimator="@null"
+            android:text="Revisar solicitudes"
+            android:textAllCaps="false"
+            android:textColor="@color/tinta"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:cornerRadius="11dp"
+            app:strokeColor="@color/tinta"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_resolver"
             style="@style/Widget.PetGo.Button.Outlined"
             android:layout_width="match_parent"

@@ -7,6 +7,7 @@ import android.location.Location
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast
@@ -24,6 +25,8 @@ import com.example.practicafinal.modelo.Denuncia
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.session.SesionManager;
 import com.example.practicafinal.util.fechaRelativa
+import com.example.practicafinal.util.VigenciaAlertasPerdidas
+import com.example.practicafinal.util.SeguimientoMapa
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.ListenerRegistration
 import org.osmdroid.config.Configuration;
@@ -43,6 +46,14 @@ class MainActivity : AppCompatActivity() {
     private val locationHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private var locationListener: android.location.LocationListener? = null
     private var locationTimeout: Runnable? = null
+    private var ajustarZoomEnSiguienteUbicacion = true
+    private var ultimaHoraUbicacion = 0L
+    private val seguimientoUsuario = SeguimientoMapa { latitud, longitud ->
+        if (::map.isInitialized && !isFinishing && !isDestroyed) {
+            mostrarUbicacion(latitud, longitud, ajustarZoomEnSiguienteUbicacion)
+            ajustarZoomEnSiguienteUbicacion = false
+        }
+    }
     private var userLoc: GeoPoint? = null;
     private var markerUsuario: Marker? = null
     private var circUser: Polygon? = null;
@@ -63,6 +74,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pnlCompartir: MaterialButton
     private lateinit var pnlBtnIzq: MaterialButton
     private lateinit var pnlBtnDer: MaterialButton
+    private lateinit var pnlBtnExtra: MaterialButton
     private var textoCompartirActual: String? = null
     private var marcBusqAvist: MutableList<Polygon> = mutableListOf()
     private lateinit var btnCercanas: TextView
@@ -81,6 +93,7 @@ class MainActivity : AppCompatActivity() {
 
     private val permiso = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permisos ->
         if (permisos.values.any { it }) centrarUsuario() else {
+            pausarSeguimiento()
             Toast.makeText(this, "Permiso denegado", Toast.LENGTH_SHORT).show(); centrarLima()
         }
     }
@@ -119,6 +132,12 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         ); map.setMultiTouchControls(true); map.setBuiltInZoomControls(false)
+        map.setOnTouchListener { _, event ->
+            if (event.actionMasked == MotionEvent.ACTION_DOWN && seguimientoUsuario.activo) {
+                pausarSeguimiento()
+            }
+            false
+        }
         map.overlays.add(MapEventsOverlay(object : MapEventsReceiver {
             override fun singleTapConfirmedHelper(p: GeoPoint) = false;
             override fun longPressHelper(p: GeoPoint): Boolean {
@@ -139,6 +158,7 @@ class MainActivity : AppCompatActivity() {
         pnlCompartir = findViewById(R.id.panel_compartir)
         pnlBtnIzq = findViewById(R.id.panel_btn_izq)
         pnlBtnDer = findViewById(R.id.panel_btn_der)
+        pnlBtnExtra = findViewById(R.id.panel_btn_extra)
         pnl.findViewById<TextView>(R.id.panel_cerrar)
             .setOnClickListener { ocultarPanel() }
         pnlCompartir.setOnClickListener { compartir() }
@@ -152,7 +172,9 @@ class MainActivity : AppCompatActivity() {
                 Intent(this, PerfilActivity::class.java)
             )
         }
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_recenter).setOnClickListener { centrarUsuario() }
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.fab_recenter).setOnClickListener {
+            if (seguimientoUsuario.activo) pausarSeguimiento() else centrarUsuario()
+        }
         findViewById<TextView>(R.id.btn_leyenda).setOnClickListener {
             androidx.appcompat.app.AlertDialog.Builder(this).setTitle("Leyenda del mapa")
                 .setView(R.layout.dialog_leyenda).setPositiveButton("Entendido", null).show()
@@ -190,7 +212,12 @@ class MainActivity : AppCompatActivity() {
         }
         val tieneDestino = (!clat.isNaN() && !clng.isNaN()) || pendienteMostrarAlerta != null
         if (!tieneDestino) {
-            if (tienePermiso()) centrarUsuario() else permiso.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            if (tienePermiso()) centrarUsuario() else permiso.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
         }
 
     }
@@ -220,6 +247,7 @@ class MainActivity : AppCompatActivity() {
             R.id.filtro_encontradas to "Encontrada",
             R.id.filtro_adopciones to "Adopcion"
         )
+
         fun pintar() {
             chips.forEach { (id, tipo) ->
                 val activo = filtroTipoMapa == tipo
@@ -289,35 +317,82 @@ class MainActivity : AppCompatActivity() {
 
     private fun cancelarUbicacion() {
         val manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationListener?.let { try { manager.removeUpdates(it) } catch (_: SecurityException) {} }
+        locationListener?.let {
+            try {
+                manager.removeUpdates(it)
+            } catch (_: SecurityException) {
+            }
+        }
         locationListener = null
         locationTimeout?.let { locationHandler.removeCallbacks(it) }
         locationTimeout = null
     }
 
-    private fun mostrarUbicacion(loc: Location) {
-        userLoc = GeoPoint(loc.latitude, loc.longitude)
+    private fun mostrarUbicacion(latitud: Double, longitud: Double, ajustarZoom: Boolean) {
+        userLoc = GeoPoint(latitud, longitud)
         marcUser(userLoc!!)
         circUser(userLoc!!)
-        map.controller.setZoom(19.5)
+        if (ajustarZoom) map.controller.setZoom(19.5)
         map.controller.setCenter(userLoc)
     }
 
-    private fun centrarUsuario() {
+    private fun actualizarBotonSeguimiento() {
+        if (!::map.isInitialized) return
+        findViewById<MaterialButton>(R.id.fab_recenter).contentDescription =
+            if (seguimientoUsuario.activo) "Pausar seguimiento" else "Seguir mi ubicación"
+    }
+
+    private fun pausarSeguimiento() {
+        seguimientoUsuario.pausar()
         cancelarUbicacion()
+        actualizarBotonSeguimiento()
+    }
+
+    private fun centrarUsuario() {
         if (!tienePermiso()) {
-            permiso.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            permiso.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
             return
         }
-        getLastLoc()?.let { mostrarUbicacion(it); return }
+        seguimientoUsuario.iniciar()
+        ajustarZoomEnSiguienteUbicacion = true
+        actualizarBotonSeguimiento()
+        val ubicacionReciente = getLastLoc()?.takeIf {
+            System.currentTimeMillis() - it.time <= 2 * 60 * 1000L
+        }
+        ultimaHoraUbicacion = ubicacionReciente?.time ?: 0L
+        ubicacionReciente?.let {
+            seguimientoUsuario.recibir(it.latitude, it.longitude)
+        }
+        iniciarActualizacionesUbicacion(ubicacionReciente != null)
+    }
+
+    private fun iniciarActualizacionesUbicacion(tieneUbicacionInicial: Boolean) {
+        if (!seguimientoUsuario.activo || locationListener != null) return
+        if (!tienePermiso()) {
+            pausarSeguimiento()
+            return
+        }
         val manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        var recibioUbicacion = tieneUbicacionInicial
         val callback = object : android.location.LocationListener {
             override fun onLocationChanged(loc: Location) {
-                cancelarUbicacion()
-                if (!isFinishing && !isDestroyed) mostrarUbicacion(loc)
+                if (!seguimientoUsuario.activo || isFinishing || isDestroyed || loc.time < ultimaHoraUbicacion) return
+                recibioUbicacion = true
+                ultimaHoraUbicacion = loc.time
+                locationTimeout?.let { locationHandler.removeCallbacks(it) }
+                locationTimeout = null
+                seguimientoUsuario.recibir(loc.latitude, loc.longitude)
             }
+
             @Deprecated("Deprecated in Java")
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+            }
+
             override fun onProviderEnabled(provider: String) {}
             override fun onProviderDisabled(provider: String) {}
         }
@@ -326,21 +401,23 @@ class MainActivity : AppCompatActivity() {
             val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
                 .filter { manager.isProviderEnabled(it) }
             if (providers.isEmpty()) {
-                cancelarUbicacion()
+                pausarSeguimiento()
                 Toast.makeText(this, "Activa la ubicación para encontrar alertas cercanas", Toast.LENGTH_SHORT).show()
                 centrarLima()
                 return
             }
             providers.forEach { manager.requestLocationUpdates(it, 1000L, 5f, callback, mainLooper) }
-            locationTimeout = Runnable {
-                cancelarUbicacion()
-                if (!isFinishing && !isDestroyed) {
-                    Toast.makeText(this, "No se pudo obtener tu ubicación", Toast.LENGTH_SHORT).show()
-                    centrarLima()
-                }
-            }.also { locationHandler.postDelayed(it, 15000) }
+            if (!recibioUbicacion) {
+                locationTimeout = Runnable {
+                    if (!recibioUbicacion && seguimientoUsuario.activo && !isFinishing && !isDestroyed) {
+                        pausarSeguimiento()
+                        Toast.makeText(this, "No se pudo obtener tu ubicación", Toast.LENGTH_SHORT).show()
+                        centrarLima()
+                    }
+                }.also { locationHandler.postDelayed(it, 15000) }
+            }
         } catch (_: SecurityException) {
-            cancelarUbicacion()
+            pausarSeguimiento()
             centrarLima()
         }
     }
@@ -354,9 +431,9 @@ class MainActivity : AppCompatActivity() {
             markerUsuario = Marker(map).apply {
                 position = p; title = "Mi ubicacion"; icon =
                 ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_punto_azul); setAnchor(
-                    Marker.ANCHOR_CENTER,
-                    Marker.ANCHOR_CENTER
-                )
+                Marker.ANCHOR_CENTER,
+                Marker.ANCHOR_CENTER
+            )
             }
             map.overlays.add(markerUsuario)
         } else {
@@ -457,14 +534,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    private fun render(l: List<Publicacion>, a: List<Avistamiento>, alb: List<Albergue>, den: List<Denuncia>, n: Map<Long, String>) {
+
+    private fun render(
+        l: List<Publicacion>,
+        a: List<Avistamiento>,
+        alb: List<Albergue>,
+        den: List<Denuncia>,
+        n: Map<Long, String>
+    ) {
         marcPub.forEach { map.overlays.remove(it) }; marcPub.clear(); marcAvist.forEach { map.overlays.remove(it) }; marcAvist.clear(); marcAlb.forEach {
             map.overlays.remove(
                 it
             )
         }; marcAlb.clear(); marcDenuncias.forEach { map.overlays.remove(it) }; marcDenuncias.clear()
         marcBusqAvist.forEach { map.overlays.remove(it) }; marcBusqAvist.clear()
-        val activas = l.filter { it.estado == "Activa" && (filtroTipoMapa == null || it.tipo == filtroTipoMapa) }
+        val activas = l.filter {
+            it.estado == "Activa" &&
+                    (filtroTipoMapa == null || it.tipo == filtroTipoMapa) &&
+                    VigenciaAlertasPerdidas.visibleParaLaComunidad(it)
+        }
         for (pub in activas) {
             val m = Marker(map); m.position = GeoPoint(pub.latitud, pub.longitud); m.icon =
                 ContextCompat.getDrawable(this, ico(pub)); m.setAnchor(
@@ -480,11 +568,12 @@ class MainActivity : AppCompatActivity() {
         }
         val alertasPerdidasActivas = l.filter {
             it.tipo == "Perdida" && it.estado == "Activa" &&
-                (filtroTipoMapa == null || filtroTipoMapa == "Perdida")
+                    (filtroTipoMapa == null || filtroTipoMapa == "Perdida") &&
+                    VigenciaAlertasPerdidas.visibleParaLaComunidad(it)
         }.map { it.id }.toSet()
         val avistamientosVisibles = a.filter { avistamiento ->
             avistamiento.estadoRevision !in setOf("No coincide", "Duplicado") &&
-                (avistamiento.publicacionId == 0L || avistamiento.publicacionId in alertasPerdidasActivas)
+                    (avistamiento.publicacionId == 0L || avistamiento.publicacionId in alertasPerdidasActivas)
         }
         for (av in avistamientosVisibles) {
             val m = Marker(map); m.position = GeoPoint(av.latitud, av.longitud); m.icon =
@@ -624,13 +713,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun valorInformativo(valor: String?): String? = valor?.trim()?.takeIf {
         it.isNotEmpty() && !it.equals("desconocido", ignoreCase = true) &&
-            !it.equals("desconocida", ignoreCase = true) && !it.equals("null", ignoreCase = true) &&
-            !it.equals("no disponible", ignoreCase = true)
+                !it.equals("desconocida", ignoreCase = true) && !it.equals("null", ignoreCase = true) &&
+                !it.equals("no disponible", ignoreCase = true)
     }
 
     private fun configurarAcciones(
         izquierda: Pair<String, () -> Unit>?,
-        derecha: Pair<String, () -> Unit>?
+        derecha: Pair<String, () -> Unit>?,
+        extra: Pair<String, () -> Unit>? = null
     ) {
         fun configurarBoton(boton: MaterialButton, accion: Pair<String, () -> Unit>?) {
             if (accion == null) {
@@ -640,20 +730,23 @@ class MainActivity : AppCompatActivity() {
             }
             boton.text = accion.first
             boton.contentDescription = accion.first
-            boton.setStrokeColorResource(when (accion.first) {
-                "Contactar", "Llamar" -> R.color.colorSuccess
-                "Avisar que la vi" -> R.color.colorRed
-                "Ver detalles", "Ver alerta" -> R.color.colorSecondary
-                else -> R.color.tinta
-            })
+            boton.setStrokeColorResource(
+                when (accion.first) {
+                    "Contactar", "Llamar" -> R.color.colorSuccess
+                    "Avisar que la vi" -> R.color.colorRed
+                    "Ver detalles", "Ver alerta" -> R.color.colorSecondary
+                    else -> R.color.tinta
+                }
+            )
             boton.visibility = View.VISIBLE
             boton.setOnClickListener { accion.second.invoke() }
         }
 
         configurarBoton(pnlBtnIzq, izquierda)
         configurarBoton(pnlBtnDer, derecha)
+        configurarBoton(pnlBtnExtra, extra)
         pnlBotonesTipo.visibility =
-            if (izquierda == null && derecha == null) View.GONE else View.VISIBLE
+            if (izquierda == null && derecha == null && extra == null) View.GONE else View.VISIBLE
     }
 
     private fun mostrarPanelAnimado() {
@@ -702,7 +795,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun mostrarAlertasCercanas(radioKm: Double?) {
         val origen = userLoc ?: return
+
         data class AlertaCercana(val publicacion: Publicacion, val kilometros: Double)
+
         val items = publicacionesActuales
             .filter { it.estado == "Activa" }
             .map { AlertaCercana(it, GeoPoint(it.latitud, it.longitud).distanceToAsDouble(origen) / 1000.0) }
@@ -723,10 +818,12 @@ class MainActivity : AppCompatActivity() {
             .setView(v)
             .setPositiveButton("Cerrar", null)
             .create()
-        rv.adapter = object : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+        rv.adapter = object :
+            androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
             override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int) = object :
                 androidx.recyclerview.widget.RecyclerView.ViewHolder(
-                    android.view.LayoutInflater.from(parent.context).inflate(R.layout.item_alerta_cercana, parent, false)
+                    android.view.LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_alerta_cercana, parent, false)
                 ) {}
 
             override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
@@ -741,7 +838,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 )
                 holder.itemView.findViewById<TextView>(R.id.tv_info).text =
-                    "${publicacion.nombre} · ${String.format(Locale.forLanguageTag("es-PE"), "%.1f km", alerta.kilometros)} · ${publicacion.tipo}"
+                    "${publicacion.nombre} · ${
+                        String.format(
+                            Locale.forLanguageTag("es-PE"),
+                            "%.1f km",
+                            alerta.kilometros
+                        )
+                    } · ${publicacion.tipo}"
                 holder.itemView.setOnClickListener {
                     dialogo.dismiss()
                     centrarArriba(GeoPoint(publicacion.latitud, publicacion.longitud))
@@ -763,14 +866,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun dibujarBusquedaColaborativa(publicaciones: List<Publicacion>, avistamientos: List<Avistamiento>) {
-        val perdidasActivas = publicaciones.filter { it.tipo == "Perdida" && it.estado == "Activa" }
+        val perdidasActivas = publicaciones.filter {
+            it.tipo == "Perdida" && it.estado == "Activa" &&
+                    VigenciaAlertasPerdidas.visibleParaLaComunidad(it)
+        }
         for (pub in perdidasActivas) {
             val avistDePub = avistamientos
                 .filter { it.publicacionId == pub.id && it.estadoRevision !in setOf("No coincide", "Duplicado") }
                 .sortedBy { it.fecha }
             if (avistDePub.isEmpty()) continue
             val puntos = listOf(GeoPoint(pub.latitud, pub.longitud)) +
-                avistDePub.map { GeoPoint(it.latitud, it.longitud) }
+                    avistDePub.map { GeoPoint(it.latitud, it.longitud) }
             val ahora = System.currentTimeMillis()
             for (indice in 0 until puntos.lastIndex) {
                 val fecha = avistDePub.getOrNull(indice)?.fecha ?: ahora
@@ -867,14 +973,18 @@ class MainActivity : AppCompatActivity() {
         } else null
 
         when (pub.tipo) {
-            "Perdida" -> configurarAcciones(
-                accionContactar,
-                "Ver detalles" to accionDetalle
-            )
+            "Perdida" -> {
+                val accionAvistamiento = if (pub.estado == "Activa") {
+                    "Avisar que la vi" to { abrirFormularioAvistamiento(pub) }
+                } else null
+                configurarAcciones(accionContactar, "Ver detalles" to accionDetalle, accionAvistamiento)
+            }
+
             "Encontrada" -> configurarAcciones(
                 accionContactar,
                 "Ver detalles" to accionDetalle
             )
+
             else -> configurarAcciones(
                 accionContactar,
                 "Ver detalles" to accionDetalle
@@ -910,12 +1020,14 @@ class MainActivity : AppCompatActivity() {
             latitud = a.latitud,
             longitud = a.longitud,
             estado = buildString {
-                append(when (a.estadoRevision) {
-                    "Coincide" -> "Coincide con la alerta"
-                    "No coincide" -> "No coincide con la alerta"
-                    "Duplicado" -> "Reporte duplicado"
-                    else -> if (a.publicacionId == 0L) "Sin alerta relacionada" else "Pendiente de revisión"
-                })
+                append(
+                    when (a.estadoRevision) {
+                        "Coincide" -> "Coincide con la alerta"
+                        "No coincide" -> "No coincide con la alerta"
+                        "Duplicado" -> "Reporte duplicado"
+                        else -> if (a.publicacionId == 0L) "Sin alerta relacionada" else "Pendiente de revisión"
+                    }
+                )
                 fechaAvistamiento?.let { append(" · Visto $it") }
             },
             colorEstado = R.color.ambar_estado,
@@ -992,9 +1104,13 @@ class MainActivity : AppCompatActivity() {
         }
         val texto = "Hola, te contacto por ${pub.nombre} (${tl(pub.tipo)})."
         try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(
-                "https://wa.me/$telefono?text=${Uri.encode(texto)}"
-            )))
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW, Uri.parse(
+                        "https://wa.me/$telefono?text=${Uri.encode(texto)}"
+                    )
+                )
+            )
         } catch (_: Exception) {
             Toast.makeText(this, "No se pudo abrir WhatsApp", Toast.LENGTH_SHORT).show()
         }
@@ -1029,7 +1145,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        super.onResume(); if (::map.isInitialized) { map.onResume(); cargarBD() }
+        super.onResume()
+        if (::map.isInitialized) {
+            map.onResume()
+            cargarBD()
+            if (seguimientoUsuario.activo) iniciarActualizacionesUbicacion(userLoc != null)
+        }
     }
 
     override fun onPause() {
@@ -1037,6 +1158,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        seguimientoUsuario.pausar()
         cancelarUbicacion()
         if (::map.isInitialized) map.onDetach()
         firebaseListeners.forEach { it.remove() }

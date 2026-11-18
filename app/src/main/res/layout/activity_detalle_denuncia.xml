@@ -41,6 +41,14 @@
             <TextView android:id="@+id/tv_fecha" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:layout_marginTop="8dp"
                 android:textColor="@color/texto_suave" android:textSize="12sp" />
+            <TextView android:id="@+id/tv_folio" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                android:textColor="@color/tinta" android:textSize="12sp" android:textStyle="bold" />
+            <TextView android:id="@+id/tv_estado" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="6dp"
+                android:background="@drawable/bg_pill_estado" android:paddingStart="9dp"
+                android:paddingTop="3dp" android:paddingEnd="9dp" android:paddingBottom="3dp"
+                android:textColor="@color/tinta" android:textSize="11sp" android:textStyle="bold" />
             <TextView android:id="@+id/tv_ubicacion" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:layout_marginTop="8dp"
                 android:text="Ver ubicación en el mapa" android:textColor="@color/azul_enlace"

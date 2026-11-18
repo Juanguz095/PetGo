@@ -62,6 +62,8 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
     private lateinit var imgFotoAvist: ImageView
     private lateinit var tvFotoHintAvist: TextView
     private lateinit var tvEstadoRed: TextView
+    private lateinit var btnInfoSeguridad: com.google.android.material.button.MaterialButton
+    private lateinit var tvInfoSeguridad: TextView
     private lateinit var monitorConectividad: MonitorConectividad
     private var formularioListo = false
     private var borradorActivo = false
@@ -114,6 +116,18 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
         tvFotoHintAvist = findViewById(R.id.tv_foto_hint_avist)
         tvAyudaUbicacion = findViewById(R.id.tv_ayuda_ubicacion)
         tvEstadoRed = findViewById(R.id.tv_estado_red)
+        btnInfoSeguridad = findViewById(R.id.btn_info_seguridad)
+        tvInfoSeguridad = findViewById(R.id.tv_info_seguridad)
+        btnInfoSeguridad.setOnClickListener {
+            val expandida = tvInfoSeguridad.visibility != View.VISIBLE
+            tvInfoSeguridad.visibility = if (expandida) View.VISIBLE else View.GONE
+            btnInfoSeguridad.text = if (expandida) {
+                "Ocultar información de seguridad"
+            } else {
+                "Información de seguridad"
+            }
+
+        }
         btnHoraAvistamiento = findViewById(R.id.btn_hora_avistamiento)
         btnHoraAvistamiento.setOnClickListener { elegirHoraAvistamiento() }
         btnAlertaRelacionada = findViewById(R.id.btn_alerta_relacionada)
@@ -187,12 +201,10 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
         map.controller.setCenter(centro)
 
         puntoSeleccionado = null
-        tvAyudaUbicacion.text = if (ubicacionActual != null) {
-            "Pin sugerido desde tu ubicación reciente. Toca el mapa para confirmar o ajustar dónde viste a la mascota."
-        } else if (ubicacionAlerta != null) {
-            "El mapa muestra la última ubicación reportada como referencia. Toca el punto exacto donde viste a la mascota."
+        tvAyudaUbicacion.text = if (publicacionSeleccionadaId != null) {
+            "Toca el mapa donde la viste. Solo tú y el responsable de la alerta verán el punto exacto."
         } else {
-            "No hay una ubicación reciente disponible. Toca el mapa exactamente donde viste a la mascota."
+            "Toca el mapa para indicar dónde la viste."
         }
         pinSeleccion = Marker(map).apply {
             position = centro
@@ -209,7 +221,7 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
                     ubicacionConfirmada = true
                     pinSeleccion.position = p
                     pinSeleccion.alpha = 1f
-                    tvAyudaUbicacion.text = "Lugar seleccionado. Revisa que el pin esté donde viste a la mascota."
+                    tvAyudaUbicacion.text = "Punto marcado. Toca otra vez para ajustar la ubicación."
                     btnReportar.isEnabled = true
                     btnReportar.text = "Reportar avistamiento"
                     map.invalidate()
@@ -427,7 +439,7 @@ class ReportarAvistamientoActivity : AppCompatActivity() {
             map.controller.setCenter(punto)
             btnReportar.isEnabled = ubicacionConfirmada
             btnReportar.text = if (ubicacionConfirmada) "Reportar avistamiento" else "Selecciona el lugar en el mapa"
-            if (ubicacionConfirmada) tvAyudaUbicacion.text = "Lugar restaurado. Revisa que el pin esté donde viste a la mascota."
+            if (ubicacionConfirmada) tvAyudaUbicacion.text = "Punto recuperado. Toca el mapa para ajustarlo."
         }
         fotoAvistUri = datos.optString("foto").takeIf(String::isNotBlank)
         if (!fotoAvistUri.isNullOrBlank()) {

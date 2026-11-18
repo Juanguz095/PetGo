@@ -31,6 +31,7 @@
         android:text="Mantén pulsado para publicar"
         android:textColor="@color/texto_suave"
         android:textSize="11sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@id/controls_recenter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -59,7 +60,7 @@
         app:layout_constraintEnd_toStartOf="@id/controls_recenter"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_pista_publicar" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/panel_controles_mapa"
@@ -236,7 +237,7 @@
             style="@style/Widget.PetGo.Button.Icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:contentDescription="Recentrar"
+            android:contentDescription="Seguir mi ubicación"
                 app:icon="@drawable/ic_my_location" />
     </FrameLayout>
 
@@ -365,9 +366,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/panel_compartir"
                 style="@style/Widget.PetGo.Button.Outlined"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:text="Compartir"
@@ -411,6 +411,29 @@
                 android:insetBottom="0dp"
                 android:textColor="@color/petgo_button_text"
                 android:textSize="12sp"
+                android:visibility="gone"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/panel_btn_extra"
+                style="@style/Widget.PetGo.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:maxLines="1"
+                android:minWidth="0dp"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:textColor="@color/petgo_button_text"
+                android:textSize="10sp"
                 android:visibility="gone"
                 app:cornerRadius="11dp"
                 app:strokeColor="@color/tinta"

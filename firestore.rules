@@ -5,6 +5,10 @@ service cloud.firestore {
     function signedIn() {
       return request.auth != null;
     }
+    function moderator() {
+      return signedIn() && ('moderator' in request.auth.token)
+        && request.auth.token.moderator == true;
+    }
     function owner(data) {
       return signedIn() && data.usuarioId == request.auth.uid;
     }
@@ -12,6 +16,15 @@ service cloud.firestore {
       return !('contactoWhatsapp' in data)
         || (data.contactoWhatsapp is string
           && data.contactoWhatsapp.matches('^(51)?[0-9]{9}$'));
+    }
+    function validPublicadorName(data) {
+      return !('usuarioNombre' in data)
+        || (data.usuarioNombre is string
+          && data.usuarioNombre.size() > 0
+          && data.usuarioNombre.size() <= 80
+          && data.usuarioNombre == get(
+            /databases/$(database)/documents/usuarios/$(request.auth.uid)
+          ).data.nombre);
     }
     function validSighting(data) {
       return data.keys().hasOnly([
@@ -35,6 +48,8 @@ service cloud.firestore {
         && data.descripcion is string
         && data.descripcion.size() <= 1000
         && data.fecha is number
+        && data.fecha <= request.time.toMillis()
+        && data.fecha >= request.time.toMillis() - 2592000000
         && (!('estadoRevision' in data) || data.estadoRevision == 'Pendiente')
         && (!('especie' in data) || (data.especie is string && data.especie in ['Perro', 'Gato']))
         && (!('foto' in data) || (data.foto is string && data.foto.size() <= 1000000));
@@ -64,6 +79,49 @@ service cloud.firestore {
         && publication.usuarioId == data.usuarioDestinoId
         && publication.tipo == 'Perdida'
         && publication.estado == 'Activa';
+    }
+    function notificationHasMatchingReview(data) {
+      let sighting = getAfter(
+        /databases/$(database)/documents/avistamientos/$(data.avistamientoId)
+      ).data;
+      let publication = get(
+        /databases/$(database)/documents/publicaciones/$(data.publicacionId)
+      ).data;
+      return sighting.usuarioId == data.usuarioDestinoId
+        && sighting.publicacionId == data.publicacionId
+        && publication.usuarioId == request.auth.uid
+        && data.usuarioOrigenId == request.auth.uid
+        && sighting.estadoRevision in ['Pendiente', 'Coincide', 'No coincide', 'Duplicado'];
+    }
+    function notificationHasMatchingAdoptionRequest(data) {
+      let requestData = getAfter(
+        /databases/$(database)/documents/solicitudes_adopcion/$(data.avistamientoId)
+      ).data;
+      let publication = get(
+        /databases/$(database)/documents/publicaciones/$(data.publicacionId)
+      ).data;
+      return requestData.publicacionId == data.publicacionId
+        && requestData.usuarioPropietarioId == publication.usuarioId
+        && (
+          (request.auth.uid == requestData.usuarioInteresadoId
+            && data.usuarioOrigenId == requestData.usuarioInteresadoId
+            && data.usuarioDestinoId == requestData.usuarioPropietarioId
+            && requestData.estado == 'Pendiente')
+          || (request.auth.uid == requestData.usuarioPropietarioId
+            && data.usuarioOrigenId == requestData.usuarioPropietarioId
+            && data.usuarioDestinoId == requestData.usuarioInteresadoId
+            && requestData.estado in ['En conversación', 'No seleccionado', 'Adopción completada'])
+        );
+    }
+    function notificationHasMatchingModeratedReport(data) {
+      let report = getAfter(
+        /databases/$(database)/documents/denuncias/$(data.avistamientoId)
+      ).data;
+      return moderator()
+        && data.usuarioOrigenId == request.auth.uid
+        && data.publicacionId == data.avistamientoId
+        && report.usuarioId == data.usuarioDestinoId
+        && report.estado in ['Recibida', 'En revisión', 'Atendida', 'No procede'];
     }
 
     match /usuarios/{uid} {
@@ -107,7 +165,7 @@ service cloud.firestore {
       allow read: if signedIn();
       allow create: if owner(request.resource.data)
         && request.resource.data.keys().hasOnly([
-          'usuarioId', 'usuarioLegacyId', 'tipo', 'nombre', 'descripcion',
+          'usuarioId', 'usuarioLegacyId', 'usuarioNombre', 'tipo', 'nombre', 'descripcion',
           'foto', 'ultimoLugar', 'especie', 'latitud', 'longitud',
           'fechaCreacion', 'estado', 'contactoWhatsapp', 'fechaPerdida',
           'recompensa', 'ultimaConfirmacion', 'color', 'tamano', 'senasParticulares'
@@ -141,6 +199,7 @@ service cloud.firestore {
         && (!('senasParticulares' in request.resource.data)
           || (request.resource.data.senasParticulares is string && request.resource.data.senasParticulares.size() <= 180))
         && validWhatsapp(request.resource.data)
+        && validPublicadorName(request.resource.data)
         && (!('foto' in request.resource.data) || request.resource.data.foto is string)
         && (!('ultimoLugar' in request.resource.data) || request.resource.data.ultimoLugar is string)
         && (!('especie' in request.resource.data) || request.resource.data.especie is string);
@@ -150,7 +209,7 @@ service cloud.firestore {
           (request.resource.data.diff(resource.data).affectedKeys().hasOnly([
             'tipo', 'nombre', 'descripcion', 'foto', 'ultimoLugar', 'especie',
             'latitud', 'longitud', 'contactoWhatsapp', 'fechaPerdida', 'recompensa',
-            'ultimaConfirmacion', 'color', 'tamano', 'senasParticulares'
+            'ultimaConfirmacion', 'color', 'tamano', 'senasParticulares', 'usuarioNombre'
           ])
             && resource.data.estado == 'Activa'
             && request.resource.data.estado == 'Activa'
@@ -181,6 +240,7 @@ service cloud.firestore {
               || (request.resource.data.recompensa is string
                 && request.resource.data.recompensa.size() <= 120))
             && validWhatsapp(request.resource.data)
+            && validPublicadorName(request.resource.data)
             && (!('foto' in request.resource.data) || request.resource.data.foto is string)
             && (!('ultimoLugar' in request.resource.data) || request.resource.data.ultimoLugar is string)
             && (!('especie' in request.resource.data) || request.resource.data.especie is string))
@@ -194,6 +254,53 @@ service cloud.firestore {
             && request.resource.data.ultimaConfirmacion is number)
         );
       allow delete: if owner(resource.data);
+    }
+    match /solicitudes_adopcion/{id} {
+      allow read: if signedIn() && (
+        resource.data.usuarioInteresadoId == request.auth.uid
+        || resource.data.usuarioPropietarioId == request.auth.uid
+      );
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          'id', 'publicacionId', 'usuarioInteresadoId', 'usuarioPropietarioId',
+          'mensaje', 'contactoWhatsapp', 'estado', 'fecha'
+        ])
+        && request.resource.data.keys().hasAll([
+          'id', 'publicacionId', 'usuarioInteresadoId', 'usuarioPropietarioId',
+          'mensaje', 'contactoWhatsapp', 'estado', 'fecha'
+        ])
+        && request.resource.data.id == id
+        && request.resource.data.publicacionId is string
+        && id == request.resource.data.publicacionId + '_' + request.auth.uid
+        && request.resource.data.usuarioInteresadoId == request.auth.uid
+        && request.resource.data.usuarioPropietarioId is string
+        && request.resource.data.usuarioPropietarioId != request.auth.uid
+        && request.resource.data.mensaje is string
+        && request.resource.data.mensaje.size() <= 500
+        && request.resource.data.contactoWhatsapp is string
+        && (request.resource.data.contactoWhatsapp == ''
+          || request.resource.data.contactoWhatsapp.matches('^(51)?[0-9]{9}$'))
+        && request.resource.data.estado == 'Pendiente'
+        && request.resource.data.fecha is number
+        && request.resource.data.fecha <= request.time.toMillis()
+        && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.usuarioId
+          == request.resource.data.usuarioPropietarioId
+        && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.tipo == 'Adopcion'
+        && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.estado == 'Activa';
+      allow update: if signedIn()
+        && resource.data.usuarioPropietarioId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado'])
+        && request.resource.data.usuarioInteresadoId == resource.data.usuarioInteresadoId
+        && request.resource.data.usuarioPropietarioId == resource.data.usuarioPropietarioId
+        && request.resource.data.estado in ['En conversación', 'No seleccionado', 'Adopción completada']
+        && (
+          (resource.data.estado in ['Pendiente', 'En conversación']
+            && request.resource.data.estado in ['En conversación', 'No seleccionado'])
+          || (resource.data.estado in ['Pendiente', 'En conversación']
+            && request.resource.data.estado == 'Adopción completada'
+            && get(/databases/$(database)/documents/publicaciones/$(resource.data.publicacionId)).data.estado == 'Adoptada')
+        );
+      allow delete: if false;
     }
     match /avistamientos/{id} {
       allow read: if signedIn();
@@ -254,12 +361,35 @@ service cloud.firestore {
       allow write: if false;
     }
     match /denuncias/{id} {
-      allow read, delete: if owner(resource.data);
+      allow read: if owner(resource.data) || moderator();
+      allow delete: if owner(resource.data);
       allow create: if owner(request.resource.data)
+        && request.resource.data.keys().hasOnly([
+          'usuarioId', 'motivo', 'descripcion', 'foto', 'latitud', 'longitud', 'fecha', 'estado'
+        ])
+        && request.resource.data.keys().hasAll([
+          'usuarioId', 'motivo', 'descripcion', 'latitud', 'longitud', 'fecha', 'estado'
+        ])
+        && request.resource.data.motivo is string
+        && request.resource.data.motivo.size() > 0
+        && request.resource.data.motivo.size() <= 80
         && request.resource.data.descripcion is string
-        && request.resource.data.descripcion.size() > 0;
-      allow update: if owner(resource.data)
-        && request.resource.data.usuarioId == resource.data.usuarioId;
+        && request.resource.data.descripcion.size() > 0
+        && request.resource.data.descripcion.size() <= 1000
+        && request.resource.data.latitud is number
+        && request.resource.data.latitud >= -90
+        && request.resource.data.latitud <= 90
+        && request.resource.data.longitud is number
+        && request.resource.data.longitud >= -180
+        && request.resource.data.longitud <= 180
+        && request.resource.data.fecha is number
+        && request.resource.data.fecha <= request.time.toMillis()
+        && request.resource.data.estado == 'Recibida'
+        && (!('foto' in request.resource.data)
+          || (request.resource.data.foto is string && request.resource.data.foto.size() <= 1000000));
+      allow update: if moderator()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado'])
+        && request.resource.data.estado in ['Recibida', 'En revisión', 'Atendida', 'No procede'];
     }
     match /notificaciones/{id} {
       allow read, delete: if signedIn() && resource.data.usuarioDestinoId == request.auth.uid;
@@ -273,10 +403,8 @@ service cloud.firestore {
           'avistamientoId', 'mensaje', 'latitud', 'longitud', 'fecha', 'leida'
         ])
         && request.resource.data.usuarioOrigenId == request.auth.uid
-        && request.resource.data.tipo == 'avistamiento'
         && request.resource.data.leida == false
         && request.resource.data.id == id
-        && request.resource.data.avistamientoId == id
         && request.resource.data.usuarioDestinoId is string
         && request.resource.data.usuarioDestinoId != request.auth.uid
         && request.resource.data.publicacionId is string
@@ -290,7 +418,17 @@ service cloud.firestore {
         && request.resource.data.longitud >= -180
         && request.resource.data.longitud <= 180
         && request.resource.data.fecha is number
-        && notificationHasMatchingSighting(request.resource.data);
+        && (
+          (request.resource.data.tipo == 'avistamiento'
+            && request.resource.data.avistamientoId == id
+            && notificationHasMatchingSighting(request.resource.data))
+          || (request.resource.data.tipo == 'revision_avistamiento'
+            && notificationHasMatchingReview(request.resource.data))
+          || (request.resource.data.tipo == 'solicitud_adopcion'
+            && notificationHasMatchingAdoptionRequest(request.resource.data))
+          || (request.resource.data.tipo == 'denuncia_estado'
+            && notificationHasMatchingModeratedReport(request.resource.data))
+        );
       allow update: if signedIn() && resource.data.usuarioDestinoId == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['leida'])
         && request.resource.data.leida is bool;

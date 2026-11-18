@@ -10,7 +10,9 @@ data class Avistamiento(
     val foto: String?,
     val fecha: Long,
     val especie: String? = null,
-    val estadoRevision: String = "Pendiente"
+    val estadoRevision: String = "Pendiente",
+    val puntajeCoincidencia: Int? = null,
+    val motivosCoincidencia: List<String> = emptyList()
 ) {
     fun toFirestoreMap(firebaseUid: String? = null): Map<String, Any> = buildMap {
         put("publicacionId", publicacionId.toString())

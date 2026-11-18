@@ -98,36 +98,61 @@
                 android:textColor="@color/texto_suave"
                 android:textSize="14sp" />
 
-
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_publicado_por"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Ubicación"
+                android:layout_marginTop="12dp"
+                android:text="Publicado por un miembro de PetGo"
                 android:textColor="@color/texto_suave"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:textSize="12sp" />
 
-            <TextView
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/tv_ubicacion"
-                android:layout_width="wrap_content"
+                style="@style/Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/bg_chip"
-                android:gravity="center_vertical"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:layout_marginTop="16dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:stateListAnimator="@null"
+                android:text="📍  Ver ubicación en el mapa"
+                android:textAllCaps="false"
                 android:textColor="@color/azul_enlace"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
 
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_solicitud_adopcion"
+                style="@style/Widget.PetGo.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="20dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:stateListAnimator="@null"
+                android:text="Me interesa · enviar solicitud"
+                android:textAllCaps="false"
+                android:textColor="@color/tinta"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/colorPrimary"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_whatsapp"
                 style="@style/Widget.PetGo.Button.Outlined"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:text="💬  Contactar por WhatsApp"
                 android:textColor="@color/white"
                 android:textSize="13sp"

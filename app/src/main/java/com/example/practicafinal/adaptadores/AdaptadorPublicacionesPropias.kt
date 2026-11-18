@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.practicafinal.R
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.util.fechaRelativa
+import com.example.practicafinal.util.VigenciaAlertasPerdidas
 
 class AdaptadorPublicacionesPropias(
     private val items: List<Publicacion>,
@@ -21,7 +22,8 @@ class AdaptadorPublicacionesPropias(
     private val onEditar: ((Publicacion) -> Unit)? = null,
     private val onEliminar: ((Publicacion) -> Unit)? = null,
     private val onConfirmar: ((Publicacion) -> Unit)? = null,
-    private val onVerAvistamientos: ((Publicacion) -> Unit)? = null
+    private val onVerAvistamientos: ((Publicacion) -> Unit)? = null,
+    private val onVerSolicitudesAdopcion: ((Publicacion) -> Unit)? = null
 ) : RecyclerView.Adapter<AdaptadorPublicacionesPropias.PubViewHolder>() {
     class PubViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imgFoto: ImageView = view.findViewById(R.id.img_foto)
@@ -36,6 +38,8 @@ class AdaptadorPublicacionesPropias(
         val btnEliminar: com.google.android.material.button.MaterialButton = view.findViewById(R.id.btn_eliminar)
         val btnVerAvistamientos: com.google.android.material.button.MaterialButton =
             view.findViewById(R.id.btn_ver_avistamientos_mios)
+        val btnVerSolicitudes: com.google.android.material.button.MaterialButton =
+            view.findViewById(R.id.btn_solicitudes_adopcion)
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PubViewHolder =
         PubViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_mi_publicacion, parent, false))
@@ -55,13 +59,14 @@ class AdaptadorPublicacionesPropias(
             else -> "En adopcion"
         }
         holder.tvFecha.text = fechaRelativa(p.fechaCreacion)
-        val ultimaRevision = p.ultimaConfirmacion ?: p.fechaCreacion
-        val necesitaRevision = p.estado == "Activa" && ultimaRevision > 0L &&
-            System.currentTimeMillis() - ultimaRevision >= 14L * 24 * 60 * 60 * 1000
+        val necesitaRevision = VigenciaAlertasPerdidas.necesitaConfirmacion(p)
+        val fueraDeBusqueda = !VigenciaAlertasPerdidas.visibleParaLaComunidad(p)
         holder.tvAntigua.visibility = if (necesitaRevision) View.VISIBLE else View.GONE
-        holder.tvAntigua.text = if (p.tipo == "Perdida" && onConfirmar != null) {
-            "¿Sigue perdida? Toca aquí para confirmar"
-        } else "Revisa si esta publicación sigue activa"
+        holder.tvAntigua.text = when {
+            fueraDeBusqueda -> "Oculta de la comunidad: toca para reactivarla"
+            p.tipo == "Perdida" && onConfirmar != null -> "¿Sigue perdida? Toca aquí para confirmar"
+            else -> "Revisa si esta publicación sigue activa"
+        }
         holder.tvAntigua.isClickable = necesitaRevision && p.tipo == "Perdida" && onConfirmar != null
         holder.tvAntigua.setOnClickListener {
             if (necesitaRevision && p.tipo == "Perdida") onConfirmar?.invoke(p)
@@ -69,6 +74,9 @@ class AdaptadorPublicacionesPropias(
         holder.btnVerAvistamientos.visibility =
             if (p.tipo == "Perdida" && onVerAvistamientos != null) View.VISIBLE else View.GONE
         holder.btnVerAvistamientos.setOnClickListener { onVerAvistamientos?.invoke(p) }
+        holder.btnVerSolicitudes.visibility =
+            if (p.tipo == "Adopcion" && onVerSolicitudesAdopcion != null) View.VISIBLE else View.GONE
+        holder.btnVerSolicitudes.setOnClickListener { onVerSolicitudesAdopcion?.invoke(p) }
         val resuelta = p.estado == "Resuelta" || p.estado == "Adoptada"
         holder.tvEstado.text = when {
             p.estado == "Adoptada" -> "Adoptada"

@@ -22,5 +22,13 @@ object ControladorDenuncias {
     fun obtenerDenuncias(context: Context): List<Denuncia> =
         DatabaseHelper(context).obtenerDenuncias()
 
+    fun esModerador(context: Context): Boolean = DatabaseHelper(context).esModeradorDenuncias()
+
+    fun obtenerDenunciasModeracion(context: Context): List<Denuncia> =
+        DatabaseHelper(context).obtenerDenunciasModeracion()
+
+    fun actualizarEstadoModeracion(context: Context, id: Long, estado: String) =
+        DatabaseHelper(context).actualizarEstadoDenunciaModeracion(id, estado)
+
     fun contarDenuncias(context: Context): Long = DatabaseHelper(context).contarDenuncias()
 }

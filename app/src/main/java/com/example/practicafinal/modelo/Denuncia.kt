@@ -7,7 +7,8 @@ data class Denuncia(
     val foto: String?,
     val latitud: Double,
     val longitud: Double,
-    val fecha: Long
+    val fecha: Long,
+    val estado: String = "Recibida"
 ) {
     fun toFirestoreMap(firebaseUid: String? = null): Map<String, Any> = buildMap {
         firebaseUid?.let { put("usuarioId", it) }
@@ -17,5 +18,6 @@ data class Denuncia(
         put("latitud", latitud)
         put("longitud", longitud)
         put("fecha", fecha)
+        put("estado", estado)
     }
 }

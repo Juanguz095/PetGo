@@ -11,7 +11,14 @@ exports.enviarPushAvistamiento = onDocumentCreated(
   "notificaciones/{notificationId}",
   async (event) => {
     const notification = event.data?.data();
-    if (!notification || !["avistamiento", "caso_resuelto", "alerta_cercana"].includes(notification.tipo)) return;
+    if (!notification || ![
+      "avistamiento",
+      "caso_resuelto",
+      "alerta_cercana",
+      "revision_avistamiento",
+      "solicitud_adopcion",
+      "denuncia_estado",
+    ].includes(notification.tipo)) return;
 
     const userId = notification.usuarioDestinoId;
     const publicationId = notification.publicacionId;
@@ -48,7 +55,13 @@ exports.enviarPushAvistamiento = onDocumentCreated(
       ? "Mascota encontrada"
       : notification.tipo === "alerta_cercana"
         ? "Mascota perdida cerca"
-        : "Nuevo avistamiento";
+        : notification.tipo === "revision_avistamiento"
+          ? "Actualización de avistamiento"
+          : notification.tipo === "solicitud_adopcion"
+            ? "Solicitud de adopción"
+            : notification.tipo === "denuncia_estado"
+              ? "Actualización de denuncia"
+              : "Nuevo avistamiento";
     const body =
       typeof notification.mensaje === "string" && notification.mensaje.length > 0
         ? notification.mensaje
@@ -160,15 +173,15 @@ exports.notificarAvistamientoVinculado = onDocumentUpdated(
     const reporterId = after.usuarioId;
     if (typeof ownerId !== "string" || typeof reporterId !== "string" || ownerId === reporterId) return;
 
-    const notificationId = event.params.sightingId;
+    const notificationId = `${event.params.sightingId}_vinculado`;
     await db.collection("notificaciones").doc(notificationId).set({
       id: notificationId,
-      usuarioDestinoId: ownerId,
-      usuarioOrigenId: reporterId,
-      tipo: "avistamiento",
+      usuarioDestinoId: reporterId,
+      usuarioOrigenId: ownerId,
+      tipo: "revision_avistamiento",
       publicacionId: after.publicacionId,
-      avistamientoId: notificationId,
-      mensaje: `Un reporte de ${after.especie || "una mascota"} fue relacionado con ${publication.nombre || "tu alerta"}.`,
+      avistamientoId: event.params.sightingId,
+      mensaje: `El dueño relacionó tu reporte con ${publication.nombre || "una alerta"}. Está pendiente de revisión.`,
       latitud: latitude,
       longitud: longitude,
       fecha: Date.now(),
@@ -233,5 +246,127 @@ exports.notificarPerdidaCercana = onDocumentCreated(
         leida: false,
       });
     }
+  }
+);
+
+exports.notificarRevisionAvistamiento = onDocumentUpdated(
+  "avistamientos/{sightingId}",
+  async (event) => {
+    const before = event.data?.before?.data();
+    const after = event.data?.after?.data();
+    const estadosNotificables = new Set(["Coincide", "No coincide", "Duplicado"]);
+    if (
+      !before || !after ||
+      before.publicacionId !== after.publicacionId ||
+      after.publicacionId === "0" ||
+      before.estadoRevision === after.estadoRevision ||
+      !estadosNotificables.has(after.estadoRevision)
+    ) return;
+
+    const publicationSnapshot = await db.doc(`publicaciones/${after.publicacionId}`).get();
+    if (!publicationSnapshot.exists) return;
+    const publication = publicationSnapshot.data();
+    const ownerId = publication.usuarioId;
+    const reporterId = after.usuarioId;
+    if (typeof ownerId !== "string" || typeof reporterId !== "string" || ownerId === reporterId) return;
+
+    const privateLocation = await db.doc(
+      `avistamientos/${event.params.sightingId}/ubicacion_privada/coordenadas`
+    ).get();
+    const latitude = privateLocation.get("latitud") ?? after.latitud;
+    const longitude = privateLocation.get("longitud") ?? after.longitud;
+    const statusKey = after.estadoRevision.toLowerCase().replaceAll(" ", "_");
+    const notificationId = `${event.params.sightingId}_revision_${statusKey}`;
+    const message = after.estadoRevision === "Coincide"
+      ? `El dueño confirmó que tu avistamiento coincide con ${publication.nombre || "la mascota"}.`
+      : after.estadoRevision === "No coincide"
+        ? `El dueño revisó tu avistamiento y señaló que no coincide con ${publication.nombre || "la mascota"}.`
+        : `El dueño marcó tu avistamiento como duplicado.`;
+
+    await db.collection("notificaciones").doc(notificationId).set({
+      id: notificationId,
+      usuarioDestinoId: reporterId,
+      usuarioOrigenId: ownerId,
+      tipo: "revision_avistamiento",
+      publicacionId: after.publicacionId,
+      avistamientoId: event.params.sightingId,
+      mensaje: message,
+      latitud: latitude,
+      longitud: longitude,
+      fecha: Date.now(),
+      leida: false,
+    });
+  }
+);
+
+async function notificarSolicitudAdopcion(
+  solicitud,
+  notificationId,
+  destinationId,
+  originId,
+  message
+) {
+  if (typeof destinationId !== "string" || typeof originId !== "string" || destinationId === originId) return;
+  await db.collection("notificaciones").doc(notificationId).set({
+    id: notificationId,
+    usuarioDestinoId: destinationId,
+    usuarioOrigenId: originId,
+    tipo: "solicitud_adopcion",
+    publicacionId: solicitud.publicacionId,
+    avistamientoId: "",
+    mensaje: message,
+    latitud: 0,
+    longitud: 0,
+    fecha: Date.now(),
+    leida: false,
+  });
+}
+
+exports.notificarNuevaSolicitudAdopcion = onDocumentCreated(
+  "solicitudes_adopcion/{solicitudId}",
+  async (event) => {
+    const solicitud = event.data?.data();
+    if (!solicitud || solicitud.estado !== "Pendiente") return;
+    const publicationSnapshot = await db.doc(`publicaciones/${solicitud.publicacionId}`).get();
+    if (!publicationSnapshot.exists) return;
+    const nombre = publicationSnapshot.get("nombre") || "tu publicación";
+    const message = `Una persona quiere conocer más sobre ${nombre}.`;
+    await notificarSolicitudAdopcion(
+      solicitud,
+      `${event.params.solicitudId}_nueva`,
+      solicitud.usuarioPropietarioId,
+      solicitud.usuarioInteresadoId,
+      message
+    );
+  }
+);
+
+exports.notificarEstadoSolicitudAdopcion = onDocumentUpdated(
+  "solicitudes_adopcion/{solicitudId}",
+  async (event) => {
+    const before = event.data?.before?.data();
+    const after = event.data?.after?.data();
+    if (!before || !after || before.estado === after.estado) return;
+    const publicationSnapshot = await db.doc(`publicaciones/${after.publicacionId}`).get();
+    if (!publicationSnapshot.exists) return;
+    const nombre = publicationSnapshot.get("nombre") || "la mascota";
+    const message = after.estado === "En conversación"
+      ? `El dueño de ${nombre} quiere conversar contigo sobre la adopción.`
+      : after.estado === "No seleccionado"
+        ? `El dueño cerró tu solicitud para ${nombre}. Gracias por tu interés.`
+        : `La solicitud para ${nombre} se cerró porque la adopción ya se concretó.`;
+    const stateKey = after.estado === "En conversación"
+      ? "en_conversación"
+      : after.estado === "Adopción completada"
+        ? "adopcion_completada"
+        : after.estado.toLowerCase().replaceAll(" ", "_");
+    const notificationId = `${event.params.solicitudId}_estado_${stateKey}`;
+    await notificarSolicitudAdopcion(
+      after,
+      notificationId,
+      after.usuarioInteresadoId,
+      after.usuarioPropietarioId,
+      message
+    );
   }
 );

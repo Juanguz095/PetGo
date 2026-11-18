@@ -1,0 +1,519 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="3840" viewBox="0 0 1600 3840" font-family="'Segoe UI', Arial, sans-serif">
+  <style>
+    .t8 { font-size: 8px; fill: #6b6259; }
+    .t9 { font-size: 9px; fill: #6b6259; }
+    .t10 { font-size: 10px; fill: #6b6259; }
+    .t11 { font-size: 11px; fill: #3d3731; }
+    .t13 { font-size: 13px; fill: #1f1a17; }
+    .t16 { font-size: 16px; font-weight: 600; fill: #1f1a17; }
+    .t22 { font-size: 22px; font-weight: 600; fill: #1f1a17; }
+    .t36 { font-size: 36px; font-weight: 600; fill: #1f1a17; }
+    .lab { font-size: 9px; letter-spacing: 1.6px; font-weight: 600; fill: #8a7f70; }
+    .wt { fill: #ffffff; }
+    .wt2 { fill: #d8d2c4; }
+    .acc { fill: #b9773f; }
+    .pan { fill: #ece7da; }
+    .card { fill: #ffffff; stroke: #1f1a17; stroke-width: 1; }
+    .line { stroke: #1f1a17; stroke-width: 1; }
+    .line2 { stroke: #a89f92; stroke-width: 1; }
+    .dash { fill: none; stroke: #a89f92; stroke-width: 1; stroke-dasharray: 4 4; }
+    .box { fill: #ffffff; stroke: #a89f92; stroke-width: 1; }
+  </style>
+
+  <rect width="1600" height="3840" fill="#ffffff"/>
+
+  <!-- TITULO -->
+  <text x="100" y="42" class="t22">PetGo · estructura de la landing</text>
+  <text x="100" y="62" class="t10">Wireframe de bloques. Sin estilo visual. Rejilla de 12 columnas, gutter 24, máximo 1120 px.</text>
+
+  <!-- MARCO -->
+  <rect x="40" y="80" width="1240" height="3700" fill="#f7f5ee" stroke="#c9c1aa"/>
+
+  <!-- AVISO -->
+  <rect x="40" y="80" width="1240" height="24" fill="#1f1a17"/>
+  <text x="660" y="96" text-anchor="middle" class="t8 wt">PROYECTO ACADÉMICO · GRATIS · SIN ANUNCIOS · ANDROID 8+</text>
+
+  <!-- NAV -->
+  <line x1="40" y1="152" x2="1280" y2="152" class="line"/>
+  <circle cx="112" cy="128" r="8" fill="#1f1a17"/>
+  <text x="130" y="133" class="t16">PetGo</text>
+  <text x="520" y="132" class="t11">Alertas</text>
+  <text x="600" y="132" class="t11">Adopciones</text>
+  <text x="700" y="132" class="t11">Albergues</text>
+  <text x="790" y="132" class="t11">Preguntas</text>
+  <text x="1050" y="132" class="t11">Ver el mapa</text>
+  <rect x="1090" y="112" width="120" height="28" rx="4" class="acc"/>
+  <text x="1150" y="130" text-anchor="middle" class="t11 wt">Descargar</text>
+
+  <!-- HERO -->
+  <text x="100" y="216" class="lab">COMUNIDAD DE MASCOTAS · PERÚ</text>
+  <text x="100" y="268" class="t36">Cuando una mascota</text>
+  <text x="100" y="308" class="t36">se pierde, se mueve</text>
+  <text x="100" y="348" class="t36">toda la cuadra.</text>
+  <text x="100" y="388" class="t13">Publica una alerta en el mapa, recibe</text>
+  <text x="100" y="406" class="t13">avistamientos de tus vecinos y ayuda a</text>
+  <text x="100" y="424" class="t13">que vuelva a casa.</text>
+  <rect x="100" y="452" width="190" height="42" rx="4" class="acc"/>
+  <text x="195" y="478" text-anchor="middle" class="t11 wt">Descargar para Android</text>
+  <text x="306" y="482" class="t11" text-decoration="underline">Ver alertas cerca de ti →</text>
+  <text x="100" y="516" class="t10">Android 8.0+ · 18 MB · ver el mapa no requiere cuenta</text>
+  <text x="100" y="534" class="t10">Sin anuncios. Sin compras dentro de la app.</text>
+
+  <rect x="680" y="196" width="540" height="404" rx="4" class="pan" stroke="#c9c1aa"/>
+  <line x1="700" y1="262" x2="1190" y2="292" class="line2"/>
+  <line x1="820" y1="212" x2="786" y2="560" class="line2"/>
+  <line x1="1000" y1="212" x2="1044" y2="570" class="line2"/>
+  <text x="918" y="240" class="t8">MIRAFLORES</text>
+  <text x="1054" y="330" class="t8">BARRANCO</text>
+  <circle cx="940" cy="300" r="70" fill="none" stroke="#a33a2f" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="1014" y="240" class="t8" fill="#a33a2f">1,5 km</text>
+  <circle cx="940" cy="300" r="5" fill="#a33a2f"/>
+  <circle cx="1080" cy="360" r="5" fill="#3f6b3a"/>
+  <circle cx="860" cy="430" r="5" fill="#b9773f"/>
+  <circle cx="1010" cy="470" r="5" fill="#c9a247"/>
+  <circle cx="940" cy="300" r="11" fill="none" stroke="#a33a2f" stroke-width="1"/>
+
+  <rect x="650" y="448" width="340" height="130" rx="4" class="card"/>
+  <rect x="666" y="464" width="56" height="56" class="box"/>
+  <text x="694" y="496" text-anchor="middle" class="t8">foto</text>
+  <text x="736" y="484" class="t13">Toby · perro mestizo</text>
+  <text x="736" y="502" class="t10">Miraflores · hace 2 h · 3 avist.</text>
+  <rect x="666" y="532" width="58" height="16" rx="8" class="acc"/>
+  <text x="695" y="544" text-anchor="middle" class="t8 wt">ACTIVA</text>
+  <rect x="900" y="528" width="76" height="24" rx="4" class="box"/>
+  <text x="938" y="544" text-anchor="middle" class="t8">Compartir</text>
+  <text x="950" y="616" text-anchor="middle" class="t8">Datos de ejemplo</text>
+
+  <!-- TAREAS -->
+  <line x1="40" y1="644" x2="1280" y2="644" class="line"/>
+  <line x1="370" y1="660" x2="370" y2="760" class="line2"/>
+  <line x1="650" y1="660" x2="650" y2="760" class="line2"/>
+  <line x1="930" y1="660" x2="930" y2="760" class="line2"/>
+
+  <text x="100" y="672" class="t9">01</text>
+  <text x="100" y="700" class="t16">Perdí a mi mascota</text>
+  <text x="100" y="720" class="t10">Publica en 1 minuto,</text>
+  <text x="100" y="734" class="t10">con foto y punto exacto.</text>
+  <text x="340" y="700" class="t13">→</text>
+
+  <text x="380" y="672" class="t9">02</text>
+  <text x="380" y="700" class="t16">Encontré una</text>
+  <text x="380" y="720" class="t10">Repórtala y avisa</text>
+  <text x="380" y="734" class="t10">al dueño en el momento.</text>
+  <text x="620" y="700" class="t13">→</text>
+
+  <text x="660" y="672" class="t9">03</text>
+  <text x="660" y="700" class="t16">Quiero adoptar</text>
+  <text x="660" y="720" class="t10">Perros y gatos</text>
+  <text x="660" y="734" class="t10">cerca de tu distrito.</text>
+  <text x="900" y="700" class="t13">→</text>
+
+  <text x="940" y="672" class="t9">04</text>
+  <text x="940" y="700" class="t16">Vi un caso de maltrato</text>
+  <text x="940" y="720" class="t10">Denuncia con foto,</text>
+  <text x="940" y="734" class="t10">descripción y ubicación.</text>
+  <text x="1180" y="700" class="t13">→</text>
+  <line x1="40" y1="772" x2="1280" y2="772" class="line2"/>
+
+  <!-- ALERTAS -->
+  <line x1="40" y1="796" x2="1280" y2="796" class="line"/>
+  <text x="100" y="820" class="lab">EN VIVO</text>
+  <text x="100" y="850" class="t22">Alertas recientes</text>
+  <text x="1220" y="850" text-anchor="end" class="t11">Ver todas las alertas →</text>
+
+  <rect x="100" y="880" width="48" height="48" class="box"/>
+  <text x="164" y="898" class="t13">Toby · perro</text>
+  <text x="164" y="916" class="t10">Miraflores · hace 2 h</text>
+  <rect x="596" y="884" width="64" height="16" rx="8" class="acc"/>
+  <text x="628" y="896" text-anchor="middle" class="t8 wt">ACTIVA</text>
+  <text x="676" y="898" class="t10">3 avistamientos</text>
+  <line x1="100" y1="936" x2="760" y2="936" class="line2"/>
+
+  <rect x="100" y="938" width="48" height="48" class="box"/>
+  <text x="164" y="956" class="t13">Luna · gata</text>
+  <text x="164" y="974" class="t10">Barranco · hace 5 h</text>
+  <rect x="596" y="942" width="64" height="16" rx="8" class="acc"/>
+  <text x="628" y="954" text-anchor="middle" class="t8 wt">ACTIVA</text>
+  <text x="676" y="956" class="t10">1 avistamiento</text>
+  <line x1="100" y1="994" x2="760" y2="994" class="line2"/>
+
+  <rect x="100" y="996" width="48" height="48" class="box"/>
+  <text x="164" y="1014" class="t13">Sin collar · perro</text>
+  <text x="164" y="1032" class="t10">Surco · hace 1 día</text>
+  <rect x="584" y="1000" width="76" height="16" rx="8" class="box"/>
+  <text x="622" y="1012" text-anchor="middle" class="t8">ENCONTRADA</text>
+  <line x1="100" y1="1052" x2="760" y2="1052" class="line2"/>
+
+  <rect x="100" y="1054" width="48" height="48" class="box"/>
+  <text x="164" y="1072" class="t13">Michi · gato</text>
+  <text x="164" y="1090" class="t10">San Isidro · hace 2 días</text>
+  <rect x="584" y="1058" width="70" height="16" rx="8" fill="#d8d2c4"/>
+  <text x="619" y="1070" text-anchor="middle" class="t8">RESUELTA</text>
+
+  <rect x="800" y="880" width="420" height="248" rx="4" class="pan" stroke="#c9c1aa"/>
+  <circle cx="880" cy="950" r="5" fill="#a33a2f"/>
+  <circle cx="1000" cy="920" r="5" fill="#c9a247"/>
+  <circle cx="1100" cy="1000" r="5" fill="#3f6b3a"/>
+  <circle cx="950" cy="1040" r="5" fill="#b9773f"/>
+  <circle cx="880" cy="950" r="11" fill="none" stroke="#a33a2f" stroke-width="1"/>
+  <circle cx="820" cy="1096" r="3" fill="#a33a2f"/><text x="830" y="1099" class="t8">Perdida</text>
+  <circle cx="900" cy="1096" r="3" fill="#3f6b3a"/><text x="910" y="1099" class="t8">Encontrada</text>
+  <circle cx="1000" cy="1096" r="3" fill="#b9773f"/><text x="1010" y="1099" class="t8">Adopción</text>
+  <circle cx="1090" cy="1096" r="3" fill="#c9a247"/><text x="1100" y="1099" class="t8">Avistamiento</text>
+
+  <text x="100" y="1124" class="t9">Actualizado hace 2 minutos</text>
+  <text x="1220" y="1124" text-anchor="end" class="t11">Abrir el mapa completo →</text>
+
+  <!-- MANIFIESTO -->
+  <text x="260" y="1200" class="t22">Cada cartel en un poste dura hasta la próxima lluvia.</text>
+  <text x="260" y="1232" class="t22">Una alerta compartida, no.</text>
+  <text x="260" y="1268" class="t13">PetGo no es una red social ni un clasificado. Es el mapa que se activa</text>
+  <text x="260" y="1286" class="t13">cuando alguien del barrio pierde a su mascota: una alerta, un círculo</text>
+  <text x="260" y="1304" class="t13">de búsqueda de 1,5 km y vecinos que miran.</text>
+  <text x="260" y="1330" class="t10">Sin publicidad. Sin comisiones. Solo la comunidad.</text>
+
+  <!-- COMO FUNCIONA -->
+  <line x1="40" y1="1358" x2="1280" y2="1358" class="line"/>
+  <text x="100" y="1382" class="lab">CÓMO FUNCIONA</text>
+  <line x1="150" y1="1400" x2="150" y2="1680" class="dash"/>
+
+  <text x="100" y="1440" class="t36">01</text>
+  <text x="100" y="1550" class="t36">02</text>
+  <text x="100" y="1660" class="t36">03</text>
+
+  <line x1="320" y1="1392" x2="1220" y2="1392" class="line2"/>
+  <text x="320" y="1424" class="t16">Publicas la alerta</text>
+  <text x="320" y="1448" class="t11">Foto, nombre, especie y el punto exacto en el mapa.</text>
+  <text x="320" y="1464" class="t11">Mantienes presionado y queda publicada.</text>
+  <rect x="860" y="1402" width="360" height="84" rx="4" class="dash"/>
+  <text x="1040" y="1448" text-anchor="middle" class="t9">captura · crear publicación</text>
+
+  <line x1="320" y1="1502" x2="1220" y2="1502" class="line2"/>
+  <text x="320" y="1534" class="t16">Tus vecinos responden</text>
+  <text x="320" y="1558" class="t11">Los avistamientos llegan como pines amarillos y como</text>
+  <text x="320" y="1574" class="t11">aviso en el teléfono del dueño.</text>
+  <rect x="860" y="1512" width="360" height="84" rx="4" class="dash"/>
+  <text x="1040" y="1558" text-anchor="middle" class="t9">captura · mapa y aviso</text>
+
+  <line x1="320" y1="1612" x2="1220" y2="1612" class="line2"/>
+  <text x="320" y="1644" class="t16">Cierras el caso</text>
+  <text x="320" y="1668" class="t11">Marcas “resuelta” y quienes ayudaron reciben el aviso.</text>
+  <text x="320" y="1684" class="t11">El caso queda en el historial de la zona.</text>
+  <rect x="860" y="1622" width="360" height="72" rx="4" class="dash"/>
+  <text x="1040" y="1662" text-anchor="middle" class="t9">captura · caso resuelto</text>
+
+  <!-- ADOPCIONES -->
+  <line x1="40" y1="1722" x2="1280" y2="1722" class="line"/>
+  <text x="100" y="1746" class="lab">ADOPCIONES</text>
+  <text x="100" y="1776" class="t22">Buscan hogar</text>
+  <text x="1220" y="1756" text-anchor="end" class="t10">12 en adopción hoy</text>
+  <text x="1220" y="1776" text-anchor="end" class="t11">Ver todas →</text>
+
+  <rect x="100" y="1796" width="56" height="24" rx="12" class="acc"/>
+  <text x="128" y="1812" text-anchor="middle" class="t9 wt">Todos</text>
+  <rect x="166" y="1796" width="60" height="24" rx="12" class="box"/>
+  <text x="196" y="1812" text-anchor="middle" class="t9">Perros</text>
+  <rect x="236" y="1796" width="56" height="24" rx="12" class="box"/>
+  <text x="264" y="1812" text-anchor="middle" class="t9">Gatos</text>
+  <rect x="900" y="1792" width="320" height="32" rx="4" class="box"/>
+  <text x="916" y="1812" class="t10">Distrito, nombre o albergue</text>
+
+  <rect x="100" y="1846" width="353" height="120" rx="4" class="card"/>
+  <rect x="116" y="1860" width="92" height="92" class="box"/>
+  <text x="162" y="1910" text-anchor="middle" class="t8">foto</text>
+  <text x="224" y="1876" class="t13">Canela</text>
+  <text x="224" y="1894" class="t10">Perra · 2 años</text>
+  <text x="224" y="1912" class="t10">Albergue Huellitas</text>
+  <text x="224" y="1930" class="t9">3,2 km · San Miguel</text>
+  <text x="224" y="1950" class="t9" text-decoration="underline">Ver ficha →</text>
+
+  <rect x="483" y="1846" width="353" height="120" rx="4" class="card"/>
+  <rect x="499" y="1860" width="92" height="92" class="box"/>
+  <text x="545" y="1910" text-anchor="middle" class="t8">foto</text>
+  <text x="607" y="1876" class="t13">Tito</text>
+  <text x="607" y="1894" class="t10">Gato · 8 meses</text>
+  <text x="607" y="1912" class="t10">Casa Refugio Sur</text>
+  <text x="607" y="1930" class="t9">5,1 km · Surco</text>
+  <text x="607" y="1950" class="t9" text-decoration="underline">Ver ficha →</text>
+
+  <rect x="866" y="1846" width="353" height="120" rx="4" class="card"/>
+  <rect x="882" y="1860" width="92" height="92" class="box"/>
+  <text x="928" y="1910" text-anchor="middle" class="t8">foto</text>
+  <text x="990" y="1876" class="t13">Nina</text>
+  <text x="990" y="1894" class="t10">Perra · 4 años</text>
+  <text x="990" y="1912" class="t10">Albergue Amanecer</text>
+  <text x="990" y="1930" class="t9">2,4 km · Barranco</text>
+  <text x="990" y="1950" class="t9" text-decoration="underline">Ver ficha →</text>
+
+  <rect x="100" y="1986" width="353" height="120" rx="4" class="card"/>
+  <rect x="116" y="2000" width="92" height="92" class="box"/>
+  <text x="162" y="2050" text-anchor="middle" class="t8">foto</text>
+  <text x="224" y="2016" class="t13">Miel</text>
+  <text x="224" y="2034" class="t10">Gata · 1 año</text>
+  <text x="224" y="2052" class="t10">Refugio Patitas</text>
+  <text x="224" y="2070" class="t9">6,8 km · La Molina</text>
+  <text x="224" y="2090" class="t9" text-decoration="underline">Ver ficha →</text>
+
+  <rect x="483" y="1986" width="353" height="120" rx="4" class="card"/>
+  <rect x="499" y="2000" width="92" height="92" class="box"/>
+  <text x="545" y="2050" text-anchor="middle" class="t8">foto</text>
+  <text x="607" y="2016" class="t13">Rocco</text>
+  <text x="607" y="2034" class="t10">Perro · 3 años</text>
+  <text x="607" y="2052" class="t10">Albergue Huellitas</text>
+  <text x="607" y="2070" class="t9">3,2 km · San Miguel</text>
+  <text x="607" y="2090" class="t9" text-decoration="underline">Ver ficha →</text>
+
+  <rect x="866" y="1986" width="353" height="120" rx="4" class="card"/>
+  <rect x="882" y="2000" width="92" height="92" class="box"/>
+  <text x="928" y="2050" text-anchor="middle" class="t8">foto</text>
+  <text x="990" y="2016" class="t13">Lua</text>
+  <text x="990" y="2034" class="t10">Gata · 6 meses</text>
+  <text x="990" y="2052" class="t10">Casa Refugio Sur</text>
+  <text x="990" y="2070" class="t9">5,1 km · Surco</text>
+  <text x="990" y="2090" class="t9" text-decoration="underline">Ver ficha →</text>
+
+  <text x="100" y="2132" class="t9">Cada ficha la publica el albergue o una persona; el contacto es directo por WhatsApp.</text>
+
+  <!-- ALBERGUES -->
+  <line x1="40" y1="2166" x2="1280" y2="2166" class="line"/>
+  <text x="100" y="2190" class="lab">ALBERGUES</text>
+  <text x="100" y="2220" class="t22">Cerca de ti</text>
+  <text x="1220" y="2200" text-anchor="end" class="t10">12 registrados</text>
+  <text x="1220" y="2220" text-anchor="end" class="t11">Ver el directorio →</text>
+
+  <rect x="100" y="2240" width="360" height="30" rx="4" class="box"/>
+  <text x="116" y="2260" class="t10">Buscar por distrito o nombre</text>
+  <text x="1220" y="2260" text-anchor="end" class="t9">Solo albergues verificados por el equipo</text>
+
+  <text x="100" y="2302" class="t8">NOMBRE</text>
+  <text x="420" y="2302" class="t8">DISTRITO</text>
+  <text x="620" y="2302" class="t8">DISTANCIA</text>
+  <text x="780" y="2302" class="t8">TELÉFONO</text>
+  <text x="1220" y="2302" text-anchor="end" class="t8">ACCIÓN</text>
+  <line x1="100" y1="2312" x2="1220" y2="2312" class="line"/>
+
+  <text x="100" y="2338" class="t13">Albergue Huellitas</text>
+  <text x="420" y="2338" class="t10">San Miguel</text>
+  <text x="620" y="2338" class="t10">3,2 km</text>
+  <text x="780" y="2338" class="t10">+51 987 654 321</text>
+  <text x="1220" y="2338" text-anchor="end" class="t9" text-decoration="underline">Ver en el mapa →</text>
+  <line x1="100" y1="2352" x2="1220" y2="2352" class="line2"/>
+
+  <text x="100" y="2378" class="t13">Casa Refugio Sur</text>
+  <text x="420" y="2378" class="t10">Surco</text>
+  <text x="620" y="2378" class="t10">5,1 km</text>
+  <text x="780" y="2378" class="t10">+51 912 345 678</text>
+  <text x="1220" y="2378" text-anchor="end" class="t9" text-decoration="underline">Ver en el mapa →</text>
+  <line x1="100" y1="2392" x2="1220" y2="2392" class="line2"/>
+
+  <text x="100" y="2416" class="t9">Listado ordenado por distancia desde tu ubicación aproximada.</text>
+
+  <!-- TRANSPARENCIA -->
+  <rect x="40" y="2440" width="1240" height="200" fill="#1f1a17"/>
+  <text x="100" y="2472" class="lab" fill="#a89f92">TRANSPARENCIA</text>
+  <text x="100" y="2504" class="t22 wt">Qué pasa cuando reportas un avistamiento</text>
+
+  <circle cx="110" cy="2544" r="10" fill="none" stroke="#ffffff"/>
+  <text x="110" y="2548" text-anchor="middle" class="t9 wt">1</text>
+  <text x="100" y="2578" class="t11 wt">Llegas al punto</text>
+  <text x="100" y="2594" class="t9" fill="#d8d2c4">Con tu ubicación actual.</text>
+
+  <circle cx="390" cy="2544" r="10" fill="none" stroke="#ffffff"/>
+  <text x="390" y="2548" text-anchor="middle" class="t9 wt">2</text>
+  <text x="380" y="2578" class="t11 wt">Foto y una nota</text>
+  <text x="380" y="2594" class="t9" fill="#d8d2c4">Ambas opcionales.</text>
+
+  <circle cx="670" cy="2544" r="10" fill="none" stroke="#ffffff"/>
+  <text x="670" y="2548" text-anchor="middle" class="t9 wt">3</text>
+  <text x="660" y="2578" class="t11 wt">El dueño revisa</text>
+  <text x="660" y="2594" class="t9" fill="#d8d2c4">Confirma o descarta.</text>
+
+  <circle cx="950" cy="2544" r="10" fill="none" stroke="#ffffff"/>
+  <text x="950" y="2548" text-anchor="middle" class="t9 wt">4</text>
+  <text x="940" y="2578" class="t11 wt">Se publica o se descarta</text>
+  <text x="940" y="2594" class="t9" fill="#d8d2c4">Queda en el historial.</text>
+
+  <line x1="100" y1="2612" x2="1220" y2="2612" stroke="#4a443c"/>
+  <text x="100" y="2630" class="t9" fill="#d8d2c4">Tu ubicación exacta nunca se muestra: solo la zona aproximada.</text>
+  <text x="1220" y="2630" text-anchor="end" class="t9" fill="#d8d2c4" text-decoration="underline">Leer la política →</text>
+
+  <!-- DENUNCIAS -->
+  <line x1="40" y1="2674" x2="1280" y2="2674" class="line"/>
+  <text x="100" y="2698" class="lab">DENUNCIAS</text>
+  <text x="100" y="2728" class="t22">Maltrato y abandono</text>
+  <text x="100" y="2756" class="t11">Reporta con foto, descripción y ubicación. La denuncia</text>
+  <text x="100" y="2772" class="t11">queda vinculada a tu cuenta y puede revisarse.</text>
+
+  <rect x="100" y="2792" width="520" height="56" rx="4" class="box"/>
+  <text x="116" y="2812" class="t9">PetGo no reemplaza una denuncia formal.</text>
+  <text x="116" y="2828" class="t9">Te mostramos cómo presentarla ante la autoridad.</text>
+
+  <rect x="700" y="2698" width="520" height="150" rx="4" class="card"/>
+  <text x="716" y="2722" class="t9">Tipo de caso</text>
+  <line x1="716" y1="2732" x2="1204" y2="2732" class="line2"/>
+  <text x="716" y="2758" class="t9">Descripción</text>
+  <line x1="716" y1="2768" x2="1204" y2="2768" class="line2"/>
+  <text x="716" y="2794" class="t9">Foto</text>
+  <rect x="716" y="2804" width="40" height="30" class="box"/>
+  <text x="776" y="2794" class="t9">Ubicación</text>
+  <line x1="776" y1="2804" x2="1204" y2="2804" class="line2"/>
+  <rect x="1024" y="2810" width="180" height="28" rx="4" class="acc"/>
+  <text x="1114" y="2828" text-anchor="middle" class="t9 wt">Enviar denuncia</text>
+
+  <!-- CAPTURAS -->
+  <line x1="40" y1="2874" x2="1280" y2="2874" class="line"/>
+  <text x="100" y="2898" class="lab">CAPTURAS</text>
+  <rect x="40" y="2912" width="1240" height="138" class="pan"/>
+  <rect x="40" y="2922" width="200" height="118" class="dash"/>
+  <text x="140" y="2986" text-anchor="middle" class="t9">mapa</text>
+  <rect x="300" y="2922" width="200" height="118" class="dash"/>
+  <text x="400" y="2986" text-anchor="middle" class="t9">alerta</text>
+  <rect x="560" y="2922" width="200" height="118" class="dash"/>
+  <text x="660" y="2986" text-anchor="middle" class="t9">avistamiento</text>
+  <rect x="820" y="2922" width="200" height="118" class="dash"/>
+  <text x="920" y="2986" text-anchor="middle" class="t9">adopción</text>
+  <rect x="1080" y="2922" width="200" height="118" class="dash"/>
+  <text x="1180" y="2986" text-anchor="middle" class="t9">perfil</text>
+  <text x="100" y="3068" class="t9">Capturas reales, recortadas por los bordes para dar continuidad.</text>
+
+  <!-- FAQ -->
+  <line x1="40" y1="3094" x2="1280" y2="3094" class="line"/>
+  <text x="100" y="3118" class="lab">PREGUNTAS</text>
+  <text x="100" y="3148" class="t22">Dudas frecuentes</text>
+  <text x="100" y="3174" class="t10">Ordenadas por tema. Si falta</text>
+  <text x="100" y="3188" class="t10">algo, escríbenos.</text>
+  <text x="100" y="3212" class="t11" text-decoration="underline">Escríbenos →</text>
+
+  <text x="560" y="3124" class="t8">CUENTA</text>
+  <text x="560" y="3150" class="t13">¿Necesito cuenta para ver el mapa?</text>
+  <text x="1204" y="3150" text-anchor="end" class="t11">+</text>
+  <line x1="560" y1="3162" x2="1220" y2="3162" class="line2"/>
+  <text x="560" y="3186" class="t13">¿Puedo borrar mi cuenta y mis datos?</text>
+  <text x="1204" y="3186" text-anchor="end" class="t11">+</text>
+  <line x1="560" y1="3198" x2="1220" y2="3198" class="line2"/>
+
+  <text x="560" y="3224" class="t8">ALERTAS Y AVISTAMIENTOS</text>
+  <text x="560" y="3250" class="t13">¿Cuánto tarda en publicarse una alerta?</text>
+  <text x="1204" y="3250" text-anchor="end" class="t11">+</text>
+  <line x1="560" y1="3262" x2="1220" y2="3262" class="line2"/>
+  <text x="560" y="3286" class="t13">¿Quién ve la ubicación exacta?</text>
+  <text x="1204" y="3286" text-anchor="end" class="t11">+</text>
+  <line x1="560" y1="3298" x2="1220" y2="3298" class="line2"/>
+
+  <text x="560" y="3324" class="t8">ADOPCIONES</text>
+  <text x="560" y="3350" class="t13">¿Cómo contacto al albergue?</text>
+  <text x="1204" y="3350" text-anchor="end" class="t11">+</text>
+  <line x1="560" y1="3362" x2="1220" y2="3362" class="line2"/>
+
+  <text x="560" y="3388" class="t8">PRIVACIDAD</text>
+  <text x="560" y="3414" class="t13">¿Qué hacen con las fotos que subo?</text>
+  <text x="1204" y="3414" text-anchor="end" class="t11">+</text>
+  <line x1="560" y1="3426" x2="1220" y2="3426" class="line2"/>
+
+  <!-- DESCARGA -->
+  <line x1="40" y1="3470" x2="1280" y2="3470" class="line"/>
+  <text x="100" y="3494" class="lab">DESCARGA</text>
+  <text x="100" y="3524" class="t22">Instalar PetGo</text>
+
+  <circle cx="110" cy="3554" r="9" class="acc"/>
+  <text x="110" y="3558" text-anchor="middle" class="t8 wt">1</text>
+  <text x="130" y="3558" class="t11">Abre el enlace de descarga.</text>
+  <circle cx="110" cy="3580" r="9" class="acc"/>
+  <text x="110" y="3584" text-anchor="middle" class="t8 wt">2</text>
+  <text x="130" y="3584" class="t11">Permite la instalación de esta fuente.</text>
+  <circle cx="110" cy="3606" r="9" class="acc"/>
+  <text x="110" y="3610" text-anchor="middle" class="t8 wt">3</text>
+  <text x="130" y="3610" class="t11">Abre PetGo y crea tu cuenta.</text>
+  <text x="100" y="3640" class="t9">Requisitos: Android 8.0+ · 18 MB · conexión para cargar el mapa.</text>
+  <text x="100" y="3660" class="t10" text-decoration="underline">Notas de la versión →</text>
+
+  <rect x="700" y="3494" width="520" height="176" rx="4" class="card"/>
+  <rect x="720" y="3518" width="90" height="90" class="box"/>
+  <rect x="730" y="3528" width="18" height="18" fill="#1f1a17"/>
+  <rect x="770" y="3528" width="18" height="18" fill="#1f1a17"/>
+  <rect x="730" y="3568" width="18" height="18" fill="#1f1a17"/>
+  <rect x="770" y="3568" width="8" height="8" fill="#1f1a17"/>
+  <text x="836" y="3538" class="t13">v1.0 · 12 nov 2026</text>
+  <text x="836" y="3556" class="t10">18 MB · Android 8.0+</text>
+  <rect x="836" y="3572" width="180" height="30" rx="4" class="acc"/>
+  <text x="926" y="3591" text-anchor="middle" class="t9 wt">Descargar APK</text>
+  <text x="836" y="3626" class="t9">Proyecto académico · sin fines de lucro</text>
+  <text x="720" y="3656" class="t9">Sin anuncios. Sin compras. Sin registro para ver el mapa.</text>
+
+  <!-- FOOTER -->
+  <line x1="40" y1="3690" x2="1280" y2="3690" class="line"/>
+  <text x="1220" y="3712" text-anchor="end" class="t8">© 2026 · PROYECTO ACADÉMICO</text>
+  <text x="100" y="3712" class="t8">PRODUCTO</text>
+  <text x="100" y="3734" class="t10">Alertas</text>
+  <text x="100" y="3750" class="t10">Adopciones</text>
+  <text x="100" y="3766" class="t10">Albergues</text>
+
+  <text x="380" y="3712" class="t8">COMUNIDAD</text>
+  <text x="380" y="3734" class="t10">GitHub</text>
+  <text x="380" y="3750" class="t10">Guía para albergues</text>
+  <text x="380" y="3766" class="t10">Estado del proyecto</text>
+
+  <text x="700" y="3712" class="t8">LEGAL</text>
+  <text x="700" y="3734" class="t10">Privacidad</text>
+  <text x="700" y="3750" class="t10">Términos de uso</text>
+  <text x="700" y="3766" class="t10">Tratamiento de datos</text>
+
+  <text x="1000" y="3712" class="t8">CONTACTO</text>
+  <text x="1000" y="3734" class="t10">hola@petgo.app</text>
+  <text x="1000" y="3750" class="t10">WhatsApp</text>
+  <text x="1000" y="3766" class="t10">Lima, Perú</text>
+
+  <!-- ===================== ANOTACIONES ===================== -->
+  <text x="1300" y="120" class="t11" font-weight="600">CLAVES DE LA ESTRUCTURA</text>
+  <text x="1300" y="144" class="t9">· Ritmo vertical variable:</text>
+  <text x="1300" y="158" class="t9">  120 / 96 / 64 / 32 px.</text>
+  <text x="1300" y="178" class="t9">· Solo dos full-bleed: capturas</text>
+  <text x="1300" y="192" class="t9">  y banda de transparencia.</text>
+  <text x="1300" y="212" class="t9">· Hero 5/12 + 7/12, no 50/50.</text>
+  <text x="1300" y="232" class="t9">· Entradas por tarea, no</text>
+  <text x="1300" y="246" class="t9">  por funcionalidad.</text>
+  <text x="1300" y="266" class="t9">· Una idea por bloque.</text>
+  <text x="1300" y="286" class="t9">· Máximo 6 módulos con</text>
+  <text x="1300" y="300" class="t9">  contenedores; el resto texto.</text>
+  <text x="1300" y="320" class="t9">· Rejilla 12 col · gutter 24 ·</text>
+  <text x="1300" y="334" class="t9">  máximo 1120 px.</text>
+
+  <line x1="1280" y1="132" x2="1296" y2="132" class="line2"/>
+  <text x="1300" y="136" class="t8">nav fija · CTA siempre visible</text>
+  <line x1="1280" y1="700" x2="1296" y2="700" class="line2"/>
+  <text x="1300" y="704" class="t8">acciones, no features</text>
+  <line x1="1280" y1="908" x2="1296" y2="908" class="line2"/>
+  <text x="1300" y="912" class="t8">7/5 · lista + mapa, mismo dato</text>
+  <line x1="1280" y1="1200" x2="1296" y2="1200" class="line2"/>
+  <text x="1300" y="1204" class="t8">col 3–10 · solo texto</text>
+  <line x1="1280" y1="1450" x2="1296" y2="1450" class="line2"/>
+  <text x="1300" y="1454" class="t8">rail sticky · pasos, no zigzag</text>
+  <line x1="1280" y1="1830" x2="1296" y2="1830" class="line2"/>
+  <text x="1300" y="1834" class="t8">rejilla 3×2 con filtros reales</text>
+  <line x1="1280" y1="2230" x2="1296" y2="2230" class="line2"/>
+  <text x="1300" y="2234" class="t8">tabla, no tarjetas</text>
+  <line x1="1280" y1="2470" x2="1296" y2="2470" class="line2"/>
+  <text x="1300" y="2474" class="t8">banda oscura única</text>
+  <line x1="1280" y1="2710" x2="1296" y2="2710" class="line2"/>
+  <text x="1300" y="2714" class="t8">copy + formulario + aviso legal</text>
+  <line x1="1280" y1="2930" x2="1296" y2="2930" class="line2"/>
+  <text x="1300" y="2934" class="t8">cortadas por los bordes</text>
+  <line x1="1280" y1="3150" x2="1296" y2="3150" class="line2"/>
+  <text x="1300" y="3154" class="t8">acordeón agrupado por tema</text>
+  <line x1="1280" y1="3540" x2="1296" y2="3540" class="line2"/>
+  <text x="1300" y="3544" class="t8">QR + requisitos + versión</text>
+  <line x1="1280" y1="3720" x2="1296" y2="3720" class="line2"/>
+  <text x="1300" y="3724" class="t8">4 columnas + nota académica</text>
+
+  <!-- LEYENDA -->
+  <line x1="1300" y1="600" x2="1560" y2="600" class="line2"/>
+  <text x="1300" y="624" class="t11" font-weight="600">LEYENDA</text>
+  <rect x="1300" y="638" width="36" height="20" class="dash"/>
+  <text x="1346" y="652" class="t9">captura pendiente</text>
+  <rect x="1300" y="668" width="36" height="20" class="box"/>
+  <text x="1346" y="682" class="t9">componente o tarjeta</text>
+  <rect x="1300" y="698" width="14" height="14" class="acc"/>
+  <text x="1324" y="709" class="t9">acción principal</text>
+  <line x1="1300" y1="730" x2="1336" y2="730" class="line"/>
+  <text x="1346" y="734" class="t9">separador de sección</text>
+</svg>

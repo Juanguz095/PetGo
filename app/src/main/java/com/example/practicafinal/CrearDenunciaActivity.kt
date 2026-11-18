@@ -159,11 +159,15 @@ class CrearDenunciaActivity : AppCompatActivity() {
         button.isEnabled = false
         ejecutarSeguro(exec) {
             try {
-                ControladorDenuncias.insertarDenuncia(
+                val idDenuncia = ControladorDenuncias.insertarDenuncia(
                     this, motivoFinal, desc, foto, pt.latitude, pt.longitude
                 )
                 actualizarUi {
-                    Toast.makeText(this, "Denuncia enviada", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Denuncia recibida · Folio PG-${idDenuncia.toString().takeLast(6)}",
+                        Toast.LENGTH_LONG
+                    ).show()
                     finish()
                 }
             } catch (error: Exception) {

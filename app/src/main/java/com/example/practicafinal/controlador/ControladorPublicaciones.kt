@@ -47,6 +47,18 @@ object ControladorPublicaciones {
 
     fun adoptar(context: Context, id: Long) = DatabaseHelper(context).marcarAdoptada(id)
 
+    fun enviarSolicitudAdopcion(context: Context, id: Long, mensaje: String, contactoWhatsapp: String): String =
+        DatabaseHelper(context).enviarSolicitudAdopcion(id, mensaje, contactoWhatsapp)
+
+    fun obtenerMiSolicitudAdopcion(context: Context, id: Long): Map<String, Any>? =
+        DatabaseHelper(context).obtenerMiSolicitudAdopcion(id)
+
+    fun obtenerSolicitudesAdopcion(context: Context, id: Long): List<Map<String, Any>> =
+        DatabaseHelper(context).obtenerSolicitudesAdopcion(id)
+
+    fun actualizarEstadoSolicitudAdopcion(context: Context, solicitudId: String, estado: String) =
+        DatabaseHelper(context).actualizarEstadoSolicitudAdopcion(solicitudId, estado)
+
     fun reportarAvistamiento(
         context: Context, publicacionId: Long?, usuarioId: Long?, latitud: Double, longitud: Double,
         descripcion: String, foto: String?, fechaAvistamiento: Long = System.currentTimeMillis(),
@@ -85,6 +97,9 @@ object ControladorPublicaciones {
 
     fun obtenerAvistamientos(context: Context): List<Avistamiento> =
         DatabaseHelper(context).obtenerAvistamientos()
+
+    fun obtenerAvistamientosParaAlertas(context: Context, publicacionIds: List<Long>): List<Avistamiento> =
+        DatabaseHelper(context).obtenerAvistamientosParaAlertas(publicacionIds)
 
     fun obtenerAvistamientosPorPublicacion(context: Context, id: Long): List<Avistamiento> =
         DatabaseHelper(context).obtenerAvistamientosPorPublicacion(id)

@@ -671,7 +671,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="WhatsApp (opcional; quien abra la alerta podrá escribirte)"
+                    android:text="WhatsApp de contacto (opcional)"
                     android:textColor="@color/tinta"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -682,7 +682,7 @@
                     android:layout_height="50dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_brutal_blanco"
-                    android:hint="9 dígitos; se compartirá al abrir WhatsApp"
+                    android:hint="9 dígitos; permite iniciar un chat desde PetGo"
                     android:importantForAutofill="no"
                     android:inputType="phone"
                     android:paddingStart="15dp"
@@ -690,6 +690,15 @@
                     android:textColor="@color/tinta"
                     android:textColorHint="@color/texto_suave"
                     android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_contacto_privacidad"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Opcional. Si agregas tu número, las personas que consulten el aviso podrán contactarte por WhatsApp. Al tocar el botón, WhatsApp se abrirá con ese número. Si lo dejas vacío, el botón no aparecerá; en adopciones podrán enviarte una solicitud desde PetGo."
+                    android:textColor="@color/texto_suave"
+                    android:textSize="12sp" />
             </LinearLayout>
 
 

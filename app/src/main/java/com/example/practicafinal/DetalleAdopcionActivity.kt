@@ -5,6 +5,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import com.example.practicafinal.util.ejecutarSeguro
 import com.example.practicafinal.util.actualizarUi
@@ -12,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.practicafinal.controlador.ControladorPublicaciones
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.session.FavoritosManager
+import com.example.practicafinal.session.SesionManager
 import java.util.concurrent.Executors
 
 class DetalleAdopcionActivity : AppCompatActivity() {
@@ -51,7 +54,7 @@ class DetalleAdopcionActivity : AppCompatActivity() {
     }
 
     private fun mostrar(p: Publicacion) {
-        
+
         val imgFoto = findViewById<android.widget.ImageView>(R.id.img_foto)
         val tvPlaceholder = findViewById<TextView>(R.id.tv_placeholder)
         if (!p.foto.isNullOrBlank()) {
@@ -78,8 +81,9 @@ class DetalleAdopcionActivity : AppCompatActivity() {
             )
             if (extras.isNotEmpty()) append(" · " + extras.joinToString(" · "))
         }
+        val nombrePublicador = p.usuarioNombre?.takeIf { it.isNotBlank() } ?: "un miembro de PetGo"
+        findViewById<TextView>(R.id.tv_publicado_por).text = "Publicado por $nombrePublicador"
 
-        
         findViewById<TextView>(R.id.tv_ubicacion).apply {
             text = "📍 Ver ubicación en el mapa"
             setOnClickListener {
@@ -93,7 +97,7 @@ class DetalleAdopcionActivity : AppCompatActivity() {
             }
         }
 
-        
+
         val btnFav = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_favorito)
         actualizarBotonFavorito(btnFav)
         btnFav.setOnClickListener {
@@ -110,11 +114,99 @@ class DetalleAdopcionActivity : AppCompatActivity() {
             actualizarBotonFavorito(btnFav)
         }
 
-        
+
         findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_whatsapp).apply {
             visibility = if (p.contactoWhatsapp.isNullOrBlank()) View.GONE else View.VISIBLE
             setOnClickListener { contactarWhatsApp(p) }
         }
+
+        val btnSolicitud = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_solicitud_adopcion)
+        val esPropietario = p.usuarioId == SesionManager.obtenerUsuarioId(this)
+        btnSolicitud.visibility = if (p.estado == "Activa" && !esPropietario) View.VISIBLE else View.GONE
+        if (btnSolicitud.visibility == View.VISIBLE) {
+            btnSolicitud.setOnClickListener { mostrarFormularioSolicitud(btnSolicitud) }
+            ejecutarSeguro(executor) {
+                val solicitud = ControladorPublicaciones.obtenerMiSolicitudAdopcion(this, publicacionId)
+                solicitud?.get("estado")?.toString()?.let { estado ->
+                    actualizarUi {
+                        btnSolicitud.isEnabled = false
+                        btnSolicitud.text = "Solicitud enviada · ${etiquetaEstadoSolicitud(estado)}"
+                    }
+                }
+            }
+        }
+    }
+
+    private fun mostrarFormularioSolicitud(boton: com.google.android.material.button.MaterialButton) {
+        val contenedor = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(48, 8, 48, 0)
+        }
+        val telefono = EditText(this).apply {
+            hint = "Tu WhatsApp (opcional)"
+            inputType = android.text.InputType.TYPE_CLASS_PHONE
+            maxLines = 1
+        }
+        val mensaje = EditText(this).apply {
+            hint = "Cuéntale brevemente por qué te interesa (opcional)"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_CAP_SENTENCES or
+                    android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            minLines = 2
+            maxLines = 4
+        }
+        contenedor.addView(telefono)
+        contenedor.addView(mensaje)
+        val dialogo = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Enviar solicitud de adopción")
+            .setMessage("Comparte un número para que puedan coordinar. Solo el dueño de la publicación verá tus datos.")
+            .setView(contenedor)
+            .setNegativeButton("Cancelar", null)
+            .setPositiveButton("Enviar", null)
+            .create()
+        dialogo.setOnShowListener {
+            dialogo.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val phone = telefono.text.toString().filter(Char::isDigit)
+                if (phone.isNotBlank() && !phone.matches(Regex("^(51)?[0-9]{9}$"))) {
+                    telefono.error = "Escribe 9 dígitos, con 51 solo si incluyes el país"
+                    return@setOnClickListener
+                }
+                val note = mensaje.text.toString().trim()
+                if (note.length > 500) {
+                    mensaje.error = "Máximo 500 caracteres"
+                    return@setOnClickListener
+                }
+                boton.isEnabled = false
+                boton.text = "Enviando solicitud…"
+                ejecutarSeguro(executor) {
+                    try {
+                        val estado = ControladorPublicaciones.enviarSolicitudAdopcion(
+                            this, publicacionId, note, phone
+                        )
+                        actualizarUi {
+                            boton.text = "Solicitud enviada · ${etiquetaEstadoSolicitud(estado)}"
+                            Toast.makeText(this, "El dueño recibirá tu solicitud", Toast.LENGTH_LONG).show()
+                            dialogo.dismiss()
+                        }
+                    } catch (error: Exception) {
+                        actualizarUi {
+                            boton.isEnabled = true
+                            boton.text = "Me interesa · enviar solicitud"
+                            Toast.makeText(this, error.message ?: "No se pudo enviar la solicitud", Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+                }
+            }
+        }
+        dialogo.show()
+        com.example.practicafinal.util.Dialogos.aplicar(this, dialogo)
+    }
+
+    private fun etiquetaEstadoSolicitud(estado: String): String = when (estado) {
+        "En conversación" -> "en conversación"
+        "No seleccionado" -> "cerrada"
+        "Adopción completada" -> "adopción concretada"
+        else -> "pendiente"
     }
 
     private fun actualizarBotonFavorito(btn: com.google.android.material.button.MaterialButton) {

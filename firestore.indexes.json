@@ -4,6 +4,14 @@
       "collectionGroup": "publicaciones",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "tipo", "order": "ASCENDING" },
+        { "fieldPath": "fechaCreacion", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "publicaciones",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "estado", "order": "ASCENDING" },
         { "fieldPath": "fechaCreacion", "order": "DESCENDING" }
       ]
@@ -13,6 +21,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "tipo", "order": "ASCENDING" },
+        { "fieldPath": "estado", "order": "ASCENDING" },
         { "fieldPath": "fechaCreacion", "order": "DESCENDING" }
       ]
     },
@@ -33,11 +42,60 @@
       ]
     },
     {
+      "collectionGroup": "publicaciones",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "usuarioLegacyId", "order": "ASCENDING" },
+        { "fieldPath": "fechaCreacion", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "notificaciones",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "usuarioDestinoId", "order": "ASCENDING" },
         { "fieldPath": "leida", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "notificaciones",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "usuarioDestinoId", "order": "ASCENDING" },
+        { "fieldPath": "fecha", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "denuncias",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "usuarioId", "order": "ASCENDING" },
+        { "fieldPath": "fecha", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "avistamientos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "publicacionId", "order": "ASCENDING" },
+        { "fieldPath": "fecha", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "solicitudes_adopcion",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "publicacionId", "order": "ASCENDING" },
+        { "fieldPath": "usuarioPropietarioId", "order": "ASCENDING" },
+        { "fieldPath": "fecha", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "solicitudes_adopcion",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "publicacionId", "order": "ASCENDING" },
+        { "fieldPath": "estado", "order": "ASCENDING" }
       ]
     }
   ],

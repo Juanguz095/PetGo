@@ -22,13 +22,17 @@ import com.example.practicafinal.modelo.Avistamiento
 import com.example.practicafinal.modelo.Publicacion
 import com.example.practicafinal.session.SesionManager
 import com.example.practicafinal.util.fechaRelativa
+import com.example.practicafinal.util.MotorCoincidenciasAvistamiento
+import com.example.practicafinal.util.VigenciaAlertasPerdidas
 import com.google.firebase.firestore.DocumentSnapshot
 import org.osmdroid.util.GeoPoint
 import java.util.concurrent.Executors
 
 class MascotasPerdidasActivity : AppCompatActivity() {
 
-    companion object { const val EXTRA_TIPO_LISTADO = "tipo_listado_mascotas" }
+    companion object {
+        const val EXTRA_TIPO_LISTADO = "tipo_listado_mascotas"
+    }
 
     private val executor = Executors.newSingleThreadExecutor()
     private lateinit var rvPerdidas: RecyclerView
@@ -87,12 +91,15 @@ class MascotasPerdidasActivity : AppCompatActivity() {
             ?.let { GeoPoint(it.latitude, it.longitude) }
         findViewById<TextView>(R.id.btn_radio).setOnClickListener { mostrarMenuRadio() }
 
-        val panelFiltros = findViewById<View>(R.id.panel_filtros)
-        findViewById<View>(R.id.btn_filtro).setOnClickListener {
-            panelFiltros.visibility = if (panelFiltros.visibility == View.VISIBLE) View.GONE else View.VISIBLE
-        }
+
         findViewById<TextView>(R.id.btn_fecha_filtro).setOnClickListener { mostrarMenuFecha() }
         findViewById<TextView>(R.id.btn_orden).setOnClickListener { mostrarMenuOrden() }
+        val panelFiltros = findViewById<View>(R.id.panel_filtros_secundarios)
+        findViewById<View>(R.id.btn_toggle_filtros).setOnClickListener { boton ->
+            val mostrar = panelFiltros.visibility != View.VISIBLE
+            panelFiltros.visibility = if (mostrar) View.VISIBLE else View.GONE
+            boton.contentDescription = if (mostrar) "Ocultar filtros" else "Mostrar filtros"
+        }
 
         etBuscar = findViewById(R.id.et_buscar)
         etBuscar.doAfterTextChanged { mostrarPerdidas() }
@@ -135,12 +142,19 @@ class MascotasPerdidasActivity : AppCompatActivity() {
 
     private fun mostrarMenuOrden() {
         androidx.appcompat.widget.PopupMenu(this, findViewById(R.id.btn_orden)).apply {
-            val opciones = listOf("Actividad reciente" to "actividad", "Último avistamiento" to "avistamiento", "Más cercanas" to "cercanas")
+            val opciones = listOf(
+                "Actividad reciente" to "actividad",
+                "Último avistamiento" to "avistamiento",
+                "Más cercanas" to "cercanas"
+            )
             opciones.forEach { (etiqueta, valor) ->
                 menu.add(etiqueta).setOnMenuItemClickListener {
                     if (valor == "cercanas" && userLoc == null) {
-                        android.widget.Toast.makeText(this@MascotasPerdidasActivity,
-                            "Necesitas una ubicación reciente para ordenar por distancia", android.widget.Toast.LENGTH_LONG).show()
+                        android.widget.Toast.makeText(
+                            this@MascotasPerdidasActivity,
+                            "Necesitas una ubicación reciente para ordenar por distancia",
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
                         return@setOnMenuItemClickListener true
                     }
                     ordenActual = valor
@@ -198,28 +212,33 @@ class MascotasPerdidasActivity : AppCompatActivity() {
             try {
                 val pagina = ControladorPublicaciones.obtenerPagina(this, tipoListado, cursorPagina)
                 val avistamientos = if (tipoListado == "Perdida") {
-                    val reportes = ControladorPublicaciones.obtenerAvistamientos(this)
+                    val cargadas = (if (reset) emptyList() else publicaciones) + pagina.items
+                        .filter { it.estado == "Activa" && VigenciaAlertasPerdidas.visibleParaLaComunidad(it) }
+                    val alertasCargadas = cargadas.filter { it.tipo == "Perdida" }
+                    val reportes = ControladorPublicaciones.obtenerAvistamientosParaAlertas(
+                        this, alertasCargadas.map { it.id }
+                    )
                     val sinVincular = reportes.filter { it.publicacionId == 0L }
-                    val cargadas = (if (reset) emptyList() else publicaciones) +
-                        pagina.items.filter { it.estado == "Activa" }
-                    cargadas.filter { it.tipo == "Perdida" }.associate { alerta ->
-                        val ubicacion = GeoPoint(alerta.latitud, alerta.longitud)
-                        val fechaDesdeQueSeBusca = alerta.fechaPerdida ?: alerta.fechaCreacion
+                    alertasCargadas.associate { alerta ->
                         val vinculados = reportes.filter { it.publicacionId == alerta.id }
-                        val sugeridos = sinVincular.filter { reporte ->
-                            val reciente = reporte.fecha > 0L &&
-                                reporte.fecha >= fechaDesdeQueSeBusca &&
-                                System.currentTimeMillis() - reporte.fecha <= 30L * 24 * 60 * 60 * 1000
-                            val mismaEspecie = reporte.especie.isNullOrBlank() || alerta.especie.isNullOrBlank() ||
-                                reporte.especie.equals(alerta.especie, ignoreCase = true)
-                            reciente && mismaEspecie &&
-                                ubicacion.distanceToAsDouble(GeoPoint(reporte.latitud, reporte.longitud)) <= 50_000.0
+                        val sugeridos = sinVincular.mapNotNull { reporte ->
+                            MotorCoincidenciasAvistamiento.evaluar(alerta, reporte)?.let { evaluacion ->
+                                reporte.copy(
+                                    puntajeCoincidencia = evaluacion.puntaje,
+                                    motivosCoincidencia = evaluacion.motivos
+                                )
+                            }
                         }
-                        alerta.id to (vinculados + sugeridos).distinctBy { it.id }.sortedByDescending { it.fecha }
+                        alerta.id to (vinculados + sugeridos).distinctBy { it.id }.sortedWith(
+                            compareByDescending<Avistamiento> { it.puntajeCoincidencia ?: -1 }
+                                .thenByDescending { it.fecha }
+                        )
                     }
                 } else avistPorId
                 val publicacionesCargadas = (if (reset) emptyList() else publicaciones) +
-                    pagina.items.filter { it.estado == "Activa" }
+                        pagina.items.filter {
+                            it.estado == "Activa" && VigenciaAlertasPerdidas.visibleParaLaComunidad(it)
+                        }
                 actualizarUi {
                     cursorPagina = pagina.cursor
                     hayMas = pagina.hayMas
@@ -256,10 +275,12 @@ class MascotasPerdidasActivity : AppCompatActivity() {
                 compareByDescending<Publicacion> { avistPorId[it.id].orEmpty().maxOfOrNull(Avistamiento::fecha) ?: 0L }
                     .thenByDescending { actividadMasReciente(it) }
             )
+
             "cercanas" -> filtradas.sortedBy {
                 userLoc?.let { origen -> GeoPoint(it.latitud, it.longitud).distanceToAsDouble(origen) }
                     ?: Double.MAX_VALUE
             }
+
             else -> filtradas.sortedByDescending(::actividadMasReciente)
         }
         listOf(R.id.chip_todos to null, R.id.chip_perros to "Perro", R.id.chip_gatos to "Gato")
@@ -271,12 +292,14 @@ class MascotasPerdidasActivity : AppCompatActivity() {
                 chip.isSelected = activo
             }
         findViewById<TextView>(R.id.chip_todos).text = getString(R.string.all_pets_count, publicaciones.size)
-        tvVacio.setText(when {
-            filtradas.isEmpty() && publicaciones.isNotEmpty() && hayMas -> R.string.search_more_loaded
-            publicaciones.isNotEmpty() -> R.string.no_pet_results
-            tipoListado == "Encontrada" -> R.string.empty_found_pets
-            else -> R.string.empty_lost_pets
-        })
+        tvVacio.setText(
+            when {
+                filtradas.isEmpty() && publicaciones.isNotEmpty() && hayMas -> R.string.search_more_loaded
+                publicaciones.isNotEmpty() -> R.string.no_pet_results
+                tipoListado == "Encontrada" -> R.string.empty_found_pets
+                else -> R.string.empty_lost_pets
+            }
+        )
         tvVacio.visibility = if (filtradas.isEmpty()) View.VISIBLE else View.GONE
         val layoutManager = rvPerdidas.layoutManager as? LinearLayoutManager
         val firstVisible = layoutManager?.findFirstVisibleItemPosition() ?: 0
@@ -381,7 +404,21 @@ class MascotasPerdidasActivity : AppCompatActivity() {
                         append(avistamiento.descripcion.ifBlank { "Sin detalles adicionales" })
                     }
                     holder.tvRevision.text = if (avistamiento.publicacionId == 0L) {
-                        "Posible coincidencia · reporte aún sin vincular"
+                        val puntaje = avistamiento.puntajeCoincidencia
+                        if (puntaje == null) "Posible coincidencia · reporte aún sin vincular"
+                        else buildString {
+                            append(
+                                "Coincidencia ${
+                                    when {
+                                        puntaje >= 75 -> "alta"
+                                        puntaje >= 55 -> "media"
+                                        else -> "baja"
+                                    }
+                                } · $puntaje%"
+                            )
+                            avistamiento.motivosCoincidencia.take(2).takeIf { it.isNotEmpty() }
+                                ?.joinToString(" · ")?.let { append(" · $it") }
+                        }
                     } else when (avistamiento.estadoRevision) {
                         "Coincide" -> "El dueño confirmó que coincide"
                         "No coincide" -> "El dueño indicó que no coincide"
@@ -425,7 +462,12 @@ class MascotasPerdidasActivity : AppCompatActivity() {
                                     }
                                 }
                                 .show()
-                                .also { com.example.practicafinal.util.Dialogos.aplicar(this@MascotasPerdidasActivity, it) }
+                                .also {
+                                    com.example.practicafinal.util.Dialogos.aplicar(
+                                        this@MascotasPerdidasActivity,
+                                        it
+                                    )
+                                }
                         } else {
                             val opciones = arrayOf(
                                 "Coincide con mi mascota",
@@ -463,14 +505,20 @@ class MascotasPerdidasActivity : AppCompatActivity() {
                                     }
                                 }
                                 .show()
-                                .also { com.example.practicafinal.util.Dialogos.aplicar(this@MascotasPerdidasActivity, it) }
+                                .also {
+                                    com.example.practicafinal.util.Dialogos.aplicar(
+                                        this@MascotasPerdidasActivity,
+                                        it
+                                    )
+                                }
                         }
                     }
                     holder.itemView.contentDescription =
                         "Avistamiento " + fechaRelativa(avistamiento.fecha) + ". Abrir su ubicación en el mapa."
                     holder.itemView.setOnClickListener {
                         ejecutarSeguro(executor) {
-                            val puedeVerExacta = esPropietario || avistamiento.usuarioId == SesionManager.obtenerUsuarioId(this@MascotasPerdidasActivity)
+                            val puedeVerExacta =
+                                esPropietario || avistamiento.usuarioId == SesionManager.obtenerUsuarioId(this@MascotasPerdidasActivity)
                             val ubicacionExacta = if (puedeVerExacta) {
                                 runCatching {
                                     ControladorPublicaciones.obtenerCoordenadasAvistamiento(
@@ -513,6 +561,7 @@ class MascotasPerdidasActivity : AppCompatActivity() {
         val btnRevision: com.google.android.material.button.MaterialButton =
             view.findViewById(R.id.btn_revision_avistamiento)
     }
+
     override fun onResume() {
         super.onResume()
         if (!primeraPaginaCargada || actualizarAlVolver) {

@@ -248,23 +248,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/item_anuncio"
-                android:layout_width="match_parent"
-                android:layout_height="154dp"
-                android:layout_marginTop="9dp"
-                android:background="@drawable/bg_anuncio"
-                android:gravity="center"
-                android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Anuncio"
-                    android:textColor="@color/black"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

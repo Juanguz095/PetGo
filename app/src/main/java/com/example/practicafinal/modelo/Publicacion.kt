@@ -22,11 +22,13 @@ data class Publicacion(
     val senasParticulares: String? = null,
     val edadAproximada: String? = null,
     val caracter: String? = null,
-    val cuidados: String? = null
+    val cuidados: String? = null,
+    val usuarioNombre: String? = null
 ) {
     fun toFirestoreMap(firebaseUid: String? = null): Map<String, Any> = buildMap {
         firebaseUid?.let { put("usuarioId", it) }
         put("usuarioLegacyId", usuarioId ?: 0L)
+        usuarioNombre?.trim()?.takeIf { it.isNotEmpty() }?.let { put("usuarioNombre", it) }
         put("tipo", tipo)
         put("nombre", nombre)
         put("descripcion", descripcion)

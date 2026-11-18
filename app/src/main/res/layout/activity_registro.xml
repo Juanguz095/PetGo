@@ -139,32 +139,6 @@
                 android:textColorHint="@color/texto_suave"
                 android:textSize="15sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Ciudad"
-                android:textColor="@color/tinta"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/et_ciudad"
-                android:layout_width="match_parent"
-                android:layout_height="53dp"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/bg_brutal_crema"
-                android:gravity="center_vertical"
-                android:hint="Tu ciudad"
-                android:importantForAutofill="no"
-                android:inputType="textPersonName"
-                android:paddingBottom="5dp"
-                android:paddingEnd="15dp"
-                android:paddingStart="15dp"
-                android:singleLine="true"
-                android:textColor="@color/tinta"
-                android:textColorHint="@color/texto_suave"
-                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/label_confirmar"

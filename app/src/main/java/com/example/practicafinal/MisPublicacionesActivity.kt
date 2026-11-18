@@ -98,6 +98,11 @@ class MisPublicacionesActivity : AppCompatActivity() {
                             startActivity(android.content.Intent(this, DetallePublicacionActivity::class.java).apply {
                                 putExtra(DetallePublicacionActivity.EXTRA_PUBLICACION_ID, publicacion.id)
                             })
+                        },
+                        onVerSolicitudesAdopcion = { publicacion ->
+                            startActivity(android.content.Intent(this, SolicitudesAdopcionActivity::class.java).apply {
+                                putExtra(SolicitudesAdopcionActivity.EXTRA_PUBLICACION_ID, publicacion.id)
+                            })
                         }
                     )
                     if (!reset && firstVisible >= 0) {

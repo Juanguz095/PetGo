@@ -97,11 +97,21 @@ class DatabaseHelper(context: Context) {
     )
 
     fun obtenerAvistamientos(): List<Avistamiento> = repository.obtenerAvistamientos()
+    fun obtenerAvistamientosParaAlertas(publicacionIds: List<Long>): List<Avistamiento> =
+        repository.obtenerAvistamientosParaAlertas(publicacionIds)
     fun obtenerAvistamientosPorPublicacion(publicacionId: Long): List<Avistamiento> =
         repository.obtenerAvistamientosPorPublicacion(publicacionId)
 
     fun marcarResuelta(id: Long) = repository.marcarResuelta(id)
     fun marcarAdoptada(id: Long) = repository.marcarAdoptada(id)
+    fun enviarSolicitudAdopcion(publicacionId: Long, mensaje: String, contactoWhatsapp: String): String =
+        repository.enviarSolicitudAdopcion(publicacionId, mensaje, contactoWhatsapp)
+    fun obtenerMiSolicitudAdopcion(publicacionId: Long): Map<String, Any>? =
+        repository.obtenerMiSolicitudAdopcion(publicacionId)
+    fun obtenerSolicitudesAdopcion(publicacionId: Long): List<Map<String, Any>> =
+        repository.obtenerSolicitudesAdopcion(publicacionId)
+    fun actualizarEstadoSolicitudAdopcion(solicitudId: String, estado: String) =
+        repository.actualizarEstadoSolicitudAdopcion(solicitudId, estado)
     fun actualizarAvistamiento(id: Long, latitud: Double, longitud: Double) =
         repository.actualizarAvistamiento(id, latitud, longitud)
     fun obtenerCoordenadasAvistamiento(id: Long): Pair<Double, Double>? =
@@ -120,6 +130,10 @@ class DatabaseHelper(context: Context) {
     ): Long = repository.insertarDenuncia(motivo, descripcion, foto, latitud, longitud)
 
     fun obtenerDenuncias(): List<Denuncia> = repository.obtenerDenuncias()
+    fun esModeradorDenuncias(): Boolean = repository.esModeradorDenuncias()
+    fun obtenerDenunciasModeracion(): List<Denuncia> = repository.obtenerDenunciasModeracion()
+    fun actualizarEstadoDenunciaModeracion(id: Long, estado: String) =
+        repository.actualizarEstadoDenunciaModeracion(id, estado)
     fun contarDenuncias(): Long = repository.contarDenuncias()
 
     fun observarPublicaciones(

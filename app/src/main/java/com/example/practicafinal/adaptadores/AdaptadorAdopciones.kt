@@ -18,13 +18,13 @@ class AdaptadorAdopciones(
     private val items: List<Publicacion>,
     private val userLat: Double?,
     private val userLng: Double?,
+    private val onVerMapa: (Publicacion) -> Unit = {},
     private val onCardClick: (Publicacion) -> Unit
 ) : RecyclerView.Adapter<AdaptadorAdopciones.AdopcionViewHolder>() {
 
-    private val expandidos = mutableSetOf<Int>()
 
     class AdopcionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val fotoCard: FrameLayout = view.findViewById(R.id.foto_card)
+        val fotoCard: FrameLayout? = view.findViewById(R.id.foto_card)
         val imgFoto: ImageView = view.findViewById(R.id.img_foto)
         val tvPlaceholder: TextView = view.findViewById(R.id.tv_placeholder)
         val tvEspecieChip: TextView = view.findViewById(R.id.tv_especie_chip)
@@ -32,17 +32,29 @@ class AdaptadorAdopciones(
         val tvDesc: TextView = view.findViewById(R.id.tv_desc)
         val tvDistancia: TextView = view.findViewById(R.id.tv_distancia)
         val tvBadgeNuevo: TextView = view.findViewById(R.id.tv_badge_nuevo)
-        val detalleCard: View = view.findViewById(R.id.detalle_card)
-        val tvDescCompleta: TextView = view.findViewById(R.id.tv_desc_completa)
-        val btnVerDetalle: MaterialButton = view.findViewById(R.id.btn_ver_detalle)
+        val detalleCard: View? = view.findViewById(R.id.detalle_card)
+        val tvDescCompleta: TextView? = view.findViewById(R.id.tv_desc_completa)
+        val btnVerDetalle: MaterialButton? = view.findViewById(R.id.btn_ver_detalle)
+        val btnVerMapa: MaterialButton? = view.findViewById(R.id.btn_ver_mapa)
+        val btnDetalles: MaterialButton? = view.findViewById(R.id.btn_detalles)
     }
 
+    private var expandedPos = -1
+
+    override fun getItemViewType(position: Int): Int = if (position == expandedPos) 1 else 0
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdopcionViewHolder =
-        AdopcionViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_adopcion_card, parent, false))
+        AdopcionViewHolder(
+            LayoutInflater.from(parent.context).inflate(
+                if (viewType == 1) R.layout.item_adopcion_card else R.layout.item_adopcion_card_small,
+                parent,
+                false
+            )
+        )
 
     override fun onBindViewHolder(holder: AdopcionViewHolder, position: Int) {
         val p = items[position]
-        val expandido = position in expandidos
+        val expandido = position == expandedPos
 
         if (!p.foto.isNullOrBlank()) {
             com.example.practicafinal.util.cargarImagen(holder.imgFoto, p.foto)
@@ -67,15 +79,17 @@ class AdaptadorAdopciones(
         holder.tvNombre.text = p.nombre
 
         val density = holder.itemView.context.resources.displayMetrics.density
-        val altura = (if (expandido) 210 else 164) * density
-        holder.fotoCard.layoutParams = holder.fotoCard.layoutParams.apply { height = altura.toInt() }
+        holder.fotoCard?.let { fotoCard ->
+            val altura = 210 * density
+            fotoCard.layoutParams = fotoCard.layoutParams.apply { height = altura.toInt() }
+        }
 
         holder.tvDesc.visibility = if (expandido) View.GONE else View.VISIBLE
         holder.tvDesc.text = p.descripcion
 
-        holder.detalleCard.visibility = if (expandido) View.VISIBLE else View.GONE
+        holder.detalleCard?.visibility = if (expandido) View.VISIBLE else View.GONE
         if (expandido) {
-            holder.tvDescCompleta.text = buildString {
+            holder.tvDescCompleta?.text = buildString {
                 append(p.descripcion)
                 val extras = listOfNotNull(
                     p.edadAproximada?.takeIf { it.isNotBlank() }?.let { "Edad: $it" },
@@ -103,11 +117,17 @@ class AdaptadorAdopciones(
         val ahora = System.currentTimeMillis()
         val horasDesdeCreacion = TimeUnit.MILLISECONDS.toHours(ahora - p.fechaCreacion)
         holder.tvBadgeNuevo.visibility = if (horasDesdeCreacion < 24) View.VISIBLE else View.GONE
+        holder.btnVerMapa?.setOnClickListener { onVerMapa(p) }
+        holder.btnDetalles?.setOnClickListener { onCardClick(p) }
+        holder.btnVerDetalle?.setOnClickListener { onCardClick(p) }
 
-        holder.btnVerDetalle.setOnClickListener { onCardClick(p) }
         holder.itemView.setOnClickListener {
-            if (expandido) expandidos.remove(position) else expandidos.add(position)
-            notifyItemChanged(position)
+            val pos = holder.bindingAdapterPosition
+            if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
+            val anterior = expandedPos
+            expandedPos = if (anterior == pos) -1 else pos
+            if (anterior in 0 until itemCount) notifyItemChanged(anterior)
+            notifyItemChanged(pos)
         }
     }
 

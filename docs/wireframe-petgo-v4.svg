@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="2200" viewBox="0 0 1200 2200" font-family="'Segoe UI', Arial, sans-serif">
+  <style>
+    .pg { fill: #ffffff; stroke: #bdbdbd; }
+    .ph { fill: #f4f4f4; stroke: #9e9e9e; stroke-width: 1.2; stroke-dasharray: 6 5; }
+    .comp { fill: #ffffff; stroke: #7a7a7a; stroke-width: 1.2; }
+    .band { fill: #ededed; }
+    .line { stroke: #111111; stroke-width: 1.2; }
+    .soft { stroke: #d6d6d6; stroke-width: 1; }
+    .lab { font-size: 12px; letter-spacing: 1.5px; fill: #777777; font-weight: 700; }
+    .t10 { font-size: 10px; fill: #888888; }
+    .t11 { font-size: 11px; fill: #555555; }
+    .t13 { font-size: 13px; fill: #111111; }
+    .t18 { font-size: 18px; fill: #111111; font-weight: 600; }
+    .t24 { font-size: 24px; fill: #111111; font-weight: 600; }
+    .ctr { text-anchor: middle; }
+  </style>
+
+  <rect width="1200" height="2200" fill="#ffffff"/>
+  <text x="40" y="30" class="t18">PetGo · estructura de la landing</text>
+  <text x="40" y="50" class="t10">Las diez secciones acordadas. Solo cajas y etiquetas.</text>
+
+  <rect x="40" y="68" width="1120" height="2090" class="pg"/>
+
+  <!-- 01 HERO -->
+  <text x="80" y="104" class="lab">01 · HERO</text>
+  <text x="80" y="152" class="t24">Título (H1)</text>
+  <text x="80" y="172" class="t10">2 líneas</text>
+  <text x="80" y="212" class="t13">Subtítulo</text>
+  <text x="80" y="230" class="t10">2 líneas</text>
+  <rect x="80" y="252" width="170" height="42" class="comp"/>
+  <text x="165" y="278" class="t11 ctr">Botón principal</text>
+  <text x="266" y="278" class="t11">enlace secundario</text>
+  <text x="80" y="322" class="t11">microcopy</text>
+
+  <rect x="640" y="100" width="480" height="300" class="ph"/>
+  <text x="880" y="242" class="t11 ctr">imagen / capturas</text>
+  <text x="880" y="262" class="t10 ctr">7/12</text>
+  <line x1="40" y1="424" x2="1160" y2="424" class="line"/>
+
+  <!-- 02 PROBLEMA -->
+  <text x="80" y="456" class="lab">02 · PROBLEMA</text>
+  <rect x="240" y="476" width="720" height="76" class="comp"/>
+  <text x="600" y="508" class="t13 ctr">Título + 2 párrafos</text>
+  <text x="600" y="530" class="t10 ctr">ancho máximo 720 px</text>
+  <line x1="40" y1="580" x2="1160" y2="580" class="line"/>
+
+  <!-- 03 QUE PUEDES HACER -->
+  <text x="80" y="612" class="lab">03 · QUÉ PUEDES HACER</text>
+
+  <rect x="80" y="632" width="330" height="86" class="comp"/>
+  <text x="96" y="666" class="t13">Tarjeta 1</text>
+  <text x="96" y="688" class="t10">icono · título · 1 línea</text>
+
+  <rect x="420" y="632" width="330" height="86" class="comp"/>
+  <text x="436" y="666" class="t13">Tarjeta 2</text>
+  <text x="436" y="688" class="t10">icono · título · 1 línea</text>
+
+  <rect x="760" y="632" width="330" height="86" class="comp"/>
+  <text x="776" y="666" class="t13">Tarjeta 3</text>
+  <text x="776" y="688" class="t10">icono · título · 1 línea</text>
+
+  <rect x="250" y="730" width="330" height="86" class="comp"/>
+  <text x="266" y="764" class="t13">Tarjeta 4</text>
+  <text x="266" y="786" class="t10">icono · título · 1 línea</text>
+
+  <rect x="590" y="730" width="330" height="86" class="comp"/>
+  <text x="606" y="764" class="t13">Tarjeta 5</text>
+  <text x="606" y="786" class="t10">icono · título · 1 línea</text>
+  <line x1="40" y1="852" x2="1160" y2="852" class="line"/>
+
+  <!-- 04 COMO FUNCIONA -->
+  <text x="80" y="884" class="lab">04 · CÓMO FUNCIONA</text>
+
+  <text x="80" y="922" class="t24">1</text>
+  <text x="140" y="920" class="t13">Paso 1</text>
+  <text x="140" y="940" class="t10">texto · 2 líneas</text>
+  <rect x="800" y="892" width="320" height="66" class="ph"/>
+  <text x="960" y="930" class="t10 ctr">captura</text>
+  <line x1="80" y1="974" x2="1120" y2="974" class="soft"/>
+
+  <text x="80" y="1012" class="t24">2</text>
+  <text x="140" y="1010" class="t13">Paso 2</text>
+  <text x="140" y="1030" class="t10">texto · 2 líneas</text>
+  <rect x="800" y="982" width="320" height="66" class="ph"/>
+  <text x="960" y="1020" class="t10 ctr">captura</text>
+  <line x1="80" y1="1064" x2="1120" y2="1064" class="soft"/>
+
+  <text x="80" y="1102" class="t24">3</text>
+  <text x="140" y="1100" class="t13">Paso 3</text>
+  <text x="140" y="1120" class="t10">texto · 2 líneas</text>
+  <rect x="800" y="1072" width="320" height="66" class="ph"/>
+  <text x="960" y="1110" class="t10 ctr">captura</text>
+  <line x1="40" y1="1162" x2="1160" y2="1162" class="line"/>
+
+  <!-- 05 CAPTURAS -->
+  <text x="80" y="1194" class="lab">05 · CAPTURAS</text>
+  <rect x="80" y="1212" width="196" height="104" class="ph"/>
+  <text x="178" y="1268" class="t10 ctr">captura 1</text>
+  <rect x="288" y="1212" width="196" height="104" class="ph"/>
+  <text x="386" y="1268" class="t10 ctr">captura 2</text>
+  <rect x="496" y="1212" width="196" height="104" class="ph"/>
+  <text x="594" y="1268" class="t10 ctr">captura 3</text>
+  <rect x="704" y="1212" width="196" height="104" class="ph"/>
+  <text x="802" y="1268" class="t10 ctr">captura 4</text>
+  <rect x="912" y="1212" width="196" height="104" class="ph"/>
+  <text x="1010" y="1268" class="t10 ctr">captura 5</text>
+  <line x1="40" y1="1344" x2="1160" y2="1344" class="line"/>
+
+  <!-- 06 COMPARTIR -->
+  <text x="80" y="1376" class="lab">06 · COMPARTIR</text>
+  <text x="80" y="1414" class="t13">Texto</text>
+  <text x="80" y="1434" class="t10">2 líneas + 3 puntos</text>
+  <rect x="640" y="1392" width="480" height="110" class="ph"/>
+  <text x="880" y="1452" class="t10 ctr">captura del mensaje</text>
+  <line x1="40" y1="1530" x2="1160" y2="1530" class="line"/>
+
+  <!-- 07 PRIVACIDAD -->
+  <text x="80" y="1562" class="lab">07 · PRIVACIDAD</text>
+  <rect x="40" y="1574" width="1120" height="84" class="band"/>
+  <text x="80" y="1606" class="t13">Título</text>
+  <text x="80" y="1630" class="t10">3 columnas de texto</text>
+  <line x1="40" y1="1680" x2="1160" y2="1680" class="line"/>
+
+  <!-- 08 FAQ -->
+  <text x="80" y="1712" class="lab">08 · FAQ</text>
+  <text x="80" y="1748" class="t18">Título</text>
+  <text x="80" y="1770" class="t10">contacto</text>
+
+  <text x="560" y="1738" class="t13">Pregunta 1</text>
+  <text x="1100" y="1738" class="t11" text-anchor="end">+</text>
+  <line x1="560" y1="1752" x2="1120" y2="1752" class="soft"/>
+  <text x="560" y="1776" class="t13">Pregunta 2</text>
+  <text x="1100" y="1776" class="t11" text-anchor="end">+</text>
+  <line x1="560" y1="1790" x2="1120" y2="1790" class="soft"/>
+  <text x="560" y="1814" class="t13">Pregunta 3</text>
+  <text x="1100" y="1814" class="t11" text-anchor="end">+</text>
+  <line x1="560" y1="1828" x2="1120" y2="1828" class="soft"/>
+  <text x="560" y="1852" class="t13">Pregunta 4</text>
+  <text x="1100" y="1852" class="t11" text-anchor="end">+</text>
+  <line x1="560" y1="1866" x2="1120" y2="1866" class="soft"/>
+  <text x="560" y="1890" class="t13">Pregunta 5</text>
+  <text x="1100" y="1890" class="t11" text-anchor="end">+</text>
+  <line x1="40" y1="1924" x2="1160" y2="1924" class="line"/>
+
+  <!-- 09 DESCARGA -->
+  <text x="80" y="1956" class="lab">09 · DESCARGA</text>
+  <text x="80" y="1992" class="t13">3 pasos</text>
+  <text x="80" y="2012" class="t10">requisitos</text>
+  <rect x="640" y="1968" width="480" height="86" class="comp"/>
+  <text x="880" y="2016" class="t11 ctr">botón + QR + versión</text>
+  <line x1="40" y1="2074" x2="1160" y2="2074" class="line"/>
+
+  <!-- 10 FOOTER -->
+  <text x="80" y="2100" class="lab">10 · FOOTER</text>
+  <text x="80" y="2128" class="t11">columna 1</text>
+  <text x="360" y="2128" class="t11">columna 2</text>
+  <text x="640" y="2128" class="t11">columna 3</text>
+  <text x="920" y="2128" class="t11">columna 4</text>
+</svg>

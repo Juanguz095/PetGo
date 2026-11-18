@@ -1,0 +1,369 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="2890" viewBox="0 0 1600 2890">
+  <style>
+    text { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; }
+    .lbl { font-size: 11px; letter-spacing: 2px; font-weight: 600; fill: #94483b; }
+    .h1 { font-size: 34px; font-weight: 600; fill: #32161f; }
+    .h2 { font-size: 20px; font-weight: 600; fill: #32161f; }
+    .h3 { font-size: 15px; font-weight: 600; fill: #32161f; }
+    .body { font-size: 13px; fill: #7a463c; }
+    .small { font-size: 11px; fill: #7a463c; }
+    .tiny { font-size: 10px; fill: #8e5849; }
+    .ph { fill: #efe8d6; stroke: #8e5849; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .phl { font-size: 12px; fill: #8e5849; }
+    .card { fill: #f7f4e8; stroke: #32161f; stroke-width: 2; }
+    .pill { fill: #c4834e; stroke: #32161f; stroke-width: 2; }
+    .ghost { fill: #fbf7ea; stroke: #32161f; stroke-width: 2; }
+    .sep { stroke: #c9c1aa; stroke-width: 1; }
+    .white { fill: #ffffff; }
+    .light { fill: #eaeadf; }
+    .gold { fill: #deb661; }
+    .green { fill: #40653b; }
+  </style>
+
+  <rect width="1600" height="2890" fill="#ffffff"/>
+
+  <!-- Encabezado -->
+  <text x="40" y="36" class="h2">PetGo · Wireframe de la landing</text>
+  <text x="40" y="56" class="small">Baja fidelidad · escritorio 1120 px / móvil 360 px</text>
+
+  <!-- Leyenda de colores -->
+  <g>
+    <circle cx="766" cy="30" r="6" fill="#772c2f"/><text x="778" y="34" class="tiny">Perdida</text>
+    <circle cx="856" cy="30" r="6" fill="#40653b"/><text x="868" y="34" class="tiny">Encontrada</text>
+    <circle cx="966" cy="30" r="6" fill="#c4834e"/><text x="978" y="34" class="tiny">Adopción</text>
+    <circle cx="1064" cy="30" r="6" fill="#deb661"/><text x="1076" y="34" class="tiny">Avistamiento</text>
+    <circle cx="1178" cy="30" r="6" fill="#7393d0"/><text x="1190" y="34" class="tiny">Albergue</text>
+  </g>
+
+  <!-- ===================== ESCRITORIO ===================== -->
+  <rect x="40" y="80" width="1120" height="2760" rx="12" fill="#eaeadf" stroke="#8e5849" stroke-width="1.5"/>
+  <rect x="40" y="80" width="1120" height="36" rx="12" fill="#e0d8c0"/>
+  <rect x="40" y="100" width="1120" height="16" fill="#e0d8c0"/>
+  <text x="64" y="103" class="lbl">ESCRITORIO · 1120 PX</text>
+
+  <!-- NAV -->
+  <line x1="40" y1="180" x2="1160" y2="180" class="sep"/>
+  <circle cx="70" cy="156" r="12" fill="#472026"/>
+  <text x="90" y="161" class="h3">PetGo</text>
+  <text x="450" y="161" class="body">Cómo funciona</text>
+  <text x="580" y="161" class="body">Funciones</text>
+  <text x="690" y="161" class="body">Preguntas</text>
+  <rect x="1010" y="140" width="130" height="32" rx="16" class="pill"/>
+  <text x="1075" y="161" text-anchor="middle" class="h3">Descargar</text>
+
+  <!-- HERO -->
+  <line x1="40" y1="204" x2="1160" y2="204" class="sep"/>
+  <text x="64" y="226" class="lbl">HERO</text>
+  <rect x="64" y="236" width="200" height="24" rx="12" fill="#fbf7ea" stroke="#32161f" stroke-width="1.5"/>
+  <text x="76" y="252" class="tiny">Gratis · Android 8+</text>
+  <text x="64" y="300" class="h1">Cada mascota merece</text>
+  <text x="64" y="340" class="h1">volver a casa</text>
+  <text x="64" y="374" class="body">Publica una alerta en el mapa, reporta</text>
+  <text x="64" y="394" class="body">avistamientos y ayuda a que vuelvan.</text>
+  <rect x="64" y="416" width="180" height="42" rx="21" class="pill"/>
+  <text x="154" y="442" text-anchor="middle" class="h3">Descargar</text>
+  <rect x="256" y="416" width="190" height="42" rx="21" class="ghost"/>
+  <text x="351" y="442" text-anchor="middle" class="h3">Cómo funciona</text>
+  <text x="64" y="484" class="tiny">Sin anuncios · Sin registro para ver</text>
+
+  <rect x="700" y="228" width="190" height="290" rx="26" class="ph"/>
+  <rect x="712" y="252" width="166" height="242" rx="10" fill="#f6f1e2" stroke="#d8cfb6"/>
+  <text x="795" y="380" text-anchor="middle" class="phl">captura 1</text>
+  <rect x="860" y="288" width="170" height="250" rx="24" class="ph"/>
+  <rect x="872" y="310" width="146" height="206" rx="10" fill="#f6f1e2" stroke="#d8cfb6"/>
+  <text x="945" y="420" text-anchor="middle" class="phl">captura 2</text>
+  <text x="965" y="548" text-anchor="middle" class="tiny">capturas solapadas · 45% del ancho</text>
+
+  <!-- PROBLEMA -->
+  <line x1="40" y1="568" x2="1160" y2="568" class="sep"/>
+  <text x="64" y="590" class="lbl">PROBLEMA</text>
+  <text x="590" y="628" text-anchor="middle" class="h2">Los avisos se pierden en grupos de WhatsApp</text>
+  <text x="590" y="656" text-anchor="middle" class="h2">y en carteles que nadie vuelve a mirar.</text>
+  <text x="590" y="690" text-anchor="middle" class="body">PetGo reúne alertas, avistamientos y adopciones en un solo mapa</text>
+  <text x="590" y="710" text-anchor="middle" class="body">que cualquier persona de la comunidad puede usar.</text>
+
+  <!-- FUNCIONES -->
+  <line x1="40" y1="742" x2="1160" y2="742" class="sep"/>
+  <text x="64" y="764" class="lbl">FUNCIONES</text>
+  <text x="64" y="798" class="h2">Cinco formas de ayudar</text>
+
+  <rect x="64" y="818" width="312" height="110" rx="20" class="card"/>
+  <circle cx="94" cy="852" r="16" fill="#772c2f"/>
+  <text x="122" y="850" class="h3">Alerta en el mapa</text>
+  <text x="122" y="872" class="small">Foto y punto exacto en</text>
+  <text x="122" y="888" class="small">menos de un minuto.</text>
+
+  <rect x="416" y="818" width="312" height="110" rx="20" class="card"/>
+  <circle cx="446" cy="852" r="16" fill="#40653b"/>
+  <text x="474" y="850" class="h3">Avistamientos</text>
+  <text x="474" y="872" class="small">Cualquiera reporta dónde</text>
+  <text x="474" y="888" class="small">la vio, con o sin foto.</text>
+
+  <rect x="768" y="818" width="312" height="110" rx="20" class="card"/>
+  <circle cx="798" cy="852" r="16" fill="#c4834e"/>
+  <text x="826" y="850" class="h3">Adopciones</text>
+  <text x="826" y="872" class="small">Perros y gatos con</text>
+  <text x="826" y="888" class="small">contacto por WhatsApp.</text>
+
+  <rect x="240" y="948" width="312" height="110" rx="20" class="card"/>
+  <circle cx="270" cy="982" r="16" fill="#7393d0"/>
+  <text x="298" y="980" class="h3">Albergues</text>
+  <text x="298" y="1002" class="small">El más cercano, con</text>
+  <text x="298" y="1018" class="small">teléfono y cómo llegar.</text>
+
+  <rect x="592" y="948" width="312" height="110" rx="20" class="card"/>
+  <circle cx="622" cy="982" r="16" fill="#7a463c"/>
+  <text x="650" y="980" class="h3">Denuncias</text>
+  <text x="650" y="1002" class="small">Maltrato o abandono con</text>
+  <text x="650" y="1018" class="small">foto y ubicación.</text>
+
+  <!-- COMO FUNCIONA -->
+  <line x1="40" y1="1096" x2="1160" y2="1096" class="sep"/>
+  <text x="64" y="1118" class="lbl">CÓMO FUNCIONA</text>
+  <text x="64" y="1152" class="h2">Tres pasos</text>
+  <line x1="90" y1="1180" x2="90" y2="1396" class="sep" stroke-dasharray="4 6"/>
+
+  <circle cx="90" cy="1198" r="20" class="pill"/>
+  <text x="90" y="1204" text-anchor="middle" class="h3">1</text>
+  <text x="126" y="1190" class="h3">Publicas la alerta</text>
+  <text x="126" y="1212" class="small">Foto, nombre, especie y</text>
+  <text x="126" y="1228" class="small">último lugar visto.</text>
+  <rect x="720" y="1168" width="380" height="95" rx="14" class="ph"/>
+  <text x="910" y="1220" text-anchor="middle" class="phl">captura: crear publicación</text>
+
+  <rect x="64" y="1273" width="380" height="95" rx="14" class="ph"/>
+  <text x="254" y="1325" text-anchor="middle" class="phl">captura: mapa con pines</text>
+  <circle cx="458" cy="1323" r="20" class="pill"/>
+  <text x="458" y="1329" text-anchor="middle" class="h3">2</text>
+  <text x="494" y="1315" class="h3">La comunidad ayuda</text>
+  <text x="494" y="1337" class="small">Los avistamientos aparecen</text>
+  <text x="494" y="1353" class="small">y te llega un aviso.</text>
+
+  <circle cx="90" cy="1413" r="20" class="pill"/>
+  <text x="90" y="1419" text-anchor="middle" class="h3">3</text>
+  <text x="126" y="1405" class="h3">Vuelve a casa</text>
+  <text x="126" y="1427" class="small">Marcas el caso como resuelto</text>
+  <text x="126" y="1443" class="small">y quienes ayudaron se enteran.</text>
+  <rect x="720" y="1378" width="380" height="80" rx="14" class="ph"/>
+  <text x="910" y="1424" text-anchor="middle" class="phl">captura: caso resuelto</text>
+
+  <!-- CAPTURAS -->
+  <line x1="40" y1="1490" x2="1160" y2="1490" class="sep"/>
+  <text x="64" y="1512" class="lbl">CAPTURAS</text>
+  <rect x="64" y="1528" width="1052" height="190" fill="#dfd8c3"/>
+  <line x1="64" y1="1528" x2="1116" y2="1528" class="sep"/>
+  <line x1="64" y1="1718" x2="1116" y2="1718" class="sep"/>
+  <rect x="220" y="1543" width="140" height="160" rx="16" class="ph"/>
+  <text x="290" y="1628" text-anchor="middle" class="phl">1</text>
+  <rect x="420" y="1558" width="140" height="160" rx="16" class="ph"/>
+  <text x="490" y="1643" text-anchor="middle" class="phl">2</text>
+  <rect x="620" y="1543" width="140" height="160" rx="16" class="ph"/>
+  <text x="690" y="1628" text-anchor="middle" class="phl">3</text>
+  <rect x="820" y="1558" width="140" height="160" rx="16" class="ph"/>
+  <text x="890" y="1643" text-anchor="middle" class="phl">4</text>
+  <text x="590" y="1738" text-anchor="middle" class="tiny">desplazamiento alternado de 24 px · scroll-snap en móvil</text>
+
+  <!-- COMPARTIR -->
+  <line x1="40" y1="1764" x2="1160" y2="1764" class="sep"/>
+  <text x="64" y="1786" class="lbl">COMPARTIR</text>
+  <text x="64" y="1824" class="h2">Una alerta, un mensaje</text>
+  <text x="64" y="1850" class="body">Comparte la publicación por WhatsApp con foto,</text>
+  <text x="64" y="1870" class="body">nombre, zona y enlace a la ubicación.</text>
+  <text x="64" y="1900" class="body">✓  Funciona sin que la otra persona instale la app</text>
+  <text x="64" y="1922" class="body">✓  Un enlace reconocible, no un texto suelto</text>
+  <text x="64" y="1944" class="body">✓  Llega a quien está cerca del último lugar visto</text>
+
+  <rect x="700" y="1798" width="410" height="170" rx="18" class="green"/>
+  <rect x="720" y="1818" width="52" height="52" rx="8" fill="#ffffff" opacity="0.85"/>
+  <text x="746" y="1850" text-anchor="middle" class="tiny">foto</text>
+  <text x="786" y="1836" class="white" font-size="13" font-weight="600">Toby · Perdido</text>
+  <text x="786" y="1856" class="light" font-size="11">Miraflores · hace 2 días</text>
+  <text x="786" y="1876" class="gold" font-size="11" text-decoration="underline">petgo.app/alerta/123</text>
+  <text x="720" y="1938" class="light" font-size="11">Comparte y ayuda a que vuelva a casa.</text>
+
+  <!-- PRIVACIDAD -->
+  <line x1="40" y1="2018" x2="1160" y2="2018" class="sep"/>
+  <rect x="64" y="2018" width="1052" height="150" rx="12" fill="#32161f"/>
+  <text x="92" y="2056" class="white" font-size="18" font-weight="600">Tu privacidad, clara</text>
+  <text x="92" y="2088" class="light" font-size="12">✓  El punto exacto del</text>
+  <text x="92" y="2104" class="light" font-size="12">avistamiento queda privado.</text>
+  <text x="440" y="2088" class="light" font-size="12">✓  Tú decides qué fotos</text>
+  <text x="440" y="2104" class="light" font-size="12">se publican. Siempre.</text>
+  <text x="790" y="2088" class="light" font-size="12">✓  Puedes pedir el borrado</text>
+  <text x="790" y="2104" class="light" font-size="12">de tu cuenta y tus datos.</text>
+  <text x="92" y="2144" class="gold" font-size="12" text-decoration="underline">Leer la política de privacidad →</text>
+
+  <!-- FAQ -->
+  <line x1="40" y1="2192" x2="1160" y2="2192" class="sep"/>
+  <text x="64" y="2214" class="lbl">PREGUNTAS</text>
+  <text x="64" y="2252" class="h2">Dudas frecuentes</text>
+  <text x="64" y="2278" class="body">Lo que más nos preguntan</text>
+  <text x="64" y="2296" class="body">antes de instalar.</text>
+  <text x="64" y="2324" class="body">¿Te falta algo?</text>
+  <text x="64" y="2344" fill="#94483b" font-size="12" text-decoration="underline">Escríbenos →</text>
+
+  <line x1="420" y1="2218" x2="1116" y2="2218" class="sep"/>
+  <text x="440" y="2242" class="h3">¿Es gratis?</text>
+  <text x="440" y="2262" class="small">Sí. Es un proyecto académico,</text>
+  <text x="440" y="2278" class="small">sin anuncios ni compras.</text>
+  <text x="1096" y="2242" text-anchor="end" class="small">–</text>
+  <line x1="420" y1="2282" x2="1116" y2="2282" class="sep"/>
+  <text x="440" y="2306" class="h3">¿Necesito cuenta?</text>
+  <text x="1096" y="2306" text-anchor="end" class="small">+</text>
+  <line x1="420" y1="2322" x2="1116" y2="2322" class="sep"/>
+  <text x="440" y="2346" class="h3">¿Dónde funciona PetGo?</text>
+  <text x="1096" y="2346" text-anchor="end" class="small">+</text>
+  <line x1="420" y1="2362" x2="1116" y2="2362" class="sep"/>
+  <text x="440" y="2386" class="h3">¿Cómo reporto un avistamiento?</text>
+  <text x="1096" y="2386" text-anchor="end" class="small">+</text>
+  <line x1="420" y1="2402" x2="1116" y2="2402" class="sep"/>
+  <text x="440" y="2426" class="h3">¿En qué teléfonos funciona?</text>
+  <text x="1096" y="2426" text-anchor="end" class="small">+</text>
+  <line x1="420" y1="2442" x2="1116" y2="2442" class="sep"/>
+
+  <!-- DESCARGAR -->
+  <line x1="40" y1="2476" x2="1160" y2="2476" class="sep"/>
+  <rect x="64" y="2476" width="1052" height="200" rx="18" fill="#f2e6c8" stroke="#32161f" stroke-width="2"/>
+  <text x="96" y="2516" class="h2">Instalar es rápido</text>
+  <circle cx="104" cy="2544" r="10" class="pill"/>
+  <text x="104" y="2548" text-anchor="middle" class="tiny">1</text>
+  <text x="124" y="2548" class="body">Abre el enlace de descarga.</text>
+  <circle cx="104" cy="2570" r="10" class="pill"/>
+  <text x="104" y="2574" text-anchor="middle" class="tiny">2</text>
+  <text x="124" y="2574" class="body">Permite la instalación de esta fuente.</text>
+  <circle cx="104" cy="2596" r="10" class="pill"/>
+  <text x="104" y="2600" text-anchor="middle" class="tiny">3</text>
+  <text x="124" y="2600" class="body">Abre PetGo y crea tu cuenta.</text>
+  <text x="96" y="2646" class="tiny">Proyecto académico · sin fines de lucro</text>
+
+  <rect x="760" y="2498" width="260" height="44" rx="22" class="pill"/>
+  <text x="890" y="2526" text-anchor="middle" class="h3">Descargar APK</text>
+  <rect x="760" y="2558" width="90" height="90" fill="#ffffff" stroke="#32161f" stroke-width="2"/>
+  <rect x="770" y="2568" width="20" height="20" fill="#32161f"/>
+  <rect x="820" y="2568" width="20" height="20" fill="#32161f"/>
+  <rect x="770" y="2618" width="20" height="20" fill="#32161f"/>
+  <rect x="802" y="2604" width="8" height="8" fill="#32161f"/>
+  <rect x="816" y="2618" width="8" height="8" fill="#32161f"/>
+  <rect x="832" y="2632" width="8" height="8" fill="#32161f"/>
+  <text x="874" y="2584" class="body">Android 8.0 o superior</text>
+  <text x="874" y="2606" class="body">18 MB · versión 1.0</text>
+  <text x="874" y="2628" class="tiny">noviembre 2026 · gratis</text>
+
+  <!-- FOOTER -->
+  <line x1="40" y1="2710" x2="1160" y2="2710" class="sep"/>
+  <text x="64" y="2746" class="h3">PetGo</text>
+  <text x="64" y="2766" class="tiny">Una comunidad que ayuda a que las mascotas vuelvan a casa.</text>
+  <text x="600" y="2746" class="body">Privacidad  ·  GitHub  ·  Contacto</text>
+  <text x="1116" y="2746" text-anchor="end" class="small">v1.0 · 2026</text>
+  <line x1="64" y1="2786" x2="1116" y2="2786" class="sep"/>
+  <text x="590" y="2804" text-anchor="middle" class="tiny">Proyecto académico · Hecho por el equipo de PetGo · ¿Eres desarrollador? El código está en GitHub</text>
+
+  <!-- ===================== MÓVIL ===================== -->
+  <rect x="1200" y="80" width="340" height="1920" rx="30" fill="#eaeadf" stroke="#32161f" stroke-width="3"/>
+  <rect x="1200" y="80" width="340" height="36" rx="30" fill="#e0d8c0"/>
+  <rect x="1200" y="100" width="340" height="16" fill="#e0d8c0"/>
+  <text x="1220" y="103" class="lbl">MÓVIL · 360 PX</text>
+
+  <!-- Móvil: nav -->
+  <circle cx="1232" cy="154" r="10" fill="#472026"/>
+  <text x="1248" y="159" class="h3" font-size="14">PetGo</text>
+  <rect x="1396" y="138" width="104" height="30" rx="15" class="pill"/>
+  <text x="1448" y="157" text-anchor="middle" class="tiny">Descargar</text>
+  <line x1="1200" y1="176" x2="1540" y2="176" class="sep"/>
+
+  <!-- Móvil: hero -->
+  <rect x="1216" y="190" width="190" height="22" rx="11" fill="#fbf7ea" stroke="#32161f" stroke-width="1.5"/>
+  <text x="1226" y="205" class="tiny">Gratis · Android 8+</text>
+  <text x="1216" y="248" font-size="23" font-weight="600" fill="#32161f">Cada mascota</text>
+  <text x="1216" y="276" font-size="23" font-weight="600" fill="#32161f">merece volver</text>
+  <text x="1216" y="304" font-size="23" font-weight="600" fill="#32161f">a casa</text>
+  <text x="1216" y="334" class="small">Publica una alerta, reporta</text>
+  <text x="1216" y="352" class="small">avistamientos y adopta.</text>
+  <rect x="1216" y="370" width="288" height="38" rx="19" class="pill"/>
+  <text x="1360" y="394" text-anchor="middle" class="h3" font-size="13">Descargar para Android</text>
+  <rect x="1216" y="416" width="288" height="38" rx="19" class="ghost"/>
+  <text x="1360" y="440" text-anchor="middle" class="h3" font-size="13">Cómo funciona</text>
+  <text x="1216" y="474" class="tiny">Sin anuncios · Sin registro para ver</text>
+  <rect x="1216" y="490" width="288" height="200" rx="14" class="ph"/>
+  <text x="1360" y="596" text-anchor="middle" class="phl">captura 1</text>
+
+  <!-- Móvil: funciones -->
+  <text x="1216" y="714" class="lbl">FUNCIONES</text>
+  <circle cx="1232" cy="744" r="12" fill="#772c2f"/>
+  <text x="1254" y="740" class="h3" font-size="12">Alerta en el mapa</text>
+  <text x="1254" y="756" class="tiny">Foto y punto exacto.</text>
+  <circle cx="1232" cy="798" r="12" fill="#40653b"/>
+  <text x="1254" y="794" class="h3" font-size="12">Avistamientos</text>
+  <text x="1254" y="810" class="tiny">Reporta dónde la viste.</text>
+  <circle cx="1232" cy="852" r="12" fill="#c4834e"/>
+  <text x="1254" y="848" class="h3" font-size="12">Adopciones</text>
+  <text x="1254" y="864" class="tiny">Perros y gatos con WhatsApp.</text>
+  <text x="1216" y="902" class="tiny">… y 2 tarjetas más</text>
+
+  <!-- Móvil: cómo funciona -->
+  <text x="1216" y="926" class="lbl">CÓMO FUNCIONA</text>
+  <circle cx="1232" cy="954" r="14" class="pill"/>
+  <text x="1232" y="959" text-anchor="middle" class="tiny">1</text>
+  <text x="1258" y="950" class="h3" font-size="12">Publicas la alerta</text>
+  <text x="1258" y="966" class="tiny">Foto, especie y lugar.</text>
+  <rect x="1216" y="980" width="288" height="56" rx="10" class="ph"/>
+  <text x="1360" y="1014" text-anchor="middle" class="phl">captura</text>
+
+  <circle cx="1232" cy="1060" r="14" class="pill"/>
+  <text x="1232" y="1065" text-anchor="middle" class="tiny">2</text>
+  <text x="1258" y="1056" class="h3" font-size="12">La comunidad ayuda</text>
+  <text x="1258" y="1072" class="tiny">Llegan avistamientos.</text>
+  <rect x="1216" y="1086" width="288" height="56" rx="10" class="ph"/>
+  <text x="1360" y="1120" text-anchor="middle" class="phl">captura</text>
+
+  <circle cx="1232" cy="1166" r="14" class="pill"/>
+  <text x="1232" y="1171" text-anchor="middle" class="tiny">3</text>
+  <text x="1258" y="1162" class="h3" font-size="12">Vuelve a casa</text>
+  <text x="1258" y="1178" class="tiny">Caso resuelto.</text>
+  <rect x="1216" y="1192" width="288" height="56" rx="10" class="ph"/>
+  <text x="1360" y="1226" text-anchor="middle" class="phl">captura</text>
+
+  <!-- Móvil: capturas -->
+  <text x="1216" y="1282" class="lbl">CAPTURAS</text>
+  <rect x="1216" y="1296" width="100" height="140" rx="12" class="ph"/>
+  <rect x="1330" y="1296" width="100" height="140" rx="12" class="ph"/>
+  <rect x="1444" y="1296" width="100" height="140" rx="12" class="ph"/>
+  <text x="1216" y="1452" class="tiny">‹  desliza para ver más  ›</text>
+
+  <!-- Móvil: privacidad -->
+  <text x="1216" y="1476" class="lbl">PRIVACIDAD</text>
+  <rect x="1216" y="1488" width="288" height="110" rx="10" fill="#32161f"/>
+  <text x="1234" y="1518" class="white" font-size="14" font-weight="600">Tu privacidad, clara</text>
+  <text x="1234" y="1542" class="light" font-size="10">✓  El punto exacto queda privado.</text>
+  <text x="1234" y="1560" class="light" font-size="10">✓  Tú decides qué fotos públicas.</text>
+  <text x="1234" y="1582" class="gold" font-size="10" text-decoration="underline">Leer la política →</text>
+
+  <!-- Móvil: FAQ -->
+  <text x="1216" y="1616" class="lbl">PREGUNTAS</text>
+  <line x1="1216" y1="1630" x2="1504" y2="1630" class="sep"/>
+  <text x="1216" y="1654" class="h3" font-size="12">¿Es gratis?</text>
+  <text x="1500" y="1654" text-anchor="end" class="tiny">–</text>
+  <line x1="1216" y1="1668" x2="1504" y2="1668" class="sep"/>
+  <text x="1216" y="1692" class="h3" font-size="12">¿Necesito cuenta?</text>
+  <text x="1500" y="1692" text-anchor="end" class="tiny">+</text>
+  <line x1="1216" y1="1706" x2="1504" y2="1706" class="sep"/>
+  <text x="1216" y="1730" class="h3" font-size="12">¿Dónde funciona?</text>
+  <text x="1500" y="1730" text-anchor="end" class="tiny">+</text>
+  <line x1="1216" y1="1744" x2="1504" y2="1744" class="sep"/>
+
+  <!-- Móvil: descargar -->
+  <rect x="1216" y="1780" width="288" height="42" rx="21" class="pill"/>
+  <text x="1360" y="1806" text-anchor="middle" class="h3" font-size="13">Descargar APK</text>
+  <rect x="1315" y="1834" width="84" height="84" fill="#ffffff" stroke="#32161f" stroke-width="2"/>
+  <rect x="1323" y="1842" width="18" height="18" fill="#32161f"/>
+  <rect x="1373" y="1842" width="18" height="18" fill="#32161f"/>
+  <rect x="1323" y="1892" width="18" height="18" fill="#32161f"/>
+  <rect x="1352" y="1876" width="7" height="7" fill="#32161f"/>
+  <rect x="1366" y="1890" width="7" height="7" fill="#32161f"/>
+  <rect x="1380" y="1902" width="7" height="7" fill="#32161f"/>
+  <text x="1360" y="1940" text-anchor="middle" class="tiny">Android 8.0+ · 18 MB</text>
+
+  <!-- Móvil: footer -->
+  <line x1="1216" y1="1962" x2="1504" y2="1962" class="sep"/>
+  <text x="1360" y="1984" text-anchor="middle" class="tiny">Privacidad · GitHub · v1.0</text>
+</svg>

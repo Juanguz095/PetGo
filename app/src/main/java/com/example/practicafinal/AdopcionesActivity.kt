@@ -9,8 +9,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.example.practicafinal.util.filtrarPublicaciones
-import androidx.appcompat.app.AlertDialog
-import com.example.practicafinal.util.Dialogos
+
 import com.example.practicafinal.util.ejecutarSeguro
 import com.example.practicafinal.util.actualizarUi
 import androidx.appcompat.app.AppCompatActivity
@@ -71,11 +70,13 @@ class AdopcionesActivity : AppCompatActivity() {
         btnCargarMas.setOnClickListener { cargarAdopciones(reset = false) }
         btnRadio = findViewById(R.id.btn_radio)
         btnRadio.setOnClickListener { mostrarMenuRadio() }
-
-        val panelFiltros = findViewById<View>(R.id.panel_filtros)
-        findViewById<View>(R.id.btn_filtro).setOnClickListener {
-            panelFiltros.visibility = if (panelFiltros.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        val panelFiltros = findViewById<View>(R.id.panel_filtros_secundarios)
+        findViewById<View>(R.id.btn_toggle_filtros).setOnClickListener { boton ->
+            val mostrar = panelFiltros.visibility != View.VISIBLE
+            panelFiltros.visibility = if (mostrar) View.VISIBLE else View.GONE
+            boton.contentDescription = if (mostrar) "Ocultar filtros" else "Mostrar filtros"
         }
+
 
         findViewById<View>(R.id.btn_favoritos).setOnClickListener {
             startActivity(Intent(this, MisFavoritosActivity::class.java))
@@ -121,19 +122,17 @@ class AdopcionesActivity : AppCompatActivity() {
         chipCercanos.setOnClickListener { seleccionarOrden("cercanos") }
         chipNombre.setOnClickListener { seleccionarOrden("nombre") }
 
-        findViewById<View>(R.id.btn_proceso).setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle(R.string.adoption_process_title)
-                .setMessage(R.string.adoption_process_body)
-                .setPositiveButton(R.string.understood, null)
-                .show().also { Dialogos.aplicar(this, it) }
-        }
+
         obtenerUbicacion()
     }
 
     private fun seleccionarOrden(orden: String) {
         if (orden == "cercanos" && (userLat == null || userLng == null)) {
-            Toast.makeText(this, "No hay una ubicación reciente; se mostrarán primero las publicaciones nuevas", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                "No hay una ubicación reciente; se mostrarán primero las publicaciones nuevas",
+                Toast.LENGTH_LONG
+            ).show()
             seleccionarOrden("recientes")
             return
         }
@@ -152,7 +151,8 @@ class AdopcionesActivity : AppCompatActivity() {
 
     private fun mostrarMenuRadio() {
         if (userLat == null || userLng == null) {
-            Toast.makeText(this, "Necesitas una ubicación reciente para filtrar por distancia", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Necesitas una ubicación reciente para filtrar por distancia", Toast.LENGTH_LONG)
+                .show()
             return
         }
         androidx.appcompat.widget.PopupMenu(this, btnRadio).apply {
@@ -196,7 +196,7 @@ class AdopcionesActivity : AppCompatActivity() {
                     btnCargarMas.isEnabled = true
                     btnCargarMas.visibility = if (hayMas) View.VISIBLE else View.GONE
                     publicaciones = (if (reset) emptyList() else publicaciones) +
-                        pagina.items.filter { it.estado == "Activa" }
+                            pagina.items.filter { it.estado == "Activa" }
                     aplicarFiltros(preserveScroll = !reset)
                     actualizarContadorFav()
                 }
@@ -236,6 +236,7 @@ class AdopcionesActivity : AppCompatActivity() {
                     filtradas.sortedByDescending { it.fechaCreacion }
                 }
             }
+
             "nombre" -> filtradas.sortedBy { it.nombre.lowercase() }
             else -> filtradas.sortedByDescending { it.fechaCreacion }
         }
@@ -243,7 +244,12 @@ class AdopcionesActivity : AppCompatActivity() {
         val layoutManager = rvAnimales.layoutManager as? LinearLayoutManager
         val firstVisible = layoutManager?.findFirstVisibleItemPosition() ?: 0
         val firstOffset = rvAnimales.getChildAt(0)?.top ?: 0
-        rvAnimales.adapter = AdaptadorAdopciones(filtradas, userLat, userLng) { publicacion ->
+        rvAnimales.adapter = AdaptadorAdopciones(
+            filtradas,
+            userLat,
+            userLng,
+            onVerMapa = { publicacion -> verEnMapa(publicacion) }
+        ) { publicacion ->
             startActivity(
                 Intent(this, DetalleAdopcionActivity::class.java).apply {
                     putExtra(DetalleAdopcionActivity.EXTRA_PUBLICACION_ID, publicacion.id)
@@ -255,6 +261,14 @@ class AdopcionesActivity : AppCompatActivity() {
         } else {
             rvAnimales.scrollToPosition(0)
         }
+    }
+
+    private fun verEnMapa(publicacion: Publicacion) {
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            putExtra("centrar_lat", publicacion.latitud)
+            putExtra("centrar_lng", publicacion.longitud)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        })
     }
 
     private fun actualizarContadorFav() {

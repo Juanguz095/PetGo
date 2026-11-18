@@ -45,6 +45,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tv_encabezado_denuncias"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -77,6 +78,24 @@
                     app:strokeColor="@color/tinta"
                     app:strokeWidth="2dp" />
             </FrameLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_moderar_denuncias"
+                style="@style/Widget.PetGo.Button.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:stateListAnimator="@null"
+                android:text="Moderación"
+                android:textAllCaps="false"
+                android:textColor="@color/tinta"
+                android:textSize="11sp"
+                android:visibility="gone"
+                app:cornerRadius="10dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="1dp" />
         </LinearLayout>
     </ScrollView>
 

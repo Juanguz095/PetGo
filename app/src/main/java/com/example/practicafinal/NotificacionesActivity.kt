@@ -59,17 +59,29 @@ class NotificacionesActivity : AppCompatActivity() {
                                 DatabaseHelper(this).marcarNotificacionLeida(notif["id"] as String)
                             }
                             val tipo = notif["tipo"] as? String
-                            val destino = if (tipo == "caso_resuelto") {
-                                DetallePublicacionActivity::class.java
-                            } else MainActivity::class.java
+                            val destino = when (tipo) {
+                                "caso_resuelto" -> DetallePublicacionActivity::class.java
+                                "solicitud_adopcion" -> DetalleAdopcionActivity::class.java
+                                "denuncia_estado" -> DetalleDenunciaActivity::class.java
+                                else -> MainActivity::class.java
+                            }
                             val intent = Intent(this, destino)
                             val lat = (notif["latitud"] as? Number)?.toDouble()
                             val lng = (notif["longitud"] as? Number)?.toDouble()
                             if (tipo == "caso_resuelto") {
                                 intent.putExtra(DetallePublicacionActivity.EXTRA_PUBLICACION_ID, pubId)
-                            } else if (tipo == "avistamiento" && lat != null && lng != null) {
+                            } else if (tipo == "solicitud_adopcion") {
+                                intent.putExtra(DetalleAdopcionActivity.EXTRA_PUBLICACION_ID, pubId)
+                            } else if (tipo == "denuncia_estado") {
+                                intent.putExtra("denuncia_id", pubId)
+                            } else if (tipo in setOf(
+                                    "avistamiento",
+                                    "revision_avistamiento"
+                                ) && lat != null && lng != null
+                            ) {
                                 intent.putExtra("centrar_lat", lat)
                                 intent.putExtra("centrar_lng", lng)
+                                intent.putExtra("mostrar_alerta", pubId)
                             } else {
                                 intent.putExtra("mostrar_alerta", pubId)
                             }
@@ -120,6 +132,9 @@ class NotificacionesActivity : AppCompatActivity() {
                 "avistamiento" -> "Avistamiento de mascota"
                 "caso_resuelto" -> "Mascota encontrada"
                 "alerta_cercana" -> "Mascota perdida cerca"
+                "revision_avistamiento" -> "Actualización de avistamiento"
+                "solicitud_adopcion" -> "Solicitud de adopción"
+                "denuncia_estado" -> "Actualización de denuncia"
                 else -> tipo
             }
             val fecha = notif["fecha"] as? Long ?: 0L

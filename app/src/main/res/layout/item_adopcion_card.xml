@@ -14,7 +14,7 @@
     <FrameLayout
         android:id="@+id/foto_card"
         android:layout_width="match_parent"
-        android:layout_height="164dp"
+        android:layout_height="160dp"
         android:background="@drawable/bg_card_foto">
 
         <com.google.android.material.imageview.ShapeableImageView
@@ -106,6 +106,52 @@
             android:textSize="13sp"
             android:textStyle="bold"
             android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_ver_mapa"
+                style="@style/Widget.PetGo.Button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="VER EN MAPA"
+                android:textColor="@color/petgo_button_text"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/amarillo"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_detalles"
+                style="@style/Widget.PetGo.Button"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="MÁS DETALLES"
+                android:textColor="@color/petgo_button_text"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="11dp"
+                app:strokeColor="@color/tinta"
+                app:strokeWidth="2dp" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

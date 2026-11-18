@@ -1,0 +1,389 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="3170" viewBox="0 0 1200 3170" font-family="'Segoe UI', Arial, sans-serif">
+  <style>
+    .pg { fill: #ffffff; stroke: #c9c9c9; }
+    .ph { fill: #f4f4f4; stroke: #9e9e9e; stroke-width: 1; stroke-dasharray: 5 4; }
+    .comp { fill: #ffffff; stroke: #9e9e9e; stroke-width: 1; }
+    .band { fill: #ededed; }
+    .line { stroke: #111111; stroke-width: 1; }
+    .soft { stroke: #d6d6d6; stroke-width: 1; }
+    .lab { font-size: 10px; letter-spacing: 1.5px; fill: #888888; font-weight: 600; }
+    .t8 { font-size: 8px; fill: #999999; }
+    .t9 { font-size: 9px; fill: #777777; }
+    .t11 { font-size: 11px; fill: #444444; }
+    .t13 { font-size: 13px; fill: #111111; }
+    .t18 { font-size: 18px; fill: #111111; font-weight: 600; }
+    .t24 { font-size: 24px; fill: #111111; font-weight: 600; }
+    .ctr { text-anchor: middle; }
+  </style>
+
+  <rect width="1200" height="3170" fill="#ffffff"/>
+  <text x="40" y="30" class="t18">PetGo · estructura de la landing · v3</text>
+  <text x="40" y="48" class="t9">Solo bloques y jerarquía. Sin color, sin mapas, sin ilustraciones.</text>
+
+  <rect x="40" y="64" width="1120" height="3080" class="pg"/>
+
+  <!-- 01 NAV -->
+  <text x="40" y="84" class="t8">01</text>
+  <text x="80" y="84" class="t13">Navegación</text>
+  <text x="80" y="108" class="t11">logo</text>
+  <text x="420" y="108" class="t9">Alertas    Adopciones    Albergues    Preguntas</text>
+  <rect x="1000" y="94" width="120" height="26" class="comp"/>
+  <text x="1060" y="111" class="t9 ctr">Descargar</text>
+  <line x1="40" y1="132" x2="1160" y2="132" class="line"/>
+
+  <!-- 02 HERO -->
+  <text x="40" y="152" class="t8">02</text>
+  <text x="80" y="152" class="lab">HERO · 5/12 + 7/12</text>
+
+  <text x="80" y="188" class="t24">H1</text>
+  <text x="108" y="188" class="t11">2 o 3 líneas</text>
+  <text x="80" y="212" class="t11">subtítulo</text>
+  <text x="140" y="212" class="t9">2 líneas</text>
+  <rect x="80" y="232" width="130" height="32" class="comp"/>
+  <text x="145" y="252" class="t9 ctr">Descargar</text>
+  <text x="226" y="252" class="t9">enlace secundario</text>
+  <text x="80" y="290" class="t9">microcopy</text>
+  <text x="144" y="290" class="t8">requisitos · sin registro para ver</text>
+
+  <rect x="640" y="168" width="480" height="212" class="ph"/>
+  <text x="880" y="266" class="t9 ctr">captura de la app</text>
+  <text x="880" y="282" class="t8 ctr">imagen pendiente</text>
+  <text x="640" y="398" class="t8">La columna visual es más ancha que el texto: no es 50/50.</text>
+  <line x1="40" y1="420" x2="1160" y2="420" class="line"/>
+
+  <!-- 03 TAREAS -->
+  <text x="40" y="440" class="t8">03</text>
+  <text x="80" y="440" class="lab">ENTRADAS POR TAREA</text>
+  <line x1="330" y1="456" x2="330" y2="520" class="soft"/>
+  <line x1="590" y1="456" x2="590" y2="520" class="soft"/>
+  <line x1="850" y1="456" x2="850" y2="520" class="soft"/>
+
+  <text x="80" y="472" class="t9">01</text>
+  <text x="80" y="496" class="t13">Perdí a mi mascota</text>
+  <text x="80" y="514" class="t9">1 línea</text>
+
+  <text x="340" y="472" class="t9">02</text>
+  <text x="340" y="496" class="t13">Encontré una</text>
+  <text x="340" y="514" class="t9">1 línea</text>
+
+  <text x="600" y="472" class="t9">03</text>
+  <text x="600" y="496" class="t13">Quiero adoptar</text>
+  <text x="600" y="514" class="t9">1 línea</text>
+
+  <text x="860" y="472" class="t9">04</text>
+  <text x="860" y="496" class="t13">Vi un caso de maltrato</text>
+  <text x="860" y="514" class="t9">1 línea</text>
+  <line x1="40" y1="540" x2="1160" y2="540" class="line"/>
+
+  <!-- 04 ALERTAS -->
+  <text x="40" y="560" class="t8">04</text>
+  <text x="80" y="560" class="lab">ALERTAS</text>
+  <text x="80" y="592" class="t18">Alertas recientes</text>
+  <text x="1120" y="592" class="t9" text-anchor="end">ver todas</text>
+
+  <rect x="80" y="610" width="62" height="22" class="comp"/>
+  <text x="111" y="625" class="t9 ctr">Todas</text>
+  <rect x="150" y="610" width="70" height="22" class="comp"/>
+  <text x="185" y="625" class="t9 ctr">Perdidas</text>
+  <rect x="228" y="610" width="90" height="22" class="comp"/>
+  <text x="273" y="625" class="t9 ctr">Encontradas</text>
+  <rect x="326" y="610" width="70" height="22" class="comp"/>
+  <text x="361" y="625" class="t9 ctr">Adoptar</text>
+
+  <rect x="80" y="648" width="34" height="34" class="ph"/>
+  <text x="126" y="663" class="t11">nombre · especie</text>
+  <text x="126" y="678" class="t9">zona · tiempo</text>
+  <text x="700" y="668" class="t9">estado</text>
+  <text x="860" y="668" class="t9">N avistamientos</text>
+  <line x1="80" y1="690" x2="1120" y2="690" class="soft"/>
+
+  <rect x="80" y="696" width="34" height="34" class="ph"/>
+  <text x="126" y="711" class="t11">nombre · especie</text>
+  <text x="126" y="726" class="t9">zona · tiempo</text>
+  <text x="700" y="716" class="t9">estado</text>
+  <text x="860" y="716" class="t9">N avistamientos</text>
+  <line x1="80" y1="738" x2="1120" y2="738" class="soft"/>
+
+  <rect x="80" y="744" width="34" height="34" class="ph"/>
+  <text x="126" y="759" class="t11">nombre · especie</text>
+  <text x="126" y="774" class="t9">zona · tiempo</text>
+  <text x="700" y="764" class="t9">estado</text>
+  <line x1="80" y1="786" x2="1120" y2="786" class="soft"/>
+
+  <rect x="80" y="792" width="34" height="34" class="ph"/>
+  <text x="126" y="807" class="t11">nombre · especie</text>
+  <text x="126" y="822" class="t9">zona · tiempo</text>
+  <text x="700" y="812" class="t9">estado</text>
+  <text x="80" y="848" class="t8">Lista, sin mapa. El mapa vive en la app.</text>
+  <line x1="40" y1="864" x2="1160" y2="864" class="line"/>
+
+  <!-- 05 TEXTO -->
+  <text x="40" y="884" class="t8">05</text>
+  <text x="80" y="884" class="lab">BLOQUE DE TEXTO · COLUMNA ESTRECHA</text>
+  <text x="240" y="920" class="t18">Declaración</text>
+  <text x="240" y="942" class="t9">2 líneas, sin caja</text>
+  <text x="240" y="972" class="t11">Párrafo</text>
+  <text x="296" y="972" class="t9">3 líneas</text>
+  <text x="240" y="1002" class="t9">Cierre corto · 1 línea</text>
+  <line x1="40" y1="1022" x2="1160" y2="1022" class="line"/>
+
+  <!-- 06 COMO FUNCIONA -->
+  <text x="40" y="1042" class="t8">06</text>
+  <text x="80" y="1042" class="lab">CÓMO FUNCIONA · RAIL + 3 PASOS</text>
+  <line x1="150" y1="1060" x2="150" y2="1252" class="soft"/>
+  <text x="80" y="1112" class="t24">01</text>
+  <text x="80" y="1182" class="t24">02</text>
+  <text x="80" y="1252" class="t24">03</text>
+
+  <line x1="320" y1="1068" x2="1120" y2="1068" class="soft"/>
+  <text x="320" y="1094" class="t13">Paso 1 · título</text>
+  <text x="320" y="1112" class="t9">2 líneas de apoyo</text>
+  <rect x="880" y="1076" width="240" height="52" class="ph"/>
+  <text x="1000" y="1106" class="t8 ctr">captura</text>
+
+  <line x1="320" y1="1140" x2="1120" y2="1140" class="soft"/>
+  <text x="320" y="1166" class="t13">Paso 2 · título</text>
+  <text x="320" y="1184" class="t9">2 líneas de apoyo</text>
+  <rect x="880" y="1148" width="240" height="52" class="ph"/>
+  <text x="1000" y="1178" class="t8 ctr">captura</text>
+
+  <line x1="320" y1="1212" x2="1120" y2="1212" class="soft"/>
+  <text x="320" y="1238" class="t13">Paso 3 · título</text>
+  <text x="320" y="1256" class="t9">2 líneas de apoyo</text>
+  <rect x="880" y="1220" width="240" height="52" class="ph"/>
+  <text x="1000" y="1250" class="t8 ctr">captura</text>
+  <line x1="40" y1="1282" x2="1160" y2="1282" class="line"/>
+
+  <!-- 07 ADOPCIONES -->
+  <text x="40" y="1302" class="t8">07</text>
+  <text x="80" y="1302" class="lab">ADOPCIONES</text>
+  <text x="80" y="1334" class="t18">En adopción</text>
+  <text x="1120" y="1334" class="t9" text-anchor="end">ver todas</text>
+
+  <rect x="80" y="1352" width="60" height="24" class="comp"/>
+  <text x="110" y="1368" class="t9 ctr">Todos</text>
+  <rect x="150" y="1352" width="64" height="24" class="comp"/>
+  <text x="182" y="1368" class="t9 ctr">Perros</text>
+  <rect x="224" y="1352" width="64" height="24" class="comp"/>
+  <text x="256" y="1368" class="t9 ctr">Gatos</text>
+  <rect x="900" y="1350" width="220" height="26" class="comp"/>
+  <text x="912" y="1367" class="t9">buscar</text>
+
+  <rect x="80" y="1396" width="320" height="124" class="comp"/>
+  <rect x="94" y="1410" width="92" height="92" class="ph"/>
+  <text x="140" y="1460" class="t8 ctr">foto</text>
+  <text x="200" y="1428" class="t11">Nombre</text>
+  <text x="200" y="1446" class="t9">especie · edad</text>
+  <text x="200" y="1464" class="t9">albergue</text>
+  <text x="200" y="1482" class="t9">distancia</text>
+  <text x="200" y="1502" class="t8">ver ficha</text>
+
+  <rect x="420" y="1396" width="320" height="124" class="comp"/>
+  <rect x="434" y="1410" width="92" height="92" class="ph"/>
+  <text x="480" y="1460" class="t8 ctr">foto</text>
+  <text x="540" y="1428" class="t11">Nombre</text>
+  <text x="540" y="1446" class="t9">especie · edad</text>
+  <text x="540" y="1464" class="t9">albergue</text>
+  <text x="540" y="1482" class="t9">distancia</text>
+  <text x="540" y="1502" class="t8">ver ficha</text>
+
+  <rect x="760" y="1396" width="320" height="124" class="comp"/>
+  <rect x="774" y="1410" width="92" height="92" class="ph"/>
+  <text x="820" y="1460" class="t8 ctr">foto</text>
+  <text x="880" y="1428" class="t11">Nombre</text>
+  <text x="880" y="1446" class="t9">especie · edad</text>
+  <text x="880" y="1464" class="t9">albergue</text>
+  <text x="880" y="1482" class="t9">distancia</text>
+  <text x="880" y="1502" class="t8">ver ficha</text>
+
+  <rect x="80" y="1536" width="320" height="124" class="comp"/>
+  <rect x="94" y="1550" width="92" height="92" class="ph"/>
+  <text x="140" y="1600" class="t8 ctr">foto</text>
+  <text x="200" y="1568" class="t11">Nombre</text>
+  <text x="200" y="1586" class="t9">especie · edad</text>
+  <text x="200" y="1604" class="t9">albergue</text>
+  <text x="200" y="1622" class="t9">distancia</text>
+  <text x="200" y="1642" class="t8">ver ficha</text>
+
+  <rect x="420" y="1536" width="320" height="124" class="comp"/>
+  <rect x="434" y="1550" width="92" height="92" class="ph"/>
+  <text x="480" y="1600" class="t8 ctr">foto</text>
+  <text x="540" y="1568" class="t11">Nombre</text>
+  <text x="540" y="1586" class="t9">especie · edad</text>
+  <text x="540" y="1604" class="t9">albergue</text>
+  <text x="540" y="1622" class="t9">distancia</text>
+  <text x="540" y="1642" class="t8">ver ficha</text>
+
+  <rect x="760" y="1536" width="320" height="124" class="comp"/>
+  <rect x="774" y="1550" width="92" height="92" class="ph"/>
+  <text x="820" y="1600" class="t8 ctr">foto</text>
+  <text x="880" y="1568" class="t11">Nombre</text>
+  <text x="880" y="1586" class="t9">especie · edad</text>
+  <text x="880" y="1604" class="t9">albergue</text>
+  <text x="880" y="1622" class="t9">distancia</text>
+  <text x="880" y="1642" class="t8">ver ficha</text>
+
+  <text x="80" y="1690" class="t8">Rejilla 3 × 2. Cada ficha indica quién la publica.</text>
+  <line x1="40" y1="1710" x2="1160" y2="1710" class="line"/>
+
+  <!-- 08 ALBERGUES -->
+  <text x="40" y="1730" class="t8">08</text>
+  <text x="80" y="1730" class="lab">ALBERGUES</text>
+  <text x="80" y="1762" class="t18">Directorio</text>
+  <text x="1120" y="1762" class="t9" text-anchor="end">ver directorio</text>
+
+  <rect x="80" y="1780" width="300" height="26" class="comp"/>
+  <text x="92" y="1797" class="t9">buscar por distrito o nombre</text>
+
+  <text x="80" y="1832" class="t8">NOMBRE</text>
+  <text x="400" y="1832" class="t8">DISTRITO</text>
+  <text x="600" y="1832" class="t8">DISTANCIA</text>
+  <text x="760" y="1832" class="t8">TELÉFONO</text>
+  <text x="1120" y="1832" class="t8" text-anchor="end">ACCIÓN</text>
+  <line x1="80" y1="1842" x2="1120" y2="1842" class="line"/>
+
+  <text x="80" y="1868" class="t11">Albergue</text>
+  <text x="400" y="1868" class="t9">distrito</text>
+  <text x="600" y="1868" class="t9">km</text>
+  <text x="760" y="1868" class="t9">teléfono</text>
+  <text x="1120" y="1868" class="t9" text-anchor="end">ver mapa</text>
+  <line x1="80" y1="1882" x2="1120" y2="1882" class="soft"/>
+
+  <text x="80" y="1908" class="t11">Albergue</text>
+  <text x="400" y="1908" class="t9">distrito</text>
+  <text x="600" y="1908" class="t9">km</text>
+  <text x="760" y="1908" class="t9">teléfono</text>
+  <text x="1120" y="1908" class="t9" text-anchor="end">ver mapa</text>
+  <line x1="80" y1="1922" x2="1120" y2="1922" class="soft"/>
+
+  <text x="80" y="1950" class="t8">Tabla, no tarjetas. Ordenada por distancia.</text>
+  <line x1="40" y1="1970" x2="1160" y2="1970" class="line"/>
+
+  <!-- 09 TRANSPARENCIA -->
+  <text x="40" y="1990" class="t8">09</text>
+  <text x="80" y="1990" class="lab">TRANSPARENCIA · BANDA ÚNICA</text>
+  <rect x="40" y="2004" width="1120" height="130" class="band"/>
+  <text x="80" y="2032" class="t18">Flujo de un avistamiento</text>
+  <circle cx="86" cy="2066" r="9" fill="#ffffff" stroke="#9e9e9e"/>
+  <text x="86" y="2069" class="t8 ctr">1</text>
+  <text x="80" y="2092" class="t11">Llegas al punto</text>
+  <circle cx="366" cy="2066" r="9" fill="#ffffff" stroke="#9e9e9e"/>
+  <text x="366" y="2069" class="t8 ctr">2</text>
+  <text x="360" y="2092" class="t11">Foto y nota</text>
+  <circle cx="646" cy="2066" r="9" fill="#ffffff" stroke="#9e9e9e"/>
+  <text x="646" y="2069" class="t8 ctr">3</text>
+  <text x="640" y="2092" class="t11">El dueño revisa</text>
+  <circle cx="926" cy="2066" r="9" fill="#ffffff" stroke="#9e9e9e"/>
+  <text x="926" y="2069" class="t8 ctr">4</text>
+  <text x="920" y="2092" class="t11">Se publica o se descarta</text>
+  <text x="80" y="2120" class="t8">Ubicación exacta privada. Solo se muestra la zona.</text>
+  <line x1="40" y1="2144" x2="1160" y2="2144" class="line"/>
+
+  <!-- 10 DENUNCIAS -->
+  <text x="40" y="2164" class="t8">10</text>
+  <text x="80" y="2164" class="lab">DENUNCIAS</text>
+  <text x="80" y="2196" class="t18">Reportar un caso</text>
+  <text x="80" y="2222" class="t9">2 líneas de explicación</text>
+  <rect x="80" y="2240" width="440" height="44" class="comp"/>
+  <text x="92" y="2258" class="t8">aviso: no reemplaza una denuncia formal</text>
+  <text x="92" y="2274" class="t8">1 línea sobre cómo presentarla</text>
+
+  <rect x="600" y="2180" width="520" height="170" class="comp"/>
+  <text x="616" y="2204" class="t9">Tipo</text>
+  <line x1="616" y1="2214" x2="1104" y2="2214" class="soft"/>
+  <text x="616" y="2238" class="t9">Descripción</text>
+  <line x1="616" y1="2248" x2="1104" y2="2248" class="soft"/>
+  <text x="616" y="2272" class="t9">Foto</text>
+  <rect x="616" y="2282" width="36" height="28" class="ph"/>
+  <text x="672" y="2272" class="t9">Ubicación</text>
+  <line x1="672" y1="2282" x2="1104" y2="2282" class="soft"/>
+  <rect x="940" y="2296" width="164" height="28" class="comp"/>
+  <text x="1022" y="2314" class="t9 ctr">Enviar</text>
+  <line x1="40" y1="2370" x2="1160" y2="2370" class="line"/>
+
+  <!-- 11 CAPTURAS -->
+  <text x="40" y="2390" class="t8">11</text>
+  <text x="80" y="2390" class="lab">CAPTURAS · 5 EN UNA FILA</text>
+  <rect x="80" y="2410" width="196" height="86" class="ph"/>
+  <text x="178" y="2457" class="t8 ctr">captura</text>
+  <rect x="288" y="2410" width="196" height="86" class="ph"/>
+  <text x="386" y="2457" class="t8 ctr">captura</text>
+  <rect x="496" y="2410" width="196" height="86" class="ph"/>
+  <text x="594" y="2457" class="t8 ctr">captura</text>
+  <rect x="704" y="2410" width="196" height="86" class="ph"/>
+  <text x="802" y="2457" class="t8 ctr">captura</text>
+  <rect x="912" y="2410" width="196" height="86" class="ph"/>
+  <text x="1010" y="2457" class="t8 ctr">captura</text>
+  <line x1="40" y1="2520" x2="1160" y2="2520" class="line"/>
+
+  <!-- 12 FAQ -->
+  <text x="40" y="2540" class="t8">12</text>
+  <text x="80" y="2540" class="lab">PREGUNTAS</text>
+  <text x="80" y="2572" class="t18">Dudas frecuentes</text>
+  <text x="80" y="2598" class="t9">2 líneas</text>
+  <text x="80" y="2620" class="t8">enlace de contacto</text>
+
+  <text x="560" y="2556" class="t8">CUENTA</text>
+  <text x="560" y="2582" class="t11">¿Pregunta?</text>
+  <text x="1104" y="2582" class="t9" text-anchor="end">+</text>
+  <line x1="560" y1="2594" x2="1120" y2="2594" class="soft"/>
+  <text x="560" y="2618" class="t11">¿Pregunta?</text>
+  <text x="1104" y="2618" class="t9" text-anchor="end">+</text>
+  <line x1="560" y1="2630" x2="1120" y2="2630" class="soft"/>
+
+  <text x="560" y="2656" class="t8">ALERTAS</text>
+  <text x="560" y="2682" class="t11">¿Pregunta?</text>
+  <text x="1104" y="2682" class="t9" text-anchor="end">+</text>
+  <line x1="560" y1="2694" x2="1120" y2="2694" class="soft"/>
+  <text x="560" y="2718" class="t11">¿Pregunta?</text>
+  <text x="1104" y="2718" class="t9" text-anchor="end">+</text>
+  <line x1="560" y1="2730" x2="1120" y2="2730" class="soft"/>
+  <line x1="40" y1="2750" x2="1160" y2="2750" class="line"/>
+
+  <!-- 13 DESCARGA -->
+  <text x="40" y="2770" class="t8">13</text>
+  <text x="80" y="2770" class="lab">DESCARGA</text>
+  <text x="80" y="2802" class="t18">Instalar la app</text>
+
+  <circle cx="88" cy="2832" r="8" fill="#ffffff" stroke="#9e9e9e"/>
+  <text x="88" y="2835" class="t8 ctr">1</text>
+  <text x="106" y="2836" class="t9">paso</text>
+  <circle cx="88" cy="2856" r="8" fill="#ffffff" stroke="#9e9e9e"/>
+  <text x="88" y="2859" class="t8 ctr">2</text>
+  <text x="106" y="2860" class="t9">paso</text>
+  <circle cx="88" cy="2880" r="8" fill="#ffffff" stroke="#9e9e9e"/>
+  <text x="88" y="2883" class="t8 ctr">3</text>
+  <text x="106" y="2884" class="t9">paso</text>
+  <text x="80" y="2912" class="t9">requisitos</text>
+  <text x="80" y="2930" class="t8">notas de la versión</text>
+
+  <rect x="600" y="2794" width="520" height="160" class="comp"/>
+  <rect x="620" y="2818" width="76" height="76" class="ph"/>
+  <text x="658" y="2860" class="t8 ctr">QR</text>
+  <text x="718" y="2840" class="t9">versión · fecha</text>
+  <text x="718" y="2858" class="t9">tamaño · requisitos</text>
+  <rect x="718" y="2874" width="160" height="28" class="comp"/>
+  <text x="798" y="2892" class="t9 ctr">Descargar</text>
+  <text x="620" y="2934" class="t8">proyecto académico</text>
+  <line x1="40" y1="2964" x2="1160" y2="2964" class="line"/>
+
+  <!-- 14 FOOTER -->
+  <text x="40" y="2984" class="t8">14</text>
+  <text x="80" y="2984" class="lab">FOOTER</text>
+  <text x="80" y="3012" class="t8">PRODUCTO</text>
+  <text x="80" y="3032" class="t9">enlace</text>
+  <text x="80" y="3048" class="t9">enlace</text>
+  <text x="340" y="3012" class="t8">COMUNIDAD</text>
+  <text x="340" y="3032" class="t9">enlace</text>
+  <text x="340" y="3048" class="t9">enlace</text>
+  <text x="600" y="3012" class="t8">LEGAL</text>
+  <text x="600" y="3032" class="t9">enlace</text>
+  <text x="600" y="3048" class="t9">enlace</text>
+  <text x="860" y="3012" class="t8">CONTACTO</text>
+  <text x="860" y="3032" class="t9">enlace</text>
+  <text x="860" y="3048" class="t9">enlace</text>
+  <text x="1120" y="3012" class="t8" text-anchor="end">© 2026</text>
+  <text x="1120" y="3048" class="t8" text-anchor="end">proyecto académico</text>
+
+  <text x="40" y="3096" class="t8">Leyenda: caja continua = componente · caja discontinua = imagen pendiente · línea = separador.</text>
+</svg>

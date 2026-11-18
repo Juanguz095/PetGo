@@ -23,7 +23,6 @@ class RegistroActivity : AppCompatActivity() {
     private lateinit var etCorreo: EditText
     private lateinit var etContrasena: EditText
     private lateinit var etConfirmar: EditText
-    private lateinit var etCiudad: EditText
     private lateinit var tvError: TextView
     private lateinit var btnRegistrar: com.google.android.material.button.MaterialButton
     private lateinit var tvIrLogin: TextView
@@ -40,7 +39,6 @@ class RegistroActivity : AppCompatActivity() {
         etCorreo = findViewById(R.id.et_correo)
         etContrasena = findViewById(R.id.et_contrasena)
         etConfirmar = findViewById(R.id.et_confirmar)
-        etCiudad = findViewById(R.id.et_ciudad)
         tvError = findViewById(R.id.tv_error)
 
         btnRegistrar = findViewById(R.id.btn_registrar)
@@ -60,9 +58,8 @@ class RegistroActivity : AppCompatActivity() {
         val correo = etCorreo.text.toString().trim()
         val contrasena = etContrasena.text.toString()
         val confirmar = etConfirmar.text.toString()
-        val ciudad = etCiudad.text.toString().trim()
 
-        val error = ControladorUsuarios.validarRegistro(nombre, correo, contrasena, confirmar, ciudad)
+        val error = ControladorUsuarios.validarRegistro(nombre, correo, contrasena, confirmar)
         if (error != null) {
             mostrarError(error); return
         }
@@ -70,7 +67,7 @@ class RegistroActivity : AppCompatActivity() {
         btnRegistrar.isEnabled = false
         ejecutarSeguro(executor) {
             try {
-                val resultado = ControladorUsuarios.registrar(this, nombre, correo, contrasena, ciudad)
+                val resultado = ControladorUsuarios.registrar(this, nombre, correo, contrasena)
                 actualizarUi {
                     btnRegistrar.isEnabled = true
                     when (resultado) {
@@ -94,10 +91,8 @@ class RegistroActivity : AppCompatActivity() {
         perfilPendiente = true
         etNombre.setText(usuario.nombre)
         etCorreo.setText(usuario.correo)
-        etCiudad.setText(usuario.ciudad)
         etNombre.isEnabled = false
         etCorreo.isEnabled = false
-        etCiudad.isEnabled = false
         etContrasena.text.clear()
         etConfirmar.text.clear()
         etContrasena.visibility = View.GONE

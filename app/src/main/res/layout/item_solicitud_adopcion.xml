@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/bg_card_lista"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <TextView
+        android:id="@+id/tv_persona"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Persona interesada"
+        android:textColor="@color/tinta"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_fecha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:textColor="@color/texto_suave"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/tv_estado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/bg_pill_estado"
+        android:paddingStart="9dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="9dp"
+        android:paddingBottom="3dp"
+        android:textColor="@color/tinta"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_mensaje"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/texto_suave"
+        android:textSize="13sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_contactar"
+        style="@style/Widget.PetGo.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginTop="8dp"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:stateListAnimator="@null"
+        android:text="Contactar por WhatsApp"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:backgroundTint="@color/verde_petgo"
+        app:cornerRadius="10dp"
+        app:strokeColor="@color/tinta"
+        app:strokeWidth="2dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_conversacion"
+        style="@style/Widget.PetGo.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginTop="7dp"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:stateListAnimator="@null"
+        android:text="Marcar en conversación"
+        android:textAllCaps="false"
+        android:textColor="@color/tinta"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:cornerRadius="10dp"
+        app:strokeColor="@color/tinta"
+        app:strokeWidth="1dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_cerrar"
+        style="@style/Widget.PetGo.Button.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginTop="6dp"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:stateListAnimator="@null"
+        android:text="No continuar"
+        android:textAllCaps="false"
+        android:textColor="@color/colorRed"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:cornerRadius="10dp"
+        app:strokeColor="@color/colorRed"
+        app:strokeWidth="1dp" />
+</LinearLayout>
