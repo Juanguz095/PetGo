@@ -62,8 +62,11 @@ const { ref, uploadBytes, getBytes } = localRequire('firebase/storage');
     await assertFails(setDoc(doc(other.firestore(), 'avistamientos/missing-fields'), {
       usuarioId: 'other', publicacionId: 'pet',
     }));
+    await assertSucceeds(setDoc(doc(other.firestore(), 'avistamientos/clock-skew'), {
+      ...sighting, fecha: Date.now() + 120_000,
+    }));
     await assertFails(setDoc(doc(other.firestore(), 'avistamientos/future'), {
-      ...sighting, fecha: Date.now() + 60_000,
+      ...sighting, fecha: Date.now() + 600_000,
     }));
     await assertFails(setDoc(doc(other.firestore(), 'avistamientos/old'), {
       ...sighting, fecha: Date.now() - 31 * 24 * 60 * 60 * 1000,
@@ -74,6 +77,12 @@ const { ref, uploadBytes, getBytes } = localRequire('firebase/storage');
       usuarioId: 'owner', motivo: 'Maltrato', descripcion: 'Necesita ayuda',
       latitud: -12, longitud: -77, fecha: Date.now(), estado: 'Recibida',
     };
+    await assertSucceeds(setDoc(doc(owner.firestore(), 'denuncias/clock-skew'), {
+      ...report, fecha: Date.now() + 120_000,
+    }));
+    await assertFails(setDoc(doc(owner.firestore(), 'denuncias/future'), {
+      ...report, fecha: Date.now() + 600_000,
+    }));
     await assertSucceeds(setDoc(doc(owner.firestore(), 'denuncias/report'), report));
     await assertFails(getDoc(doc(other.firestore(), 'denuncias/report')));
     await assertFails(setDoc(doc(owner.firestore(), 'denuncias/empty'), { ...report, descripcion: '' }));
@@ -142,8 +151,17 @@ const { ref, uploadBytes, getBytes } = localRequire('firebase/storage');
     const application = {
       id: applicationId, publicacionId: 'adoption', usuarioInteresadoId: 'other',
       usuarioPropietarioId: 'owner', mensaje: 'Puedo darle un hogar',
-      contactoWhatsapp: '999123456', estado: 'Pendiente', fecha: Date.now(),
+      contactoWhatsapp: '999123456', estado: 'Pendiente', fecha: Date.now() + 120_000,
     };
+    const futureApplication = {
+      ...application,
+      id: 'adoption_stranger',
+      usuarioInteresadoId: 'stranger',
+      fecha: Date.now() + 600_000,
+    };
+    await assertFails(setDoc(
+      doc(stranger.firestore(), 'solicitudes_adopcion/adoption_stranger'), futureApplication
+    ));
     const applicationNotification = {
       id: `${applicationId}_nueva`, usuarioOrigenId: 'other', usuarioDestinoId: 'owner',
       publicacionId: 'adoption', avistamientoId: applicationId, tipo: 'solicitud_adopcion',

@@ -868,7 +868,9 @@ class FirebaseRepository(private val context: Context) {
                     .limit(100)
                     .get()
             ).documents
-            solicitudes.chunked(200).forEach { grupo ->
+            // Each request+notification pair consumes Firestore Rules lookups; keep batches below the 20-call limit.
+            // Keep request updates and their notifications below Firestore Rules' 20-read batch limit.
+            solicitudes.chunked(6).forEach { grupo ->
                 val batch = db.batch()
                 grupo.forEach { solicitud ->
                     val interesId = solicitud.getString("usuarioInteresadoId") ?: return@forEach

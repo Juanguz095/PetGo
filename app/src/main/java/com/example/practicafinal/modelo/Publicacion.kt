@@ -28,7 +28,7 @@ data class Publicacion(
     fun toFirestoreMap(firebaseUid: String? = null): Map<String, Any> = buildMap {
         firebaseUid?.let { put("usuarioId", it) }
         put("usuarioLegacyId", usuarioId ?: 0L)
-        usuarioNombre?.trim()?.takeIf { it.isNotEmpty() }?.let { put("usuarioNombre", it) }
+        usuarioNombre?.trim()?.takeIf { it.isNotEmpty() && it.length <= 80 }?.let { put("usuarioNombre", it) }
         put("tipo", tipo)
         put("nombre", nombre)
         put("descripcion", descripcion)

@@ -34,6 +34,9 @@ service cloud.firestore {
         && (!('cuidados' in data)
           || (data.cuidados is string && data.cuidados.size() <= 180));
     }
+    function withinClockSkew(epochMillis) {
+      return epochMillis is number && epochMillis <= request.time.toMillis() + 300000;
+    }
     function validSighting(data) {
       return data.keys().hasOnly([
           'publicacionId', 'usuarioId', 'usuarioLegacyId', 'latitud',
@@ -55,9 +58,8 @@ service cloud.firestore {
         && data.longitud <= 180
         && data.descripcion is string
         && data.descripcion.size() <= 1000
-        && data.fecha is number
-        && data.fecha <= request.time.toMillis()
-        && data.fecha >= request.time.toMillis() - 2592000000
+        && withinClockSkew(data.fecha)
+        && data.fecha >= request.time.toMillis() - 2592000000 - 300000
         && (!('estadoRevision' in data) || data.estadoRevision == 'Pendiente')
         && (!('especie' in data) || (data.especie is string && data.especie in ['Perro', 'Gato']))
         && (!('foto' in data) || (data.foto is string && data.foto.size() <= 1000000));
@@ -293,8 +295,7 @@ service cloud.firestore {
         && (request.resource.data.contactoWhatsapp == ''
           || request.resource.data.contactoWhatsapp.matches('^(51)?[0-9]{9}$'))
         && request.resource.data.estado == 'Pendiente'
-        && request.resource.data.fecha is number
-        && request.resource.data.fecha <= request.time.toMillis()
+        && withinClockSkew(request.resource.data.fecha)
         && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.usuarioId
           == request.resource.data.usuarioPropietarioId
         && get(/databases/$(database)/documents/publicaciones/$(request.resource.data.publicacionId)).data.tipo == 'Adopcion'
@@ -394,8 +395,7 @@ service cloud.firestore {
         && request.resource.data.longitud is number
         && request.resource.data.longitud >= -180
         && request.resource.data.longitud <= 180
-        && request.resource.data.fecha is number
-        && request.resource.data.fecha <= request.time.toMillis()
+        && withinClockSkew(request.resource.data.fecha)
         && request.resource.data.estado == 'Recibida'
         && (!('foto' in request.resource.data)
           || (request.resource.data.foto is string && request.resource.data.foto.size() <= 1000000));

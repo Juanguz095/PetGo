@@ -7,7 +7,9 @@ import com.example.practicafinal.modelo.Denuncia
 object ControladorDenuncias {
     fun validarDenuncia(motivo: String, descripcion: String): String? = when {
         motivo.isBlank() -> "Selecciona o escribe un motivo"
+        motivo.trim().length > 80 -> "El motivo no puede superar 80 caracteres"
         descripcion.isBlank() -> "Escribe una descripción"
+        descripcion.trim().length > 1000 -> "La descripción no puede superar 1000 caracteres"
         else -> null
     }
 
