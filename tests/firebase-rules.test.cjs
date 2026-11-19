@@ -29,6 +29,22 @@ const { ref, uploadBytes, getBytes } = localRequire('firebase/storage');
       fechaCreacion: Date.now(),
     };
     await assertSucceeds(setDoc(doc(owner.firestore(), 'publicaciones/pet'), publication));
+    const adoptionReference = doc(owner.firestore(), 'publicaciones/adoption');
+    await assertSucceeds(setDoc(adoptionReference, {
+      ...publication,
+      tipo: 'Adopcion',
+      edadAproximada: '2 años',
+      caracter: 'Juguetona',
+      cuidados: 'Vacunas al día',
+    }));
+    await assertSucceeds(updateDoc(adoptionReference, {
+      edadAproximada: '3 años',
+      caracter: 'Tranquila',
+      cuidados: 'Alimentación especial',
+    }));
+    await assertFails(updateDoc(adoptionReference, { edadAproximada: 'x'.repeat(41) }));
+    await assertFails(updateDoc(adoptionReference, { caracter: 'x'.repeat(81) }));
+    await assertFails(updateDoc(adoptionReference, { cuidados: 'x'.repeat(181) }));
     await assertFails(setDoc(doc(owner.firestore(), 'publicaciones/autor-falso'), {
       ...publication, usuarioNombre: 'Beatriz',
     }));

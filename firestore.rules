@@ -26,6 +26,14 @@ service cloud.firestore {
             /databases/$(database)/documents/usuarios/$(request.auth.uid)
           ).data.nombre);
     }
+    function validAdoptionDetails(data) {
+      return (!('edadAproximada' in data)
+          || (data.edadAproximada is string && data.edadAproximada.size() <= 40))
+        && (!('caracter' in data)
+          || (data.caracter is string && data.caracter.size() <= 80))
+        && (!('cuidados' in data)
+          || (data.cuidados is string && data.cuidados.size() <= 180));
+    }
     function validSighting(data) {
       return data.keys().hasOnly([
           'publicacionId', 'usuarioId', 'usuarioLegacyId', 'latitud',
@@ -168,7 +176,8 @@ service cloud.firestore {
           'usuarioId', 'usuarioLegacyId', 'usuarioNombre', 'tipo', 'nombre', 'descripcion',
           'foto', 'ultimoLugar', 'especie', 'latitud', 'longitud',
           'fechaCreacion', 'estado', 'contactoWhatsapp', 'fechaPerdida',
-          'recompensa', 'ultimaConfirmacion', 'color', 'tamano', 'senasParticulares'
+          'recompensa', 'ultimaConfirmacion', 'color', 'tamano', 'senasParticulares',
+          'edadAproximada', 'caracter', 'cuidados'
         ])
         && request.resource.data.estado == 'Activa'
         && request.resource.data.tipo in ['Perdida', 'Encontrada', 'Adopcion']
@@ -200,6 +209,7 @@ service cloud.firestore {
           || (request.resource.data.senasParticulares is string && request.resource.data.senasParticulares.size() <= 180))
         && validWhatsapp(request.resource.data)
         && validPublicadorName(request.resource.data)
+        && validAdoptionDetails(request.resource.data)
         && (!('foto' in request.resource.data) || request.resource.data.foto is string)
         && (!('ultimoLugar' in request.resource.data) || request.resource.data.ultimoLugar is string)
         && (!('especie' in request.resource.data) || request.resource.data.especie is string);
@@ -209,7 +219,8 @@ service cloud.firestore {
           (request.resource.data.diff(resource.data).affectedKeys().hasOnly([
             'tipo', 'nombre', 'descripcion', 'foto', 'ultimoLugar', 'especie',
             'latitud', 'longitud', 'contactoWhatsapp', 'fechaPerdida', 'recompensa',
-            'ultimaConfirmacion', 'color', 'tamano', 'senasParticulares', 'usuarioNombre'
+            'ultimaConfirmacion', 'color', 'tamano', 'senasParticulares', 'usuarioNombre',
+            'edadAproximada', 'caracter', 'cuidados'
           ])
             && resource.data.estado == 'Activa'
             && request.resource.data.estado == 'Activa'
@@ -241,6 +252,7 @@ service cloud.firestore {
                 && request.resource.data.recompensa.size() <= 120))
             && validWhatsapp(request.resource.data)
             && validPublicadorName(request.resource.data)
+            && validAdoptionDetails(request.resource.data)
             && (!('foto' in request.resource.data) || request.resource.data.foto is string)
             && (!('ultimoLugar' in request.resource.data) || request.resource.data.ultimoLugar is string)
             && (!('especie' in request.resource.data) || request.resource.data.especie is string))
